@@ -1,2 +1,2 @@
-# LUX2
+# Syclone
 interpreter libs
