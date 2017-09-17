@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/LuxInterpreter.iml" filepath="$PROJECT_DIR$/.idea/LuxInterpreter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/SyCloneInterpreter.iml" filepath="$PROJECT_DIR$/.idea/SyCloneInterpreter.iml" />
     </modules>
   </component>
 </project>
