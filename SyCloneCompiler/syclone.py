@@ -1,7 +1,9 @@
-import analyzers
 import subprocess
 from inspect import signature
 import re
+import lexer
+import syc_parser
+import errormodule as er
 
 #the main application
 class Console:
@@ -28,15 +30,14 @@ class Console:
         pass
 
     def Log(self, level):
-        global loglevel
         if(level == "debug"):
-            loglevel = 0
+            er.log_level = 0
         elif(level == "status"):
-            loglevel = 1
+            er.log_level = 1
         elif(level == "warn"):
-            loglevel = 2
+            er.log_level = 2
         elif(level == "fatal"):
-            loglevel = 3
+            er.log_level = 3
         else:
             raise CustomException("Invalid Log Level.")
 
@@ -57,8 +58,7 @@ class Console:
     #runs a file
     def Run(self):
         if(self.fileType == "source"):
-            analyzers.Compile(" " + self.currentFile)
-            analyzers.Compile(" " + self.currentFile)
+            self.Compile(" " + self.currentFile)
         else:
             raise NotImplementedError
 
@@ -103,6 +103,18 @@ class Console:
                     raise CustomException("Invalid Command.")
                 else:
                     pass
+
+    def Compile(self, code):
+        lx = lexer.Lexer()
+        tokens = lx.Lex(code)
+        er.Log("Lexical Analysis Complete", 1)
+        er.Log(tokens, 0)
+        pr = syc_parser.Parser()
+        sepT = pr.Buffer(tokens)
+        tree = pr.Parse(sepT)
+        er.Log("Parsing Complete", 1)
+        er.Log(tree, 0)
+        # get parse tree
 
 class CustomException(Exception):
     pass

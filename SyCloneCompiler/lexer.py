@@ -1,5 +1,5 @@
-import subprocess
 import re
+import errormodule as er
 
 class Lexer():
     def __init__(self):
@@ -111,7 +111,7 @@ class Lexer():
         }
 
     def Lex(self, code):
-        Log("Locating Tokens", 0)
+        er.Log("Locating Tokens", 1)
         phrases = {}
         #removes comments and whitespace
         code = code.replace("\n", "~").replace("\t", "~")
@@ -140,9 +140,8 @@ class Lexer():
                         code = code.replace(item, "~" * len(item), 1)
             if(counter > 3):
                 code = code.replace(" ", "~")
-        print(code)
-        if(not re.match("~*", code)):
-            Log("Invalid Token", 3)
+        if(code != "~" * len(code)):
+            er.Log("Invalid Token", 3)
         #sorts them in order
         numbers = [x for x in phrases]
         numbers.sort()
@@ -159,67 +158,3 @@ class Lexer():
         for item in multilineComments:
             code = code.replace(item, "", 1)
         return code
-
-class CustomException(Exception):
-    pass
-
-class Parser:
-    def __init__(self):
-        self.tree = []
-        self.grammars = {
-
-        }
-
-    #converts a grammar to a tree node
-    def BuildBranch(self, type, tokens):
-        pass
-
-    #splits the tokens in statement groups
-    def Separate(self, tokens):
-        splitTokens = []
-        tokenGroup = []
-        for token in tokens:
-            if(token == (";","SEMICOLON") or token == ("}", "CLOSE_CURLY") or token == ("{", "OPEN_CURLY")):
-                tokenGroup.append(token)
-                splitTokens.append(tokenGroup)
-                tokenGroup = []
-            else:
-                tokenGroup.append(token)
-        return splitTokens
-
-    def Match(self, tokens):
-       pass
-
-
-
-loglevel = 3
-
-def Throw(error):
-    print(error)
-    exit(0)
-
-def Log(action, level, end = "\n"):
-    if(level >= loglevel):
-        if(level > 2):
-            Throw(action)
-        else:
-            print(action, end=end)
-
-def Compile(code):
-    lx = Lexer()
-    tokens = lx.Lex(code)
-    Log(tokens, 0)
-    Log("Lexical Analysis Complete", 1)
-    pr = Parser()
-    sepT = pr.Separate(tokens)
-    Log(sepT, 0)
-    tree = []
-    for item in sepT:
-        branch = pr.Match(item)
-        if (branch[0]):
-            tree.append(branch[1])
-        else:
-            Log("Invalid Grammar.", 3)
-    Log("Parsing Complete", 1)
-    Log(tree, 0)
-    # get parse tree
