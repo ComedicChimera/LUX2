@@ -29,6 +29,8 @@ def BuildGrammar(str_grammar):
                 currentProduction.append(subPro)
             elif(item == "=>"):
                 continue
+            elif(item == "&"):
+                subPro.append("&")
             else:
                 if(item not in g.nonterminals):
                     g.nonterminals.append(item)

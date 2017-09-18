@@ -4,7 +4,8 @@ class Parser:
     def __init__(self):
         self.main_tree = []
         self.grammars = {
-            "test": "S => \"IDENTIFIER\" \"PLUS\" \"IDENTIFIER\" / A;A => \"BOOL_LITERAL\""
+            "test": "S => \"IDENTIFIER\" \"PLUS\" \"IDENTIFIER\" / A;A => \"BOOL_LITERAL\"",
+            "epsilon": "S => A B \"c\";A => \"a\" / &;B => \"b\" / &"
         }
 
     #splits the tokens in statement groups
@@ -45,8 +46,18 @@ class Parser:
         for item in production:
             if(item[0] in grammar.terminals):
                 firstList.append(item[0])
+            elif(item[0] == "&"):
+                firstList.append("&")
             else:
                 first = self.First(grammar, grammar.productions[item[0]])
+                counter = 1
+                while("&" in first):
+                    first.remove("&")
+                    if(item[counter] in grammar.nonterminals):
+                        first += self.First(grammar, grammar.productions[item[counter]])
+                    else:
+                        first.append(item[counter])
+                    counter += 1
                 firstList += first
         return firstList
 
