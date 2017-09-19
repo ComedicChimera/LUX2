@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/LuxInterpreter.iml" filepath="$PROJECT_DIR$/.idea/LuxInterpreter.iml" />
+      <module fileurl="file://C:\Users\forlo\Documents\LuxDocs\SyClone\SyCloneCompiler\.idea\LuxInterpreter.iml" filepath="C:\Users\forlo\Documents\LuxDocs\SyClone\SyCloneCompiler\.idea\LuxInterpreter.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/SyCloneCompiler.iml" filepath="$PROJECT_DIR$/.idea/SyCloneCompiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/SyCloneInterpreter.iml" filepath="$PROJECT_DIR$/.idea/SyCloneInterpreter.iml" />
+      <module fileurl="file://C:\Users\forlo\Documents\LuxDocs\SyClone\SyCloneCompiler\.idea\SyCloneInterpreter.iml" filepath="C:\Users\forlo\Documents\LuxDocs\SyClone\SyCloneCompiler\.idea\SyCloneInterpreter.iml" />
     </modules>
   </component>
 </project>

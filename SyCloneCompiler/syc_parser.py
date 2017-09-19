@@ -27,10 +27,17 @@ class Parser:
             sets = self.GetSets(G)
             print(sets)
             p_table = self.GenerateTable(G, sets)
+            print(p_table)
 
 
     def GenerateTable(self, grammar, sets):
-        pass
+        parsing_table = {}
+        for n_t in grammar.nonterminals:
+            parsing_table[n_t] = {}
+            for t in grammar.terminals:
+                #place in appropriate first and follow
+                parsing_table[n_t][t] = []
+        return parsing_table
 
     def GetSets(self, grammar):
         firstSet = {}
@@ -59,8 +66,6 @@ class Parser:
                 firstList += first
         return firstList
 
-
-    #broken
     def Follow(self, grammar):
         followTable = {}
         def AddToFollowTable(name, symbol):
