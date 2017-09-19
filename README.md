@@ -1,2 +1,2 @@
 # Syclone
-interpreter libs
+the git repo for the syclone compiler libs
