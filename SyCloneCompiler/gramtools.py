@@ -18,7 +18,6 @@ def BuildGrammar(str_grammar):
         proName = ""
         subPro = []
         for item in items:
-            print(subPro)
             if(re.match(r'"([^"]*)"', item)):
                 g.terminals.append(item.strip("\""))
                 subPro.append(item.strip("\""))

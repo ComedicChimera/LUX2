@@ -94,7 +94,6 @@ class Lexer():
             "FOR": "~for~",
             "IN": "~in~",
             "REPEAT": "~repeat~",
-            "MANAGER": "~manager~",
             "AS": "~as~",
             "WITH": "~with~",
             "SET": "~set~",

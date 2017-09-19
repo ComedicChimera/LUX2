@@ -14,8 +14,8 @@
       <file leaf-file-name="lexer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lexer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="43" column="32" lean-forward="true" selection-start-line="43" selection-start-column="32" selection-end-line="43" selection-end-column="32" />
+            <state relative-caret-position="1598">
+              <caret line="95" column="33" lean-forward="false" selection-start-line="95" selection-start-column="33" selection-end-line="95" selection-end-column="33" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -26,8 +26,8 @@
       <file leaf-file-name="syc_parser.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/syc_parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="484">
-              <caret line="59" column="32" lean-forward="false" selection-start-line="59" selection-start-column="32" selection-end-line="59" selection-end-column="32" />
+            <state relative-caret-position="102">
+              <caret line="6" column="72" lean-forward="false" selection-start-line="6" selection-start-column="72" selection-end-line="6" selection-end-column="72" />
               <folding />
             </state>
           </provider>
@@ -36,8 +36,8 @@
       <file leaf-file-name="gramtools.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/gramtools.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="21" column="45" lean-forward="true" selection-start-line="21" selection-start-column="45" selection-end-line="21" selection-end-column="45" />
+            <state relative-caret-position="323">
+              <caret line="19" column="26" lean-forward="false" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -46,8 +46,8 @@
       <file leaf-file-name="syclone.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/syclone.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="578">
-              <caret line="39" column="24" lean-forward="false" selection-start-line="39" selection-start-column="24" selection-end-line="39" selection-end-column="24" />
+            <state relative-caret-position="1241">
+              <caret line="78" column="17" lean-forward="false" selection-start-line="78" selection-start-column="17" selection-end-line="78" selection-end-column="17" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -81,10 +81,10 @@
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/analyzers.py" />
         <option value="$PROJECT_DIR$/parser.py" />
-        <option value="$PROJECT_DIR$/syclone.py" />
         <option value="$PROJECT_DIR$/errormodule.py" />
         <option value="$PROJECT_DIR$/gramtools.py" />
         <option value="$PROJECT_DIR$/lexer.py" />
+        <option value="$PROJECT_DIR$/syclone.py" />
         <option value="$PROJECT_DIR$/syc_parser.py" />
       </list>
     </option>
@@ -93,7 +93,7 @@
     <option name="x" value="277" />
     <option name="y" value="15" />
     <option name="width" value="1153" />
-    <option name="height" value="1100" />
+    <option name="height" value="1092" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -175,6 +175,23 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
+    <configuration name="syc_parser" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="SyCloneCompiler" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/syc_parser.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
     <configuration name="syclone" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -192,16 +209,18 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <list size="3">
+    <list size="4">
       <item index="0" class="java.lang.String" itemvalue="Python.lexer" />
       <item index="1" class="java.lang.String" itemvalue="Python.main" />
       <item index="2" class="java.lang.String" itemvalue="Python.syclone" />
+      <item index="3" class="java.lang.String" itemvalue="Python.syc_parser" />
     </list>
     <recent_temporary>
-      <list size="3">
+      <list size="4">
         <item index="0" class="java.lang.String" itemvalue="Python.syclone" />
-        <item index="1" class="java.lang.String" itemvalue="Python.main" />
-        <item index="2" class="java.lang.String" itemvalue="Python.lexer" />
+        <item index="1" class="java.lang.String" itemvalue="Python.syc_parser" />
+        <item index="2" class="java.lang.String" itemvalue="Python.main" />
+        <item index="3" class="java.lang.String" itemvalue="Python.lexer" />
       </list>
     </recent_temporary>
   </component>
@@ -227,13 +246,13 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32767764" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31495228" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3997879" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3997879" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -249,7 +268,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="5" />
+      <option name="time" value="7" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -408,13 +427,11 @@
     <entry file="file://$PROJECT_DIR$/lexer.py" />
     <entry file="file://$PROJECT_DIR$/lexer.py" />
     <entry file="file://$PROJECT_DIR$/lxparser.py" />
-    <entry file="file://$PROJECT_DIR$/syclone.py">
+    <entry file="file://$PROJECT_DIR$/gramtools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="39" column="24" lean-forward="false" selection-start-line="39" selection-start-column="24" selection-end-line="39" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="323">
+          <caret line="19" column="26" lean-forward="false" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -426,28 +443,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gramtools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="21" column="45" lean-forward="true" selection-start-line="21" selection-start-column="45" selection-end-line="21" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lexer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="43" column="32" lean-forward="true" selection-start-line="43" selection-start-column="32" selection-end-line="43" selection-end-column="32" />
+        <state relative-caret-position="1598">
+          <caret line="95" column="33" lean-forward="false" selection-start-line="95" selection-start-column="33" selection-end-line="95" selection-end-column="33" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/syclone.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1241">
+          <caret line="78" column="17" lean-forward="false" selection-start-line="78" selection-start-column="17" selection-end-line="78" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/syc_parser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="59" column="32" lean-forward="false" selection-start-line="59" selection-start-column="32" selection-end-line="59" selection-end-column="32" />
+        <state relative-caret-position="102">
+          <caret line="6" column="72" lean-forward="false" selection-start-line="6" selection-start-column="72" selection-end-line="6" selection-end-column="72" />
           <folding />
         </state>
       </provider>

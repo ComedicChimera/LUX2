@@ -66,7 +66,7 @@ class Console:
     def GetInput(self):
         command = ""
         while(command != "exit"):
-            try:
+            #try:
                 command = input("")
                 # if is a syc command, the syc parser will handle it
                 if (command.startswith("syc ")):
@@ -75,8 +75,8 @@ class Console:
                 elif (command != "exit"):
                     output = subprocess.check_output(command, shell=True)
                     print(str(output).replace("b'", "").replace("\\n", "\n").replace("\\r", "\r")[:len(output) - 1])
-            except Exception as e:
-                print(e)
+            #except Exception as e:
+                #print(e)
 
     #splits the command into its parts and executes it
     def EvaluateCommand(self, command):
