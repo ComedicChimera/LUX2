@@ -21,6 +21,9 @@ def BuildGrammar(str_grammar):
             if(re.match(r'"([^"]*)"', item)):
                 g.terminals.append(item.strip("\""))
                 subPro.append(item.strip("\""))
+            elif(re.match(r'\*.*', item)):
+                g.terminals.append(item)
+                subPro.append(item)
             elif(item == "/"):
                 currentProduction.append(subPro)
                 subPro = []

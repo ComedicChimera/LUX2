@@ -14,12 +14,15 @@ class Lexer():
             "FLOAT_LITERAL": r"\d+\.\d+",
             "INTEGER_LITERAL": r"\d+",
             "COALESCING_OPERATOR": "??",
+            "STRICT_EQUALS": "===",
+            "DUEL_UNEQUALS": "!==",
             "DOLLAR": "$",
             "QUESTION": "?",
             "COLON": ":",
             "COMMA": ",",
             "FLOW_IN": "<<",
             "FLOW_OUT": ">>",
+            "SET": ":=",
             "NOT_EQUAL": "!=",
             "NEGATE": "!",
             "INCREMENT": "++",
@@ -45,18 +48,16 @@ class Lexer():
             "LAMBDA_OPERATOR": "=>",
             "ASSIGNMENT_OPERATOR": "=",
             "SEMICOLON": ";",
-            "STRAIGHT": "|",
             "OPEN_PAREN": "(",
             "CLOSE_PAREN": ")",
             "OPEN_CURLY": "{",
             "CLOSE_CURLY": "}",
             "OPEN_BRACKET": "[",
             "CLOSE_BRACKET": "]",
-            "ENIGMA_OPERATOR": "<\\",
             "GREATER_THAN": ">",
             "LESS_THAN": "<",
             "CONST_OPERATOR": "&",
-            "AT_OPERATOR": "@",
+            "POINTER_OPERATOR": "@",
             "INT_TYPE": "~int~",
             "IF": "~if~",
             "ELSE": "~else~",
@@ -65,7 +66,6 @@ class Lexer():
             "FUNC": "~func~",
             "THEN": "~then~",
             "RETURN": "~return~",
-            "RT_VOID": "~void~",
             "NULL": "~null~",
             "WHEN": "~when~",
             "YIELD": "~yield~",
@@ -80,8 +80,6 @@ class Lexer():
             "LIST_TYPE": "~list~",
             "DICTIONARY_TYPE": "~dict~",
             "PROTECTED": "~protected",
-            "PUBLIC": "~public~",
-            "PRIVATE": "~private~",
             "GLOBAL_SCOPE": "~global~",
             "LOCAL_SCOPE": "~local~",
             "THIS": "~this~",
@@ -96,7 +94,6 @@ class Lexer():
             "REPEAT": "~repeat~",
             "AS": "~as~",
             "WITH": "~with~",
-            "SET": "~set~",
             "BYTE_TYPE": "~byte~",
             "AWAIT": "~await~",
             "ACTIVE_TYPE": "~active~",
@@ -148,10 +145,6 @@ class Lexer():
         return phraseList
 
     def ClearComments(self, code):
-        # removes all inline comments
-        inlineComments = re.findall("//.+", code)
-        for item in inlineComments:
-            code = code.replace(item, "")
         # removes all multiline comments
         multilineComments = re.findall("/\*.+\*/", code)
         for item in multilineComments:
