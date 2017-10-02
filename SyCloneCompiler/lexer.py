@@ -107,7 +107,6 @@ class Lexer():
         }
 
     def Lex(self, code):
-        er.Log("Locating Tokens", 1)
         phrases = {}
         #removes comments and whitespace
         code = code.replace("\n", "~").replace("\t", "~")
@@ -137,7 +136,7 @@ class Lexer():
             if(counter > 3):
                 code = code.replace(" ", "~")
         if(code != "~" * len(code)):
-            er.Log("Invalid Token", 3)
+            er.Throw("lexerror", "Unknown Identifier")
         #sorts them in order
         numbers = [x for x in phrases]
         numbers.sort()

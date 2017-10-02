@@ -3,6 +3,7 @@ from inspect import signature
 import os
 import lexer
 import syc_parser
+import time
 import errormodule as er
 
 #the main application
@@ -12,13 +13,21 @@ class Console:
         self.commands = {
             "i": self.In,
             "o": self.Out,
-            "log": self.Log,
-            ".": self.Run,
+            "r": self.Run,
             "install": self.Install,
-            "u": self.Update
+            "u": self.Update,
+            "v": self.GetVersion(),
+            "bug": self.Debug()
         }
+
         self.currentFile = ""
         self.fileType = ""
+
+    def Debug(self):
+        pass
+
+    def GetVersion(self):
+        pass
 
     def Install(self):
         pass
@@ -28,18 +37,6 @@ class Console:
 
     def Out(self):
         pass
-
-    def Log(self, level):
-        if(level == "debug"):
-            er.log_level = 0
-        elif(level == "status"):
-            er.log_level = 1
-        elif(level == "warn"):
-            er.log_level = 2
-        elif(level == "fatal"):
-            er.log_level = 3
-        else:
-            raise CustomException("Invalid Log Level.")
 
     #brings in a file
     def In(self, path):
@@ -116,16 +113,19 @@ class Console:
 
 
     def Compile(self, code):
+        print("\r" + bcolors.BLUE + "Compiling Code: [          ] ...", end="")
         lx = lexer.Lexer()
         tokens = lx.Lex(code)
-        er.Log("Lexical Analysis Complete", 1)
-        er.Log(tokens, 0)
+        print("\r" + bcolors.BLUE + "Compiling Code: [#         ] ...", end="")
         pr = syc_parser.Parser()
         sepT = pr.Buffer(tokens)
         tree = pr.Parse(sepT)
-        er.Log("Parsing Complete", 1)
-        er.Log(tree, 0)
-        # get parse tree
+        print("\r" + bcolors.BLUE + "Compiling Code: [###       ] ...", end="")
+        print(tree)
+        # semantic analysis
+        time.sleep(0.5)
+        print("\r" + bcolors.BLUE + "Compiling Code: [##########] ...")
+        print("\r" + bcolors.WHITE + "Compilation Complete!")
 
 class CustomException(Exception):
     pass
