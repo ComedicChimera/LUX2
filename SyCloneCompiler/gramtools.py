@@ -1,4 +1,5 @@
 import re
+import json
 
 class Grammar:
     def __init__(self):
@@ -7,41 +8,18 @@ class Grammar:
         self.productions = {}
         self.start_symbol = ""
 
-def BuildGrammar(str_grammar):
-    splitG = str_grammar.split(";")
-    g = Grammar()
-    for production in splitG:
-        items = production.split(" ")
-        items.append("$")
-        currentProduction = []
-        hasProName = False
-        proName = ""
-        subPro = []
-        for item in items:
-            if(re.match(r'"([^"]*)"', item)):
-                g.terminals.append(item.strip("\""))
-                subPro.append(item.strip("\""))
-            elif(re.match(r'\*.*', item)):
-                g.terminals.append(item)
-                subPro.append(item)
-            elif(item == "/"):
-                currentProduction.append(subPro)
-                subPro = []
-            elif(item == "$"):
-                currentProduction.append(subPro)
-            elif(item == "=>"):
-                continue
-            elif(item == "&"):
-                subPro.append("&")
-            else:
-                if(item not in g.nonterminals):
-                    g.nonterminals.append(item)
-                if(hasProName):
-                    subPro.append(item)
-                else:
-                    proName = item
-                    hasProName = True
-                if(g.start_symbol == ""):
-                    g.start_symbol = item
-        g.productions[proName] = currentProduction
-    return(g)
+def BuildGrammar():
+    jsonObj = json.loads(open("config/grammars.json").read())
+    grammar = Grammar()
+    grammar.nonterminals = [x for x in jsonObj]
+    grammar.start_symbol = next(iter(grammar.nonterminals))
+    for key in jsonObj:
+        item = jsonObj[key]
+        grammar.productions[key] = [x.split(" ") for x in item]
+        terminals = []
+        for production in item:
+            terminals += [x for x in production.split(" ") if x not in grammar.nonterminals]
+        for terminal in terminals:
+            if(terminal not in grammar.terminals):
+                grammar.terminals.append(terminal)
+    return grammar

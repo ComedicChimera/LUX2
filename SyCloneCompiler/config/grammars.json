@@ -1,0 +1,48 @@
+{
+  "main": [
+    "stmt",
+    "block",
+    "expr"
+  ],
+  "stmt": [],
+  "block": [],
+  "expr": [
+    "cond_expr",
+    "obj_expr",
+    "math_expr",
+    "func_expr",
+    "comprehension_expr"
+  ],
+  "cond_expr": [
+    "xor_op OR xor_op",
+    "xor_op"
+  ],
+  "xor_op": [
+    "and_op XOR and_op",
+    "and_op"
+  ],
+  "and_op": [
+    "not_op AND not_op",
+    "not_op"
+  ],
+  "not_op": [
+    "! comp_expr",
+    "comp_expr"
+  ],
+  "comp_expr": [
+    "math_expr == comp_expr",
+    "math_expr != comp_expr",
+    "math_expr === comp_expr",
+    "math_expr !== comp_expr",
+    "int_math_expr > comp_expr",
+    "int_math_expr < comp_expr",
+    "int_math_expr >= comp_expr",
+    "int_math_expr <= comp_expr",
+    "math_expr"
+  ],
+  "math_expr": [
+    "str_math_expr",
+    "int_math_expr",
+    "list_math_expr"
+  ]
+}

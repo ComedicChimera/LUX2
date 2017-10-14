@@ -113,13 +113,13 @@ class Console:
 
 
     def Compile(self, code):
+        er.code = code
         print("\r" + bcolors.BLUE + "Compiling Code: [          ] ...", end="")
         lx = lexer.Lexer()
         tokens = lx.Lex(code)
         print("\r" + bcolors.BLUE + "Compiling Code: [#         ] ...", end="")
         pr = syc_parser.Parser()
-        sepT = pr.Buffer(tokens)
-        tree = pr.Parse(sepT)
+        tree = pr.Parse(tokens)
         print("\r" + bcolors.BLUE + "Compiling Code: [###       ] ...", end="")
         print(tree)
         # semantic analysis
