@@ -4,7 +4,16 @@
     "block",
     "expr"
   ],
-  "stmt": [],
+  "stmt": [
+     "stmts nstmts"
+   ],
+  "stmts": [
+    ""
+  ],
+  "nstmts": [
+    "; stmts nstmts",
+    "&"
+  ],
   "block": [],
   "expr": [
     "cond_expr",
@@ -12,6 +21,19 @@
     "math_expr",
     "func_expr",
     "comprehension_expr"
+  ],
+  "obj_expr": [
+    "NEW id ( constructor_params )"
+  ],
+  "constructor_params": [
+    "{ named_params }"
+  ],
+  "named_params": [
+    "IDENTIFIER : expr n_nmd_params"
+  ],
+  "n_nmd_params": [
+    ", named_params n_nmd_params",
+    "&"
   ],
   "cond_expr": [
     "xor_op OR xor_op",
@@ -62,9 +84,9 @@
   "str_types": [
     "CHAR_LITERAL",
     "STRING_LITERAL",
-    "IDENTIFIER",
+    "obj_id",
     "func_expr",
-    "( str_math_expr )"
+    "( str_math_exprs )"
   ],
   "list_math_expr": [
     "list_types list_add"
@@ -76,7 +98,7 @@
   "list_types": [
     "list",
     "dict",
-    "IDENTIFIER",
+    "obj_id",
     "func_expr",
     "comprehension_expr",
     "( list_math_expr )"
@@ -108,8 +130,23 @@
   "int_types": [
     "FLOAT_LITERAL",
     "INTEGER_LITERAL",
-    "IDENTIFIER",
+    "obj_id",
     "func_expr",
     "( int_math_expr )"
+  ],
+  "obj_id": [
+    "this_id",
+    "obj_expr dotid"
+  ],
+  "id": [
+    "IDENTIFIER dotid"
+  ],
+  "this_id": [
+    "IDENTIFIER dotid",
+    "THIS dotid"
+  ],
+  "dotid": [
+    ". IDENTIFIER",
+    "&"
   ]
 }
