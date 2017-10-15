@@ -1,11 +1,11 @@
 import re
 
 code = ""
-bG = [0, ""]
 
-#buggy
 def Throw(type, error, params):
     if(type == "lexerror"):
+        if(params == "\"" or params == "\'"):
+            return
         tempCode = code
         ndx = tempCode.index(params)
         tCode = code.replace("\t", "").split("\n")
@@ -21,44 +21,21 @@ def Throw(type, error, params):
         print(tCode[lncount])
         print(" " * tCode[lncount].index(params) + "^" * len(params))
     elif(type == "syntax_error"):
-        #try:
-            d = ";"
-            sCode = [e.replace("\n","")+d for e in code.split(d) if e]
-            stmt = sCode[params]
-            print(stmt)
-            print(sCode)
-            print(bG[1])
-            rx = re.compile(re.escape(bG[1]))
-            possibleTokens = rx.findall(stmt)
-            print(possibleTokens)
-            for item in possibleTokens:
-                if (stmt.index(item) > bG[0]):
-                    i = 0
-                    for istmt in code.split("\n"):
-                        if (stmt in istmt):
-                            print("\n" + bcolors.RED + error + " (\'" + bG[1] + "\') [ln:" + str(i) + " - " + str(stmt.index(item)) + "]:")
-                            print(stmt)
-                            print(" " * stmt.index(item) + "^" * len(bG[1]))
-                            break
-                        i += 1
-                    break
-                else:
-                    stmt = stmt.replace(bG[1], "~" * len(bG[1]))
-        #except Exception as e:
-            #print("Exception generated")
-            #print(bcolors.RED + str(e))
-    elif(type == "end_symbol_error"):
-        print(bcolors.RED + "Invalid end of statement.")
-
+        spaces = re.findall(r" ", code)
+        params[0] += len(spaces)
+        end_pos = params[0] + params[1]
+        split_code = code.split("\n")
+        i = 0
+        length = 0
+        for item in split_code:
+            if(params[0] >= length and end_pos <= length + len(item)):
+                break
+            i += 1
+            length += len(item)
+        print("\n" + bcolors.RED + error + " (\'" + params + "\') [ln:" + str(i) + " - " + str(params[0]) + "]:")
+        print(split_code[i])
+        print(" " * (params[0] - length) + "^" * params[1])
     exit(0)
-
-"""def Log(action, level, end="\n"):
-    global log_level
-    if (level >= log_level):
-        if (level > 2):
-            Throw(action)
-        else:
-            print(action, end=end)"""
 
 class CustomException(Exception):
     pass

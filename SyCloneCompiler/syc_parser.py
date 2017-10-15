@@ -9,14 +9,7 @@ class Parser:
         G = gramtools.BuildGrammar()
         follows = self.GetFollows(G)
         p_table = self.GenerateTable(G, follows)
-        node = ""
-        try:
-            node = self.EnterCycle(p_table, G, tokens, ";", True)
-            if (isinstance(node, list)):
-                if (er.bG[0] <= node[0]):
-                    er.bG = node
-        except:
-            pass
+        node = self.EnterCycle(p_table, G, tokens, ";", True)
         return node
 
     def EnterCycle(self, table, grammar, input, end_symbol, isMain, pos = 0):
@@ -56,7 +49,7 @@ class Parser:
                         ast_string += "[" + input[pos][0] + "," + input[pos][1] + "]"
                     stack.pop()
                 else:
-                    return [rt_pos, input[pos]]
+                    er.Throw("Unexpected Token", "syntax_error", [rt_pos, len(input[pos][0])])
                 pos += 1
         return ast_string.rstrip("(") + ")" + end_symbol
 

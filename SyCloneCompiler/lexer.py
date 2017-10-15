@@ -1,5 +1,6 @@
 import re
 import errormodule as er
+import json
 
 class Lexer():
     def __init__(self):
@@ -8,104 +9,7 @@ class Lexer():
         #creates a default array for the tokens
         self.tokens = []
         # provides a set of tokens and their templates
-        self.tokenTypes = {
-            "STRING_LITERAL": r'"([^"]*)"',
-            "CHAR_LITERAL": r"'([^']*)'",
-            "FLOAT_LITERAL": r"\d+\.\d+",
-            "INTEGER_LITERAL": r"\d+",
-            "??": "??",
-            "===": "===",
-            "!==": "!==",
-            "$": "$",
-            "?": "?",
-            ":": ":",
-            ",": ",",
-            "<<": "<<",
-            ">>": ">>",
-            ":=": ":=",
-            "!=": "!=",
-            "!": "!",
-            "++": "++",
-            "--": "--",
-            "**": "**",
-            "+=": "+=",
-            "-=": "-=",
-            "*=": "*=",
-            "/=": "/=",
-            "%=": "%=",
-            "^=": "^=",
-            "AND": "&&",
-            "OR": "||",
-            "XOR": "^^",
-            "+": "+",
-            "-": "-",
-            "*": "*",
-            "/": "/",
-            "^": "^",
-            "%": "%",
-            "==": "==",
-            ">=": ">=",
-            "<=": "<=",
-            "=>": "=>",
-            "=": "=",
-            ";": ";",
-            "(": "(",
-            ")": ")",
-            "{": "{",
-            "}": "}",
-            "[": "[",
-            "]": "]",
-            ">": ">",
-            "<": "<",
-            "&": "&",
-            "@": "@",
-            "INT_TYPE": "~int~",
-            "IF": "~if~",
-            "ELSE": "~else~",
-            "STRING_TYPE": "~str~",
-            "FLOAT_TYPE": "~float~",
-            "FUNC": "~func~",
-            "THEN": "~then~",
-            "RETURN": "~return~",
-            "NULL": "~null~",
-            "WHEN": "~when~",
-            "YIELD": "~yield~",
-            "CHAR_TYPE": "~char~",
-            "MODULE": "~module~",
-            "STRUCT": "~struct~",
-            "BEHAVIOR": "~behavior~",
-            "CLASS": "~class~",
-            "REQUIRED": "~required~",
-            "LET": "~let~",
-            "BOOL_TYPE": "~bool~",
-            "LIST_TYPE": "~list~",
-            "DICTIONARY_TYPE": "~dict~",
-            "PROTECTED": "~protected",
-            "GLOBAL_SCOPE": "~global~",
-            "LOCAL_SCOPE": "~local~",
-            "THIS": "~this~",
-            "EXTERN_TYPE": "~extern~",
-            "NEW": "~new~",
-            "ERROR_HANDLER": "~onerror~",
-            "THROW": "~throw~",
-            "EMPTY": "~pass~",
-            "WHILE": "~while~",
-            "FOR": "~for~",
-            "IN": "~in~",
-            "REPEAT": "~repeat~",
-            "AS": "~as~",
-            "WITH": "~with~",
-            "BYTE_TYPE": "~byte~",
-            "AWAIT": "~await~",
-            "ACTIVE_TYPE": "~active~",
-            "ASYNC" :"~async~",
-            "PASSIVE_TYPE": "~passive~",
-            "CALL_OBJ": "~call~",
-            "ASSEMBLER": "~assembler~",
-            "LAMBDA": "~lambda~",
-            "BOOL_LITERAL": r"(?i)~true~|~false~",
-            "IDENTIFIER": r"[_a-zA-Z]+\w*"
-        }
+        self.tokenTypes = json.loads(open("config/tokens.json").read())
 
     def Lex(self, code):
         phrases = {}
@@ -138,6 +42,7 @@ class Lexer():
                 code = code.replace(" ", "~")
         if(code != "~" * len(code)):
             er.Throw("lexerror", "Unknown Identifier", [x for x in code.split("~") if x != ""][0])
+
         #sorts them in order
         numbers = [x for x in phrases]
         numbers.sort()

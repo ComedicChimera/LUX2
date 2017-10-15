@@ -117,7 +117,8 @@ class Console:
         print("\r" + bcolors.BLUE + "Compiling Code: [          ] ...", end="")
         lx = lexer.Lexer()
         tokens = lx.Lex(code)
-        print("\r" + bcolors.BLUE + "Compiling Code: [#         ] ...", end="")
+        print(tokens)
+        """print("\r" + bcolors.BLUE + "Compiling Code: [#         ] ...", end="")
         pr = syc_parser.Parser()
         tree = pr.Parse(tokens)
         print("\r" + bcolors.BLUE + "Compiling Code: [###       ] ...", end="")
@@ -125,7 +126,7 @@ class Console:
         # semantic analysis
         time.sleep(0.5)
         print("\r" + bcolors.BLUE + "Compiling Code: [##########] ...")
-        print("\r" + bcolors.WHITE + "Compilation Complete!")
+        print("\r" + bcolors.WHITE + "Compilation Complete!")"""
 
 class CustomException(Exception):
     pass
