@@ -5,6 +5,7 @@ import lexer
 import syc_parser
 import time
 import errormodule as er
+import ASTtools
 
 #the main application
 class Console:
@@ -113,16 +114,29 @@ class Console:
 
 
     def Compile(self, code):
+        print(bcolors.BOLD + "Starting Compiler..." + bcolors.WHITE)
+        print("\n", end="")
+        #run preprocessor
+        print("Running Preprocessor...\n")
+        p_code = code
+        self.Analyze(p_code)
+
+    def Analyze(self, code):
         er.code = code
-        print("\r" + bcolors.BLUE + "Compiling Code: [          ] ...", end="")
+        print(bcolors.BLUE + "Lexing..." + bcolors.WHITE)
         lx = lexer.Lexer()
         tokens = lx.Lex(code)
-        print(tokens)
-        print("\r" + bcolors.BLUE + "Compiling Code: [#         ] ...", end="")
+        print((bcolors.YELLOW + "Found {0} tokens." + bcolors.WHITE).format(len(tokens)))
+        print("\n", end="")
+        print(bcolors.BLUE + "Parsing..." + bcolors.WHITE)
         pr = syc_parser.Parser()
         tree = pr.Parse(tokens)
-        print("\r" + bcolors.BLUE + "Compiling Code: [###       ] ...", end="")
+        print(bcolors.YELLOW + "Generated AST." + bcolors.WHITE)
         print(tree)
+        ast_obj = ASTtools.ToASTObj(tree)
+        print(bcolors.YELLOW + "Generated AST Object." + bcolors.WHITE)
+        print(ast_obj)
+        print("\n", end="")
         # semantic analysis
         time.sleep(0.5)
         print("\r" + bcolors.BLUE + "Compiling Code: [##########] ...")

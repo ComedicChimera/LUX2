@@ -20,7 +20,7 @@ class Parser:
         input.append(("", "$"))
         while(len(stack) > 0):
             if(stack[len(stack) - 1] == "queue"):
-                ast_string += ")"
+                ast_string += ")\t"
                 stack.pop()
                 continue
             elif(stack[len(stack) - 1] in grammar.nonterminals):
@@ -46,7 +46,7 @@ class Parser:
                         ast_string += header
                         header = ""
                     if(input[pos][1] != "$"):
-                        ast_string += "[" + input[pos][0] + "," + input[pos][1] + "]"
+                        ast_string += "[" + input[pos][0] + "," + input[pos][1] + "]\t"
                     stack.pop()
                 else:
                     er.Throw("Unexpected Token", "syntax_error", [rt_pos, len(input[pos][0])])
