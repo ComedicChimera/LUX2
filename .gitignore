@@ -3,3 +3,5 @@ SyCloneCompiler\.idea\misc.xml
 *.pyc
 src/.idea/modules.xml
 src/.idea/workspace.xml
+*.xml
+src/.idea/codeStyleSettings.xml
