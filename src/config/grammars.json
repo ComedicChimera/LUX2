@@ -1,20 +1,39 @@
 {
   "main": [
     "stmt",
-    "block",
-    "expr"
+    "block"
   ],
-  "stmt": [
-     "stmts nstmts"
-   ],
-  "stmts": [
-    ""
+  "func_main": [
+    "return_stmt",
+    "func_block"
   ],
-  "nstmts": [
-    "; stmts nstmts",
+  "return_stmt": [
+    "func_stmt n_func_stmt"
+  ],
+  "func_stmt": [
+    "stmt",
+    "RETURN expr"
+  ],
+  "n_func_stmt": [
+    "; func_stmt n_func_stmt",
     "&"
   ],
-  "block": [],
+  "stmt": [
+     "stmts ; nstmts"
+   ],
+  "stmts": [
+    "expr"
+  ],
+  "nstmts": [
+    "stmts ; nstmts",
+    "&"
+  ],
+  "block": [
+
+  ],
+  "func_block": [
+
+  ],
   "expr": [
     "cond_expr",
     "obj_expr",
@@ -52,6 +71,10 @@
     "comp_expr"
   ],
   "comp_expr": [
+    "bool_expr == no_math_comp_expr",
+    "bool_expr != no_math_comp_expr",
+    "bool_expr === no_math_comp_expr",
+    "bool_expr !== no_math_comp_expr",
     "math_expr == comp_expr",
     "math_expr != comp_expr",
     "math_expr === comp_expr",
@@ -60,6 +83,26 @@
     "int_math_expr < comp_expr",
     "int_math_expr >= comp_expr",
     "int_math_expr <= comp_expr",
+    "math_expr",
+    "BOOL_LITERAL"
+  ],
+  "no_math_comp_expr": [
+    "bool_expr == no_math_comp_expr",
+    "bool_expr != no_math_comp_expr",
+    "bool_expr === no_math_comp_expr",
+    "bool_expr !== no_math_comp_expr",
+    "math_expr == comp_expr",
+    "math_expr != comp_expr",
+    "math_expr === comp_expr",
+    "math_expr !== comp_expr",
+    "int_math_expr > comp_expr",
+    "int_math_expr < comp_expr",
+    "int_math_expr >= comp_expr",
+    "int_math_expr <= comp_expr",
+    "BOOL_LITERAL"
+  ],
+  "bool_expr": [
+    "BOOL_LITERAL",
     "math_expr"
   ],
   "math_expr": [
@@ -134,6 +177,27 @@
     "func_expr",
     "( int_math_expr )"
   ],
+  "list": [
+    "[ expr follow_list_item ]"
+  ],
+  "follow_list_item": [
+    ", expr follow_list_item",
+    "&"
+  ],
+  "dict": [
+    "{ all_types : expr follow_dict_item }"
+  ],
+  "follow_dict_item": [
+    ", all_types : expr follow_dict_item",
+    "&"
+  ],
+  "all_types" : [
+    "INTEGER_LITERAL",
+    "FLOAT_LITERAL",
+    "STRING_LITERAL",
+    "CHAR_LITERAL",
+    "BOOL_LITERAL"
+  ],
   "obj_id": [
     "this_id",
     "obj_expr dotid"
@@ -147,6 +211,37 @@
   ],
   "dotid": [
     ". IDENTIFIER",
+    "&"
+  ],
+  "func_expr": [
+    "func_call",
+    "inline_func"
+  ],
+  "func_call": [
+    "obj_id ( func_params )"
+  ],
+  "inline_func": [
+    "FUNC ( inline_params_decl ) { func_main }"
+  ],
+  "inline_params_decl": [
+    "inline_param, n_inline_param"
+  ],
+  "inline_param": [
+    "DOLLAR IDENTIFIER type_ext << expr"
+  ],
+  "n_inline_param": [
+    ", inline_param n_inline_param",
+    "&"
+  ],
+  "func_params": [
+    "m_param n_m_param"
+  ],
+  "m_param": [
+    "expr",
+    "IDENTIFIER : expr"
+  ],
+  "n_m_param": [
+    ", m_param n_m_param",
     "&"
   ]
 }

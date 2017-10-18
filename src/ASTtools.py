@@ -29,4 +29,29 @@ def ToASTObj(ast_string):
     fp = ast_string.find("(")
     main_ast = ASTNode(ast_string[:fp])
     main_ast.AddContent(ast_string[fp:ast_string.rfind(")")])
-    return main_ast
+    return ResolveAST(main_ast)
+
+def ResolveAST(ast):
+    content = []
+    for item in ast.content:
+        content.append(PruneAST(item))
+    ast.content = [x for x in content if x != ""]
+    return ast
+
+def PruneAST(item):
+    if(isinstance(item, Token)):
+        return item
+    else:
+        if(len(item.content) == 1):
+            if(isinstance(item.content[0], Token)):
+                return item.content[0]
+            else:
+                content = []
+                for obj in content:
+                    content.append(PruneAST(obj))
+                item.content[0].content = content
+                return item.content[0]
+        elif(len(item.content) == 0):
+            return ""
+        else:
+            return item
