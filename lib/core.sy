@@ -1,0 +1,15 @@
+#include <os>;
+
+stdout = new os.stdout({ type: "local" });
+
+macro syccore.print($x) => stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
+
+macro syccore.println($x) => stdout.out(new os.buffer(str(x) + "\n", charset: "utf8", stack: 0));
+
+func syccore.input($prompt : str) {
+	stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
+	$result = await async() { stdout.fetchResponse(1, new buffer("utf-8")); }
+	return result;
+}
+
+

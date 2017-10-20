@@ -22,11 +22,26 @@
      "stmts ; nstmts"
    ],
   "stmts": [
-    "expr"
+    "expr",
+    "var_decl"
   ],
   "nstmts": [
     "stmts ; nstmts",
     "&"
+  ],
+  "var_decl": [
+    "DOLLAR this_id extension = expr"
+  ],
+  "extension": [
+    ": types",
+    "&"
+  ],
+  "types": [
+    "INT_TYPE",
+    "BOOL_TYPE",
+    "STRING_TYPE",
+    "FLOAT_TYPE",
+    "CHAR_TYPE"
   ],
   "block": [
 
@@ -40,6 +55,15 @@
     "math_expr",
     "func_expr",
     "comprehension_expr"
+  ],
+  "lambda_expr": [
+    "LAMBDA ( IDENTIFIER => expr )"
+  ],
+  "comprehension_expr": [
+    "[ obj_id ^ ( lambda_comprehension ) ]"
+  ],
+  "lambda_comprehension": [
+    "IDENTIFIER => expr"
   ],
   "obj_expr": [
     "NEW id ( constructor_params )"
@@ -167,8 +191,13 @@
     "int_exp_ops int_types"
   ],
   "int_exp_ops": [
-    "int_types int_exp_ops ^",
+    "int_increm int_exp_ops ^",
     "&"
+  ],
+  "int_increm": [
+    "int_types ++",
+    "int_types --",
+    "int_types **"
   ],
   "int_types": [
     "FLOAT_LITERAL",
