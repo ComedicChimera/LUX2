@@ -1,0 +1,12 @@
+{
+  "start": [
+    "test * test",
+    "test"
+  ],
+  "test": [
+    "@ IDENTIFER",
+    "IDENTIFER",
+    "&"
+  ]
+
+}
