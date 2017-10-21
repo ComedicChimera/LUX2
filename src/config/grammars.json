@@ -23,25 +23,75 @@
    ],
   "stmts": [
     "expr",
-    "var_decl"
+    "var_decl",
+    "pointer_decl"
+  ],
+  "pointer_decl": [
+    "* this_id = pset_expr"
   ],
   "nstmts": [
     "stmts ; nstmts",
     "&"
   ],
   "var_decl": [
-    "DOLLAR this_id extension = expr"
+    "DOLLAR this_id extension = set_expr",
+    "& this_id extension = set_expr"
+  ],
+  "array_inst": [
+    "[ p_obj_id ]",
+    "[ INTEGER_LITERAL ]",
+    "&"
+  ],
+  "set_expr": [
+    "expr",
+    "lambda_expr"
+  ],
+  "pset_expr": [
+    "pointer_math"
+  ],
+  "pointer_math": [
+    "( p_bin_shift ) ++",
+    "( p_bin_shift ) --",
+    "p_bin_shift"
+  ],
+  "p_bin_shift": [
+    "pointer sp_bin_shift"
+  ],
+  "sp_bin_shift":[
+    "shifts pointer np_bin_shift"
+  ],
+  "np_bin_shift": [
+    "shifts pointer np_bin_shift",
+    "&"
+  ],
+  "shifts": [
+    "<<",
+    ">>"
+  ],
+  "pointer": [
+    "@ p_obj_id"
+  ],
+  "p_obj_id": [
+    "obj_expr . IDENTIFIER dot_id",
+    "this_id",
+    "func_expr"
   ],
   "extension": [
     ": types",
     "&"
   ],
   "types": [
-    "INT_TYPE",
-    "BOOL_TYPE",
-    "STRING_TYPE",
-    "FLOAT_TYPE",
-    "CHAR_TYPE"
+    "INT_TYPE array_inst",
+    "BOOL_TYPE array_inst",
+    "STRING_TYPE array_inst",
+    "FLOAT_TYPE array_inst",
+    "CHAR_TYPE array_inst",
+    "LIST_TYPE array_inst",
+    "DICTIONARY_TYPE dict_inst"
+  ],
+  "dict_inst": [
+    "[ types , types ]",
+    "&"
   ],
   "block": [
 
@@ -247,10 +297,10 @@
     "inline_func"
   ],
   "func_call": [
-    "obj_id ( func_params )"
+    "obj_id ( func_params ) dot_id"
   ],
   "inline_func": [
-    "FUNC ( inline_params_decl ) { func_main }"
+    "FUNC ( inline_params_decl ) { func_main } dot_id"
   ],
   "inline_params_decl": [
     "inline_param, n_inline_param"

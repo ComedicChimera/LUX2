@@ -9,10 +9,12 @@ class Parser:
         G = gramtools.BuildGrammar()
         follows = self.GetFollows(G)
         p_table = self.GenerateTable(G, follows)
-        node = self.EnterCycle(p_table, G, tokens, ";", True)
+        node = self.EnterCycle(p_table, G, tokens, ";")
+        print(node)
         return node
 
-    def EnterCycle(self, table, grammar, input, end_symbol, isMain, pos = 0):
+    def EnterCycle(self, table, grammar, input, end_symbol):
+        pos = 0
         rt_pos = 0
         ast_string = ""
         header = ""
@@ -94,14 +96,14 @@ class Parser:
                 AddToFirstList(item[0])
             else:
                 first = self.First(grammar, grammar.productions[item[0]])
-                counter = 1
+                """counter = 1
                 while("&" in first):
                     first.remove("&")
                     if(item[counter] in grammar.nonterminals):
                         first += self.First(grammar, grammar.productions[item[counter]])
                     else:
                         first.append(item[counter])
-                    counter += 1
+                    counter += 1"""
                 AddToFirstList(first)
         return firstList
 

@@ -8,8 +8,7 @@ class Grammar:
         self.start_symbol = ""
 
 def BuildGrammar():
-    #jsonObj = json.loads(open("config/grammars.json").read())
-    jsonObj = json.loads(open("testgrammar.json").read())
+    jsonObj = json.loads(open("config/grammars.json").read())
     grammar = Grammar()
     grammar.nonterminals = [x for x in jsonObj]
     grammar.start_symbol = next(iter(grammar.nonterminals))

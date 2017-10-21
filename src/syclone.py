@@ -62,7 +62,6 @@ class Console:
 
     #gets input from user
     def GetInput(self):
-        #os.chdir("C:/Users/forlo/Desktop/Coding/Python/SyCloneCompiler")
         command = ""
         while(command != "exit"):
             #try:
