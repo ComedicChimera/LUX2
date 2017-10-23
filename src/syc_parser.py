@@ -1,5 +1,6 @@
 import gramtools
 import errormodule as er
+import ASTtools
 
 class Parser:
     def __init__(self):
@@ -14,46 +15,62 @@ class Parser:
         return node
 
     def EnterCycle(self, table, grammar, input, end_symbol):
+        #primes stack and ect.
+        #position in input
         pos = 0
+        #real position in string for error handling
         rt_pos = 0
         ast_string = ""
         header = ""
+        #stack declaration
         stack = [ "$", grammar.start_symbol ]
+        #stack for holding building AST
+        sem_stack = [ ASTtools.ASTNode(grammar.start_symbol) ]
         input.append(("", "$"))
+        #enter cycle
         while(len(stack) > 0):
             if(stack[len(stack) - 1] == "queue"):
-                ast_string += ")\t"
+                #handles closing of ASTs
+                #ast_string += ")"
+                sem_stack[-2].content.append(sem_stack[-1])
+                sem_stack.pop()
                 stack.pop()
                 continue
+            #handles nonterminals
             elif(stack[len(stack) - 1] in grammar.nonterminals):
                 if(header != ""):
-                    ast_string += header
+                    #ast_string += header
+                    sem_stack.append(ASTtools.ASTNode(header))
                     header = ""
+                #nt = stack.pop() + "("
                 nt = stack.pop()
-                header = nt + "("
+                header = nt
                 if(table[nt][input[pos][1]] != ["$"]):
                     stack += reversed(table[nt][input[pos][1]] + ["queue"])
+            #handles epsilon
             elif(stack[-1] == "&"):
                 stack.pop()
                 if(stack[-1] == "queue"):
                     stack.pop()
-                    ast_string = ast_string[:len(ast_string) - 1]
+                    #ast_string = ast_string[:len(ast_string) - 1]
+                    sem_stack.pop()
             else:
-                if(stack[-1] == "OPEN_CURLY" and input[pos][1] == "OPEN_CURLY" and stack[-2] == "$"):
-                    ast_string += "{\n"
-                    ast_string = self.Parse(input[pos:len(input)])
                 rt_pos += len(input[pos][1])
                 if(stack[len(stack) - 1] == input[pos][1]):
                     if (header != ""):
-                        ast_string += header
+                        #ast_string += header
+                        sem_stack.append(ASTtools.ASTNode(header))
                         header = ""
                     if(input[pos][1] != "$"):
-                        ast_string += "[" + input[pos][0] + "," + input[pos][1] + "]\t"
+                        #ast_string += "[" + input[pos][0] + "," + input[pos][1] + "]"
+                        sem_stack[-1].content.append(ASTtools.Token(input[pos][0], input[pos][1]))
                     stack.pop()
                 else:
                     er.Throw("Unexpected Token", "syntax_error", [rt_pos, len(input[pos][0])])
                 pos += 1
-        return ast_string.rstrip("(") + ")" + end_symbol
+        print(sem_stack)
+        #return ast_string.rstrip("(") + ")" + end_symbol
+        return sem_stack[0]
 
     def GenerateTable(self, grammar, follows):
         parsing_table = {}

@@ -132,13 +132,9 @@ class Console:
         tree = pr.Parse(tokens)
         print(bcolors.YELLOW + "Generated AST." + bcolors.WHITE)
         print(tree)
-        ast_obj = ASTtools.ToASTObj(tree)
-        print(bcolors.YELLOW + "Generated AST Object." + bcolors.WHITE)
-        print(ast_obj)
-        print("\n", end="")
+        tree.content = ASTtools.ResolveAST(tree.content)
         # semantic analysis
         time.sleep(0.5)
-        print("\r" + bcolors.BLUE + "Compiling Code: [##########] ...")
         print("\r" + bcolors.WHITE + "Compilation Complete!")
 
 class CustomException(Exception):
