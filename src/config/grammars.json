@@ -12,7 +12,7 @@
   ],
   "func_stmt": [
     "stmt",
-    "RETURN expr"
+    "RETURN set_expr",
   ],
   "n_func_stmt": [
     "; func_stmt n_func_stmt",
@@ -24,7 +24,24 @@
   "stmts": [
     "expr",
     "var_decl",
-    "pointer_decl"
+    "pointer_decl",
+    "assignment",
+  ],
+  "yield_expr": [
+    "YIELD ( VALUE extension ) lit_assignment_ops lambda_expr",
+    "YIELD ( VALUE extension ) . func_expr"
+  ],
+  "assignment": [
+    "this_id lit_assignment_ops set_expr"
+  ],
+  "lit_assignment_ops": [
+    "+=",
+    "-=",
+    "*=",
+    "/=",
+    "%=",
+    "^=",
+    "="
   ],
   "pointer_decl": [
     "* this_id = pset_expr"
@@ -35,7 +52,9 @@
   ],
   "var_decl": [
     "DOLLAR this_id extension = set_expr",
-    "& this_id extension = set_expr"
+    "AMP this_id extension = set_expr",
+    "DOLLAR this_id extension ( set_expr ) lit_assignment_ops set_expr",
+    "AMP this_id extension ( set_expr ) lit_assignment_ops set_expr"
   ],
   "array_inst": [
     "[ p_obj_id ]",
@@ -44,7 +63,8 @@
   ],
   "set_expr": [
     "expr",
-    "lambda_expr"
+    "lambda_expr",
+    "yield_expr"
   ],
   "pset_expr": [
     "pointer_math"
@@ -107,7 +127,11 @@
     "comprehension_expr"
   ],
   "lambda_expr": [
-    "LAMBDA ( IDENTIFIER => expr )"
+    "LAMBDA ( IDENTIFIER => expr lambda_condition)"
+  ],
+  "lambda_condition": [
+    "IF ( cond_expr )",
+    "&"
   ],
   "comprehension_expr": [
     "[ obj_id ^ ( lambda_comprehension ) ]"

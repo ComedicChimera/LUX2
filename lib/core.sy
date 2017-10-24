@@ -1,15 +1,54 @@
-#include <os>;
+#package syccore : exe;
 
-stdout = new os.stdout({ type: "local" });
+#include os;
 
-macro syccore.print($x) => stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
+&stdout = new os.stdout({ type: "local" });
 
-macro syccore.println($x) => stdout.out(new os.buffer(str(x) + "\n", charset: "utf8", stack: 0));
+$string.empty = str(null);
 
-func syccore.input($prompt : str) {
+macro print($x) => stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
+
+macro println($x) => stdout.out(new os.buffer(str(x) + "\n", charset: "utf8", stack: 0));
+
+func str input($prompt : str) {
 	stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
 	$result = await async() { stdout.fetchResponse(1, new buffer("utf-8")); }
 	return result;
 }
 
+func str join($x : list, $delimiter : str = string.empty) {
+	return (yield (value : str) += lambda(x[y] => y) + delimiter).slice(-delimiter.length);
+}
 
+func slice(str, $start : int, $end : int) {
+	return yield (value : str) += lambda(this.split()[y] => y if(y < start && y > end));
+}
+
+func split(str, $delimiter : str = null) {
+	$split_list = yield (value : list).append(lambda(this[y] => y));
+	if(delimiter == null) {
+		return split_list;
+	}
+	else {
+		$rt_list = [];
+		$current_str = string.empty;
+		for($item in split_list) {
+			if(item == delimiter) {
+				rt_list.append(current_str);
+				current_str = string.empty;
+			}
+			else {
+				current_str += item;
+			}
+		}
+		return rt_list;
+	}
+}
+
+func append(list, $content) {
+	return this + [content];
+}
+
+func concat(str, ** $strings) {
+	return lambda(strings[y] => y).join();
+}
