@@ -50,7 +50,7 @@ class Lexer():
         return phraseList
 
     def ClearComments(self, code):
-        # removes all multiline comments
+        # removes all multi-line comments
         multilineComments = re.findall("/\*.+\*/", code)
         for item in multilineComments:
             code = code.replace(item, "", 1)

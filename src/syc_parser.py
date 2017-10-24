@@ -7,9 +7,13 @@ class Parser:
         pass
 
     def Parse(self, tokens):
+        #gets grammar for gramtools
         G = gramtools.BuildGrammar()
+        #gets a set of follows to be used later
         follows = self.GetFollows(G)
+        #generates parsing table
         p_table = self.GenerateTable(G, follows)
+        #calls main parsing algorithm
         node = self.EnterCycle(p_table, G, tokens, ";")
         print(node)
         return node
@@ -54,6 +58,7 @@ class Parser:
                     stack.pop()
                     #ast_string = ast_string[:len(ast_string) - 1]
                     sem_stack.pop()
+            #handles terminals
             else:
                 rt_pos += len(input[pos][1])
                 if(stack[len(stack) - 1] == input[pos][1]):
@@ -72,12 +77,19 @@ class Parser:
         #return ast_string.rstrip("(") + ")" + end_symbol
         return sem_stack[0]
 
+    #generates the parsing table
     def GenerateTable(self, grammar, follows):
+        #primes ptable
         parsing_table = {}
+        #iterates through productions getting firsts and follows and assembling parsing table
         for production in grammar.productions:
+            #adds a new entry for the nt productions
             parsing_table[production] = {}
+            #checks through each sub-production for the main production
             for subpro in grammar.productions[production]:
+                #gets first
                 first = self.First(grammar=grammar, production=[subpro])
+                #if there is an epsilon, gets follows
                 for item in first:
                     if (item == "&"):
                         follow = follows[production]
@@ -88,18 +100,23 @@ class Parser:
         return parsing_table
 
     def GetFollows(self, grammar):
+        #primes follow table
         followTable = {}
+        #interior func to add items to follow table
         def AddToFollowTable(name, symbol):
             if (item in followTable.keys()):
                 followTable[item] += symbol
             else:
                 followTable[item] = symbol
+        #iterates through productions getting follows
         for item in grammar.productions:
             AddToFollowTable(item, self.Follow(item, grammar))
         return followTable
 
     def First(self, grammar, production):
+        #primes first list
         firstList = []
+        #sets up add to first list function to make processing easier
         def AddToFirstList(obj):
             if(isinstance(obj, list)):
                 for item in obj:
@@ -108,11 +125,15 @@ class Parser:
             else:
                 if(obj not in firstList):
                     firstList.append(obj)
+        #iterates through sub-pros
         for item in production:
+            #if first item is a terminal, add to first list
             if(item[0] in grammar.terminals or item[0] == "&"):
                 AddToFirstList(item[0])
+            #if first item in non-terminal, recur and add the result to first list
             else:
                 first = self.First(grammar, grammar.productions[item[0]])
+                #possibly unnecessary
                 """counter = 1
                 while("&" in first):
                     first.remove("&")
@@ -125,17 +146,24 @@ class Parser:
         return firstList
 
     def Follow(self, symbol, grammar):
+        #sets up follow set
         followSet = []
+        #avoids repeat chars
         def AddToFollowSet(char):
             if(char not in followSet):
                 followSet.append(char)
+        #adds $ for start symbol
         if(symbol == grammar.start_symbol):
             AddToFollowSet("$")
+        #iterates through each production and then each sub-production
         for name in grammar.productions:
             production = grammar.productions[name]
             for subPro in production:
+                #checks if the given symbol is the sub-productions
                 if (symbol in subPro):
+                    #finds its location
                     ndx = subPro.index(symbol)
+                    #each evaluates a follow patterns as dictated by follow docs
                     if (ndx >= len(subPro) - 1 and symbol != name):
                         follow = self.Follow(name, grammar)
                         for item in follow:

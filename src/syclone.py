@@ -83,21 +83,29 @@ class Console:
 
     #splits the command into its parts and executes it
     def EvaluateCommand(self, command):
+        #removes unnecessary content
         command = command.strip("syc ")
         items = command.split(" ")
         args = []
+        #divides into args and cmds
         for item in items:
             if(item in self.commands.keys()):
                 args.append(("cmd", item))
             else:
                 args.append(("arg", item))
+        #sets up variable to see if cmd requires parameters
         reqParams = False
+        #current function
         currentFunc = ""
         for item in args:
+            #if it is a cmd it collects data about the cmd and sets current data for said cmd
             if(item[0] == "cmd"):
+                #raises exception if there are not adequate params
                 if(reqParams):
                     raise(CustomException("Commands arguments required."))
+                #detects data about functions
                 else:
+                    #decides if cmd reqs params and if it exists at all
                     if (len(signature(self.commands[item[1]]).parameters) > 0):
                         reqParams = True
                         currentFunc = item[1]
@@ -105,13 +113,14 @@ class Console:
                         self.commands[item[1]]()
                         reqParams = False
             else:
+                #handles passing in params
                 if(not reqParams):
                     raise(CustomException("No arguments necessary."))
                 else:
                     self.commands[currentFunc](item[1])
                     reqParams = False
 
-
+    #main compile function
     def Compile(self, code):
         print(bcolors.BOLD + "Starting Compiler..." + bcolors.WHITE)
         print("\n", end="")
@@ -120,22 +129,26 @@ class Console:
         p_code = code
         self.Analyze(p_code)
 
+    #gets semantically valid AST and catches compile time errors
     def Analyze(self, code):
+        #sets error module code
         er.code = code
+        #runs lexer
         print(bcolors.BLUE + "Lexing..." + bcolors.WHITE)
         lx = lexer.Lexer()
         tokens = lx.Lex(code)
         print((bcolors.YELLOW + "Found {0} tokens." + bcolors.WHITE).format(len(tokens)))
         print("\n", end="")
+        #runs ll(1) parser
         print(bcolors.BLUE + "Parsing..." + bcolors.WHITE)
         pr = syc_parser.Parser()
         tree = pr.Parse(tokens)
         print(bcolors.YELLOW + "Generated AST." + bcolors.WHITE)
         print(tree)
+        #cleans tree
         tree.content = ASTtools.ResolveAST(tree.content)
         # semantic analysis
         time.sleep(0.5)
-        print("\r" + bcolors.WHITE + "Compilation Complete!")
 
 class CustomException(Exception):
     pass
