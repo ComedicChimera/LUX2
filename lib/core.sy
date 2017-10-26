@@ -1,18 +1,19 @@
 #package syccore : exe;
 
 #include os;
+#include * from threading;
 
 &stdout = new os.stdout({ type: "local" });
 
-$string.empty = str(null);
+global $string.empty : str = str(null);
 
-macro print($x) => stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
+macro print($x) => stdout.out(new os.buffer({ str(x), charset: "utf8", stack: 0 }));
 
-macro println($x) => stdout.out(new os.buffer(str(x) + "\n", charset: "utf8", stack: 0));
+macro println($x) => stdout.out(new os.buffer({ str(x) + "\n", charset: "utf8", stack: 0 }));
 
 func str input($prompt : str) {
 	stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
-	$result = await async() { stdout.fetchResponse(1, new buffer("utf-8")); }
+	$result = await async() { stdout.fetchResponse(1, new buffer({charset: "utf-8"})); }
 	return result;
 }
 
@@ -21,7 +22,7 @@ func str join($x : list, $delimiter : str = string.empty) {
 }
 
 func slice(str, $start : int, $end : int) {
-	return yield (value : str) += lambda(this.split()[y] => y if(y < start && y > end));
+	return yield (value : str) += lambda(this[y] => y if(y < start && y > end));
 }
 
 func split(str, $delimiter : str = null) {
@@ -51,4 +52,36 @@ func append(list, $content) {
 
 func concat(str, ** $strings) {
 	return lambda(strings[y] => y).join();
+}
+
+func reverse(str) {
+	return lambda(this[-y] => y).join();
+}
+
+func reverse(list) {
+	return lambda(this[-y] => y);
+}
+
+func toUpper(str) {
+	return lambda(this[y] => y >> 26 if int(bin(y)) <= 25);
+}
+
+func toUpper(char) {
+	return func($x << this) {
+		return lambda(x[y] => y >> 26 if int(bin(y)) <= 25)
+	}
+}
+
+func toLower(str) {
+	return lambda(this[y] => y << 26 if int(bin(y)) > 25);
+}
+
+func toUpper(char) {
+	return func($x << this) {
+		return lambda(x[y] => y << 26 if int(bin(y)) > 25)
+	}
+}
+
+func bin($x) {
+	return str(Thread.get_content(Thread.to_address(@x)));
 }

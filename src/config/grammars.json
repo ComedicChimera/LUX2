@@ -1,6 +1,5 @@
 {
   "main": [
-    "stmt",
     "block"
   ],
   "func_main": [
@@ -114,10 +113,50 @@
     "&"
   ],
   "block": [
-
+    "blocks n_blocks"
+  ],
+  "blocks": [
+    "stmt",
+    "block_stmts"
+  ],
+  "n_blocks": [
+    "blocks n_blocks",
+    "&"
+  ],
+  "block_stmts": [
+    "func_block",
+    "if_block",
+    "else_block",
+    "for_block",
+    "while_block"
   ],
   "func_block": [
-
+    "func_decl { func_main }"
+  ],
+  "func_decl": [
+    "FUNC func_types IDENTIFIER dot_id ( func_params )"
+  ],
+  "func_types": [
+    "all_types",
+    "&"
+  ],
+  "func_params": [
+    "THIS n_func_params",
+    "all_types n_func_params",
+    "DOLLAR IDENTIFIER extension n_func_params",
+  ],
+  "n_func_params": [
+    ", func_params n_func_params",
+    ", optional_params",
+    "&"
+  ],
+  "optional_params": [
+    "DOLLAR IDENTIFIER extension = set_expr n_optional_params",
+    "** DOLLAR IDENTIFIER"
+  ],
+  "n_optional_params": [
+    ", DOLLAR IDENTIFIER extension = set_expr n_optional_params",
+    "&"
   ],
   "expr": [
     "cond_expr",
@@ -313,7 +352,7 @@
     "THIS dotid"
   ],
   "dotid": [
-    ". IDENTIFIER",
+    ". IDENTIFIER dot_id",
     "&"
   ],
   "func_expr": [
