@@ -1,7 +1,10 @@
 #package syccore : exe;
 
 #include os;
-#include * from threading;
+#include threading;
+#include io;
+
+#using threading;
 
 &stdout = new os.stdout({ type: "local" });
 
@@ -13,7 +16,7 @@ macro println($x) => stdout.out(new os.buffer({ str(x) + "\n", charset: "utf8", 
 
 func str input($prompt : str) {
 	stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
-	$result = await async() { stdout.fetchResponse(1, new buffer({charset: "utf-8"})); }
+	$result = await async() { stdout.fetchResponse(1, new os.buffer({charset: "utf-8"})); }
 	return result;
 }
 
@@ -84,4 +87,9 @@ func toUpper(char) {
 
 func bin($x) {
 	return str(Thread.get_content(Thread.to_address(@x)));
+}
+
+func object DllImport($name : str) {
+	$content = with(io.Open(name + ".dll").read("\b"));
+	
 }

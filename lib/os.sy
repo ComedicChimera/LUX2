@@ -1,0 +1,35 @@
+/*#package os : exe;
+
+[DllImport("sys32.dll") as _os];
+
+constructor buffer() {
+  $this.text : str;
+  $this.charset : str;
+  $this.stack : int;
+  $this.time = this.get_time();
+}
+
+func local float buffer.get_time() {
+  if(this.charset == "utf-8") {
+    return float(_os::out_std_buffer);
+  }
+}
+
+func local char buffer.write() {
+  $stack_list : char[this.stack] = yield (value : char).append(lambda(this.text[y] => this.encode(y));
+  for($item in stack_list) {
+    wait(this.time);
+    yield return item;
+  }
+}
+
+constructor stdout() {
+  this.console = new _os::console() as object;
+  await console.open();
+  _os::out.init();
+}
+
+macro stdout.out($content : buffer) {
+  _os::out << content.write();
+}
+*/
