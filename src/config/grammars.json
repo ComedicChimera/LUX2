@@ -50,10 +50,14 @@
     "&"
   ],
   "var_decl": [
-    "modifiers DOLLAR this_id extension = set_expr",
-    "modifiers AMP this_id extension = set_expr",
-    "modifiers DOLLAR this_id extension ( set_expr ) lit_assignment_ops set_expr",
-    "modifiers AMP this_id extension ( set_expr ) lit_assignment_ops set_expr"
+    "access_modifiers modifiers DOLLAR id extension = set_expr",
+    "access_modifiers modifiers AMP id extension = set_expr",
+    "access_modifiers modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
+    "access_modifiers modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
+  ],
+  "var_preset": [
+    "set_expr",
+    "this"
   ],
   "array_inst": [
     "[ p_obj_id ]",
@@ -185,10 +189,15 @@
     "macro_decl { block_main }"
   ],
   "func_decl": [
-    "FUNC modifiers func_types IDENTIFIER dot_id ( func_params )"
+    "FUNC access_modifiers modifiers func_types id ( func_params )"
   ],
   "macro_decl": [
-    "MACRO modifiers func_types IDENTIFIER dot_id ( func_params )"
+    "MACRO access_modifiers modifiers func_types id ( func_params )"
+  ],
+  "access_modifiers": [
+    "PROTECTED",
+    "PRIVATE",
+    "&"
   ],
   "modifiers": [
     "LOCAL",
