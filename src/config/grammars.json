@@ -163,7 +163,11 @@
     "obj_expr",
     "math_expr",
     "func_expr",
-    "comprehension_expr"
+    "comprehension_expr",
+    "cast_expr"
+  ],
+  "cast_expr": [
+    "all_types ( expr )"
   ],
   "lambda_expr": [
     "LAMBDA ( IDENTIFIER => expr lambda_condition)"
@@ -221,7 +225,8 @@
     "int_math_expr >= comp_expr",
     "int_math_expr <= comp_expr",
     "math_expr",
-    "BOOL_LITERAL"
+    "BOOL_LITERAL",
+    "( comp_expr )"
   ],
   "no_math_comp_expr": [
     "bool_expr == no_math_comp_expr",
@@ -236,7 +241,8 @@
     "int_math_expr < comp_expr",
     "int_math_expr >= comp_expr",
     "int_math_expr <= comp_expr",
-    "BOOL_LITERAL"
+    "BOOL_LITERAL",
+    "( no_math_comp_expr )"
   ],
   "bool_expr": [
     "BOOL_LITERAL",
@@ -317,6 +323,7 @@
     "INTEGER_LITERAL",
     "obj_id",
     "func_expr",
+    "cast_expr",
     "( int_math_expr )"
   ],
   "list": [

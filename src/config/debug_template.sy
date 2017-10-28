@@ -5,8 +5,8 @@
 
 #if debug;
 #raise "Unable to run debugger.";
-#endif ;
-#define debug
+#endif;
+#define debug;
 
 //default template for debug.sy file
 constructor debugger();
@@ -21,7 +21,6 @@ func bool debug() {
 
 func revert($version : int = 1) {
   if(version == 1) {
-    pass;
+    throw false;
   }
-  throw false;
 }
