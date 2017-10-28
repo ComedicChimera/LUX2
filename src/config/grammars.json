@@ -376,11 +376,15 @@
   "int_increm": [
     "int_types ++",
     "int_types --",
-    "int_types **"
+    "int_types **",
+    "( - int_types ) ++",
+    "( - int_types ) --",
+    "( - int_types ) **"
   ],
   "int_types": [
     "FLOAT_LITERAL",
     "INTEGER_LITERAL",
+    "- int_types",
     "obj_id",
     "func_expr",
     "cast_expr",
