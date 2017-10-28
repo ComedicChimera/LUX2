@@ -50,10 +50,10 @@
     "&"
   ],
   "var_decl": [
-    "DOLLAR this_id extension = set_expr",
-    "AMP this_id extension = set_expr",
-    "DOLLAR this_id extension ( set_expr ) lit_assignment_ops set_expr",
-    "AMP this_id extension ( set_expr ) lit_assignment_ops set_expr"
+    "modifiers DOLLAR this_id extension = set_expr",
+    "modifiers AMP this_id extension = set_expr",
+    "modifiers DOLLAR this_id extension ( set_expr ) lit_assignment_ops set_expr",
+    "modifiers AMP this_id extension ( set_expr ) lit_assignment_ops set_expr"
   ],
   "array_inst": [
     "[ p_obj_id ]",
@@ -125,16 +125,75 @@
   ],
   "block_stmts": [
     "func_block",
+    "macro_block",
+    "sub_block_stmts"
+  ],
+  "if_block": [
+    "IF ( cond_expr ) { block_main } elif_block",
+    "IF ( cond_expr ) { block_main } else_block",
+  ],
+  "elif_block": [
+    "ELIF ( cond_expr ) { block_main } elif_block",
+    "ELIF ( cond_expr ) { block_main } else_block",
+    "&"
+  ],
+  "else_block": [
+    "ELSE { block_main }"
+  ],
+  "block_main": [
+    "stmt",
+    "sub_blocks",
+    "&"
+  ],
+  "sub_blocks": [
+    "sub_block_stmts block_main"
+  ],
+  "sub_block_stmts": [
     "if_block",
-    "else_block",
-    "for_block",
-    "while_block"
+    "while_block",
+    "for_block"
+  ],
+  "while_block": [
+    "WHILE ( cond_expr ) { block_main }"
+  ],
+  "for_block": [
+    "FOR ( for_params ) { block_main }",
+    "FOR ( DOLLAR IDENTIFIER IN for_iter_params ) { block_main }"
+  ],
+  "for_iter_params": [
+    "lambda_expr",
+    "yield_expr",
+    "comprehension_expr",
+    "obj_id"
+  ],
+  "for_params": [
+    "DOLLAR IDENTIFIER extension = int_math_expr ; comp_expr ; for_math_expr ;",
+    "; comp_expr ; int_math_expr",
+    "; ; int_math_expr",
+    "DOLLAR IDENTIFIER extension = int_math_expr ; ; int_math_expr"
+  ],
+  "for_math_expr": [
+    "IDENTIFIER lit_assignment_ops int_math_expr",
+    "IDENTIFIER ++",
+    "IDENTIFIER --",
+    "IDENTIFIER **"
   ],
   "func_block": [
     "func_decl { func_main }"
   ],
+  "macro_block": [
+    "macro_decl { block_main }"
+  ],
   "func_decl": [
-    "FUNC func_types IDENTIFIER dot_id ( func_params )"
+    "FUNC modifiers func_types IDENTIFIER dot_id ( func_params )"
+  ],
+  "macro_decl": [
+    "MACRO modifiers func_types IDENTIFIER dot_id ( func_params )"
+  ],
+  "modifiers": [
+    "LOCAL",
+    "GLOBAL",
+    "&"
   ],
   "func_types": [
     "all_types",
@@ -144,9 +203,10 @@
     "THIS n_func_params",
     "all_types n_func_params",
     "DOLLAR IDENTIFIER extension n_func_params",
+    "&"
   ],
   "n_func_params": [
-    ", func_params n_func_params",
+    ", DOLLAR IDENTIFIER extension n_func_params",
     ", optional_params",
     "&"
   ],
@@ -167,7 +227,7 @@
     "cast_expr"
   ],
   "cast_expr": [
-    "all_types ( expr )"
+    "all_types ( set_expr )"
   ],
   "lambda_expr": [
     "LAMBDA ( IDENTIFIER => expr lambda_condition)"
