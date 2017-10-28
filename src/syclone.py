@@ -56,7 +56,7 @@ class Console:
     #runs a file
     def Run(self):
         if(self.fileType == "source"):
-            self.Compile(" " + self.currentFile)
+            self.Compile(" " + self.currentFile, False)
         else:
             raise NotImplementedError
 
@@ -121,16 +121,16 @@ class Console:
                     reqParams = False
 
     #main compile function
-    def Compile(self, code):
+    def Compile(self, code, generate_file):
         print(bcolors.BOLD + "Starting Compiler..." + bcolors.WHITE)
         print("\n", end="")
         #run preprocessor
         print("Running Preprocessor...\n")
         p_code = code
-        self.Analyze(p_code)
+        self.Analyze(p_code, generate_file)
 
     #gets semantically valid AST and catches compile time errors
-    def Analyze(self, code):
+    def Analyze(self, code, generate_file):
         #sets error module code
         er.code = code
         #runs lexer
@@ -149,6 +149,18 @@ class Console:
         tree.content = ASTtools.ResolveAST(tree.content)
         # semantic analysis
         time.sleep(0.5)
+        #generates output file architecture
+        if(generate_file):
+            os.mkdir("_build")
+            os.mkdir("_build/bin")
+            os.mkdir("_build/debug")
+            os.mkdir("_build/bin/sy_cache")
+            with open("_build/bin/sy_cache/tokens.json", "w+") as file:
+                file.write(tokens)
+                file.close()
+            with open("_build/bin/sy_cache/ast.json", "w+") as file:
+                file.write(tree)
+                file.close()
 
 class CustomException(Exception):
     pass
