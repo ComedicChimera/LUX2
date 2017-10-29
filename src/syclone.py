@@ -150,8 +150,8 @@ class Console:
         # cleans tree
         tree.content = ASTtools.ResolveAST(tree.content)
         # semantic analysis
-        sem_valid_ast = sem.sem_analyze(tree)
-        time.sleep(0.5)
+        print(ConsoleColors.BLUE + "Running semantic analysis on AST." + ConsoleColors.WHITE)
+        sem_valid_obj = sem.sem_analyze(tree)
         # generates output file architecture
         if generate_file:
             os.mkdir("_build")
@@ -164,7 +164,7 @@ class Console:
             with open("_build/bin/sy_cache/ast.json", "w+") as file:
                 file.write(tree)
                 file.close()
-        return sem_valid_ast
+        return sem_valid_obj
 
 
 class CustomException(Exception):
