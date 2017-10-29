@@ -50,10 +50,15 @@
     "&"
   ],
   "var_decl": [
-    "access_modifiers modifiers DOLLAR id extension = set_expr",
-    "access_modifiers modifiers AMP id extension = set_expr",
-    "access_modifiers modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
-    "access_modifiers modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
+    "var_modifiers DOLLAR id extension = set_expr",
+    "var_modifiers AMP id extension = set_expr",
+    "var_modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
+    "var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
+  ],
+  "var_modifiers": [
+    "access_modifiers modifiers",
+    "modifiers access_modifiers",
+    "&"
   ],
   "var_preset": [
     "set_expr",
@@ -189,10 +194,10 @@
     "macro_decl { block_main }"
   ],
   "func_decl": [
-    "FUNC access_modifiers modifiers func_types id ( func_params )"
+    "FUNC var_modifiers func_types id ( func_params )"
   ],
   "macro_decl": [
-    "MACRO access_modifiers modifiers func_types id ( func_params )"
+    "MACRO var_modifiers id ( func_params )"
   ],
   "access_modifiers": [
     "PROTECTED",
