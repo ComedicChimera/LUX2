@@ -31,7 +31,19 @@
     "YIELD ( VALUE extension ) . func_expr"
   ],
   "assignment": [
-    "this_id lit_assignment_ops set_expr"
+    "this_id list_index lit_assignment_ops set_expr"
+  ],
+  "list_index": [
+    "[ obj_id ] list_index",
+    "[ index_expr ] list_index",
+    "&"
+  ],
+  "index_expr": [
+    "func_expr",
+    "math_expr",
+    "lambda_expr",
+    "comprehension_expr",
+    "yield_expr"
   ],
   "lit_assignment_ops": [
     "+=",
