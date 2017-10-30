@@ -3,7 +3,6 @@ from inspect import signature
 import os
 import lexer
 import syc_parser
-import time
 import errormodule as er
 import ASTtools
 import semantic_analyzer as sem
