@@ -1,35 +1,37 @@
-/*#package os : exe;
+#package os : pkg;
 
-[DllImport("sys32.dll") as _os];
-
-constructor buffer() {
-  $this.text : str;
-  $this.charset : str;
-  $this.stack : int;
-  $this.time = this.get_time();
-}
-
-func local float buffer.get_time() {
-  if(this.charset == "utf-8") {
-    return float(_os::out_std_buffer);
-  }
-}
-
-func local char buffer.write() {
-  $stack_list : char[this.stack] = yield (value : char).append(lambda(this.text[y] => this.encode(y));
-  for($item in stack_list) {
-    wait(this.time);
-    yield return item;
-  }
-}
+#define iostream extern __DOS32__;
+#define istream extern __DOSIN__;
+#define istream : iostream;
+#undef istream;
+#define extern dout >> iostream __main__;
+#define extern __istream__ as func din();
 
 constructor stdout() {
-  this.console = new _os::console() as object;
-  await console.open();
-  _os::out.init();
+  $this.type : str;
 }
 
-macro stdout.out($content : buffer) {
-  _os::out << content.write();
+constructor buffer() {
+  $this.content;
+  $this.charset;
 }
-*/
+
+func buffer.write(this) {
+  if(this.charset = "utf8") {
+    $charlist : int[] = lambda(this.content[y] => int(y));
+    for($item in charlist) {
+      yield return item;
+    }
+  }
+  else {
+    throw False;
+  }
+}
+
+macro stdout.out($b : buffer) {
+  iostream::dout << b.write();
+}
+
+macro stdout.stdin($b : buffer) {
+  return yield (value : str) += lambda(buffer.write(iostream::din())[y] => char(y));
+}

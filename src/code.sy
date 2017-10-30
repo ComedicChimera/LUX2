@@ -1,6 +1,8 @@
 #package test : exe;
 
-#include math as Math;
+#include math;
+#using math as Math;
+
 #warn "This is a test program";
 
 macro eprint($y : list) {
@@ -11,7 +13,6 @@ macro eprint($y : list) {
   }
 }
 
-//fix list types
 func list mix($myList : list) {
   $rt_list : list;
   repeat(myList.length) {
@@ -33,12 +34,6 @@ module active main {
   await on("hi", func() {
     echo("Hi there!");
   });
-}
-
-builder myBuilder {
-  (sq => func($vals << value) {
-    Math.sqrt(vals[0], vals[1]);
-    });
 }
 
 func group.myThing(this) {

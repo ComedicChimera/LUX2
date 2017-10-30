@@ -11,6 +11,7 @@ class Identifier:
         self.is_grouped = is_grouped
 
 
+# custom class for macro_id
 class MacroIdentifier:
     def __init__(self, name, params, modifiers, is_forward, is_grouped):
         self.name = name
@@ -20,6 +21,7 @@ class MacroIdentifier:
         self.is_grouped = is_grouped
 
 
+# custom class for func_id
 class FuncIdentifier:
     def __init__(self, name, params, return_type, modifiers, is_forward, is_grouped):
         self.name = name
@@ -75,11 +77,11 @@ def get_s_table(ast, activation_tree):
     for item in activation_tree:
         if item in decl_stmts:
             scope_id = str(pos) + " " + str(scope)
-            s_table[scope_id] = get_symbol_data(ast, item, pos)
+            s_table[scope_id] = get_symbol_data(ast, pos)
     return ast
 
 
-def get_symbol_data(ast, name, pos):
+def get_symbol_data(ast, pos):
     count = 0
     for item in ast:
         if count == pos:
@@ -105,6 +107,7 @@ def interpret_content(node):
             else:
                 info.append(["NAME", stmt[2].content.join()])
                 info.append("IS_GROUPED")
+                info += process_params(node[0].content[4])
         else:
             if len(stmt[1].content) == 1 and has_access_modifiers:
                 raise CustomException("Un-grouped macro cannot have access modifiers.")
@@ -113,11 +116,28 @@ def interpret_content(node):
             else:
                 info.append(["NAME", stmt[1].content.join()])
                 info.append("IS_GROUPED")
+                info += process_params(node[0].content[3])
         # get params
     elif node.name == "func_block":
         pass
     else:
         pass
+
+
+def process_params(node):
+    params = []
+    for item in node:
+        if isinstance(item, AST.ASTNode):
+            if item.name == "all_types":
+                params.append(item.content[0])
+            else:
+                params += process_params(item)
+        else:
+            if item.type == "THIS":
+                params += "THIS"
+            else:
+                params.append(item)
+    return params
 
 
 def get_modifiers(node):

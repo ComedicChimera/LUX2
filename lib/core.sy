@@ -10,13 +10,13 @@
 
 global $string.empty : str = str(null);
 
-macro print($x) => stdout.out(new os.buffer({ str(x), charset: "utf8", stack: 0 }));
+macro print($x) => stdout.out(new os.buffer({ content: str(x), charset: "utf8"}));
 
-macro println($x) => stdout.out(new os.buffer({ str(x) + "\n", charset: "utf8", stack: 0 }));
+macro println($x) => stdout.out(new os.buffer({ content: str(x) + "\n", charset: "utf8"}));
 
 func str input($prompt : str) {
-	stdout.out(new os.buffer(str(x), charset: "utf8", stack: 0));
-	$result = await async() { stdout.fetchResponse(1, new os.buffer({charset: "utf-8"})); }
+	stdout.out(new os.buffer({ content: str(x), charset: "utf8"}));
+	$result = stdout.stdin(new os.buffer({charset: "utf8"}));
 	return result;
 }
 
@@ -91,5 +91,5 @@ func bin($x) {
 
 func object DllImport($name : str) {
 	$content = with(io.Open(name + ".dll").read("\b"));
-	
+
 }
