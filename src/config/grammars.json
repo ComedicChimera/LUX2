@@ -25,6 +25,15 @@
     "var_decl",
     "pointer_decl",
     "assignment",
+    "func_decl",
+    "macro_decl",
+    "constructor_stmt"
+  ],
+  "constructor_block": [
+    "CONSTRUCTOR id ( func_params ) { block_main }"
+  ],
+  "constructor_stmt": [
+    "CONSTRUCTOR id ( func_params )"
   ],
   "yield_expr": [
     "YIELD ( VALUE extension ) lit_assignment_ops lambda_expr",
@@ -43,7 +52,8 @@
     "math_expr",
     "lambda_expr",
     "comprehension_expr",
-    "yield_expr"
+    "yield_expr",
+    "AWAIT async_expr"
   ],
   "lit_assignment_ops": [
     "+=",
@@ -147,6 +157,7 @@
   "block_stmts": [
     "func_block",
     "macro_block",
+    "constructor_block",
     "sub_block_stmts"
   ],
   "if_block": [
@@ -161,10 +172,28 @@
   "else_block": [
     "ELSE { block_main }"
   ],
+  "loop_if_block": [
+    "IF ( cond_expr ) { loop_block_main } loop_elif_block",
+    "IF ( cond_expr ) { loop_block_main } Loop_else_block",
+  ],
+  "loop_elif_block": [
+    "ELIF ( cond_expr ) { loop_block_main } loop_elif_block",
+    "ELIF ( cond_expr ) { loop_block_main } loop_else_block",
+    "&"
+  ],
+  "loop_else_block": [
+    "ELSE { loop_block_main }"
+  ],
   "block_main": [
     "stmt",
     "sub_blocks",
     "&"
+  ],
+  "loop_block_main": [
+    "stmt loop_block_main",
+    "while_block loop_block_main",
+    "for_block loop_block_main",
+    "loop_if_block loop_block_main"
   ],
   "sub_blocks": [
     "sub_block_stmts block_main"
@@ -175,11 +204,17 @@
     "for_block"
   ],
   "while_block": [
-    "WHILE ( cond_expr ) { block_main }"
+    "WHILE ( cond_expr ) { loop_main }"
   ],
   "for_block": [
-    "FOR ( for_params ) { block_main }",
-    "FOR ( DOLLAR IDENTIFIER IN for_iter_params ) { block_main }"
+    "FOR ( for_params ) { loop_main }",
+    "FOR ( DOLLAR IDENTIFIER IN for_iter_params ) { loop_main }"
+  ],
+  "loop_main": [
+    "loop_block_main",
+    "BREAK loop_main",
+    "CONTINUE loop_main",
+    "&"
   ],
   "for_iter_params": [
     "lambda_expr",
@@ -250,7 +285,12 @@
     "math_expr",
     "func_expr",
     "comprehension_expr",
-    "cast_expr"
+    "cast_expr",
+    "AWAIT async_expr",
+    "async_expr"
+  ],
+  "async_expr": [
+    "ASYNC ( inline_params_decl ) { func_main }"
   ],
   "cast_expr": [
     "all_types ( set_expr )"
