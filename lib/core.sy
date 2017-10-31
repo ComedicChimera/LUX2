@@ -1,22 +1,22 @@
 #package syccore : exe;
 
-#include os;
+#include stdio;
 #include threading;
 #include io;
 
 #using threading;
 
-&stdout = new os.stdout({ type: "local" });
+&stdout = new stdio.stdout();
 
 global $string.empty : str = str(null);
 
-macro print($x) => stdout.out(new os.buffer({ content: str(x), charset: "utf8"}));
+macro print($x) => stdout.out(new stdio.buffer({ content: str(x), charset: "utf8"}));
 
-macro println($x) => stdout.out(new os.buffer({ content: str(x) + "\n", charset: "utf8"}));
+macro println($x) => stdout.out(new stdio.buffer({ content: str(x) + "\n", charset: "utf8"}));
 
 func str input($prompt : str) {
-	stdout.out(new os.buffer({ content: str(x), charset: "utf8"}));
-	$result = stdout.stdin(new os.buffer({charset: "utf8"}));
+	stdout.out(new stdio.buffer({ content: str(x), charset: "utf8"}));
+	$result = stdout.in(new stdio.buffer({charset: "utf8"}));
 	return result;
 }
 

@@ -1,22 +1,18 @@
-#package os : pkg;
+#package stdio : pkg;
 
 #define iostream extern __DOS32__;
 #define istream extern __DOSIN__;
 #define istream : iostream;
 #undef istream;
 #define extern dout >> iostream __main__;
-#define extern __istream__ as func din();
-
-constructor stdout() {
-  $this.type : str;
-}
+#define extern din << iostream __istream__;
 
 constructor buffer() {
   $this.content;
   $this.charset;
 }
 
-func buffer.write(this) {
+func local buffer.write(this) {
   if(this.charset = "utf8") {
     $charlist : int[] = lambda(this.content[y] => int(y));
     for($item in charlist) {
@@ -32,6 +28,8 @@ macro stdout.out($b : buffer) {
   iostream::dout << b.write();
 }
 
-macro stdout.stdin($b : buffer) {
-  return yield (value : str) += lambda(buffer.write(iostream::din())[y] => char(y));
+macro stdout.in($b : buffer) {
+  $content : str;
+  iostream::din >> content;
+  return yield (value : str) += lambda(buffer.write(content)[y] => char(y));
 }
