@@ -268,10 +268,12 @@
     "THIS n_func_params",
     "all_types n_func_params",
     "DOLLAR IDENTIFIER extension n_func_params",
+    "@ IDENTIFIER extension n_func_params",
     "&"
   ],
   "n_func_params": [
     ", DOLLAR IDENTIFIER extension n_func_params",
+    "@ IDENTIFIER extension n_func_params"
     ", optional_params",
     "&"
   ],
