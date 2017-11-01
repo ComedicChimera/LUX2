@@ -28,6 +28,11 @@ func slice(str, $start : int, $end : int) {
 	return yield (value : str) += lambda(this[y] => y if(y < start && y > end));
 }
 
+func swap(@val1, @val2) {
+	val1 = yield val2;
+	val2 = val1;
+}
+
 func split(str, $delimiter : str = null) {
 	$split_list = yield (value : list).append(lambda(this[y] => y));
 	if(delimiter == null) {
