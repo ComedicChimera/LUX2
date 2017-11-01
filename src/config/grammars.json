@@ -75,10 +75,14 @@
     "&"
   ],
   "var_decl": [
-    "var_modifiers DOLLAR id extension = set_expr",
-    "var_modifiers AMP id extension = set_expr",
+    "var_modifiers DOLLAR id extension = var_yield set_expr",
+    "var_modifiers AMP id extension = var_yield set_expr",
     "var_modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
     "var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
+  ],
+  "var_yield": [
+    "YIELD",
+    "&"
   ],
   "var_modifiers": [
     "access_modifiers modifiers",
