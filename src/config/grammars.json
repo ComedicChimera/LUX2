@@ -25,9 +25,12 @@
     "var_decl",
     "pointer_decl",
     "assignment",
-    "func_decl",
-    "macro_decl",
+    "fwd_decl",
     "constructor_stmt"
+  ],
+  "fwd_decl": [
+    "func_decl",
+    "macro_decl"
   ],
   "constructor_block": [
     "CONSTRUCTOR id ( func_params ) { block_main }"
@@ -65,7 +68,7 @@
     "="
   ],
   "pointer_decl": [
-    "* this_id = pset_expr"
+    "DOLLAR this_id * extension = pset_expr"
   ],
   "nstmts": [
     "stmts ; nstmts",
@@ -84,7 +87,8 @@
   ],
   "var_preset": [
     "set_expr",
-    "this"
+    "this",
+    "all_types"
   ],
   "array_inst": [
     "[ p_obj_id ]",
@@ -471,18 +475,21 @@
     "&"
   ],
   "all_types" : [
-    "INTEGER_LITERAL",
-    "FLOAT_LITERAL",
-    "STRING_LITERAL",
-    "CHAR_LITERAL",
-    "BOOL_LITERAL"
+    "INTEGER_TYPE",
+    "FLOAT_TYPE",
+    "STRING_TYPE",
+    "CHAR_TYPE",
+    "BOOL_TYPE",
+    "LIST_TYPE",
+    "DICTIONARY_TYPE"
   ],
   "obj_id": [
     "this_id",
     "obj_expr dotid"
   ],
   "id": [
-    "IDENTIFIER dotid"
+    "IDENTIFIER dotid",
+    "NULL"
   ],
   "this_id": [
     "IDENTIFIER dotid",

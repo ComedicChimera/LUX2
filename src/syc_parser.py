@@ -19,7 +19,8 @@ class Parser:
         print(node)
         return node
 
-    def run_parser(self, table, grammar, input_tokens):
+    @staticmethod
+    def run_parser(table, grammar, input_tokens):
         # primes stack and ect.
         # position in input
         pos = 0

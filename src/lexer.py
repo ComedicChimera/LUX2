@@ -50,7 +50,8 @@ class Lexer:
         phrase_list = [phrases[x] for x in numbers]
         return phrase_list
 
-    def clear_comments(self, code):
+    @staticmethod
+    def clear_comments(code):
         # removes all multi-line comments
         multi_line_comments = re.findall("/\*.+\*/", code)
         for item in multi_line_comments:

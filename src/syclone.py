@@ -6,6 +6,7 @@ import syc_parser
 import errormodule as er
 import ASTtools
 import semantic_analyzer as sem
+from util import *
 
 
 # the main application
@@ -131,7 +132,8 @@ class Console:
         self.analyze(p_code, generate_file)
 
     # gets semantically valid AST and catches compile time errors
-    def analyze(self, code, generate_file):
+    @staticmethod
+    def analyze(code, generate_file):
         # sets error module code
         er.code = code
         # runs lexer
@@ -164,21 +166,6 @@ class Console:
                 file.write(tree)
                 file.close()
         return sem_valid_obj
-
-
-class CustomException(Exception):
-    pass
-
-
-class ConsoleColors:
-    MAGENTA = '\033[35m'
-    BLUE = '\033[34m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[93m'
-    RED = '\033[31m'
-    WHITE = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 cn = Console()
 cn.get_input()

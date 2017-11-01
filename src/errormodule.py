@@ -1,4 +1,5 @@
 import re
+from util import *
 
 code = ""
 
@@ -37,18 +38,3 @@ def throw(type, error, params):
         print(split_code[i])
         print(" " * (params[0] - length) + "^" * params[1])
     exit(0)
-
-
-class CustomException(Exception):
-    pass
-
-
-class ConsoleColors:
-    MAGENTA = '\033[35m'
-    BLUE = '\033[34m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[93m'
-    RED = '\033[31m'
-    WHITE = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
