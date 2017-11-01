@@ -166,7 +166,33 @@
     "func_block",
     "macro_block",
     "constructor_block",
+    "struct_block",
+    "interface_block",
+    "type_block",
     "sub_block_stmts"
+  ],
+  "struct_block": [
+    "STRUCT id { struct_main }"
+  ],
+  "inferface_block": [
+    "INTERFACE id { interface_main }"
+  ],
+  "interface_main": [
+    "func_decl ; interface_main",
+    "&"
+  ],
+  "type_block": [
+    "TYPE id { type_main }"
+  ],
+  "type_main": [
+    "IDENTIFIER = set_expr , type_main",
+    "IDENTIFIER , type_main",
+    "&"
+  ],
+  "struct_main": [
+    "DOLLAR THIS dot_id = set_expr struct_main ,",
+    "DOLLAR THIS dot_id , struct_main"
+    "&"
   ],
   "if_block": [
     "IF ( cond_expr ) { block_main } elif_block",
@@ -491,10 +517,14 @@
   ],
   "obj_id": [
     "this_id",
-    "obj_expr dotid"
+    "obj_expr dotid",
+    "null_id"
   ],
   "id": [
-    "IDENTIFIER dotid",
+    "IDENTIFIER dotid"
+  ],
+  "null_id": [
+    "id",
     "NULL"
   ],
   "this_id": [
