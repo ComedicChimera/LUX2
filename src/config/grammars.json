@@ -11,7 +11,7 @@
   ],
   "func_stmt": [
     "stmt",
-    "RETURN set_expr",
+    "RETURN set_expr"
   ],
   "n_func_stmt": [
     "; func_stmt n_func_stmt",
@@ -191,12 +191,12 @@
   ],
   "struct_main": [
     "DOLLAR THIS dot_id = set_expr struct_main ,",
-    "DOLLAR THIS dot_id , struct_main"
+    "DOLLAR THIS dot_id , struct_main",
     "&"
   ],
   "if_block": [
     "IF ( cond_expr ) { block_main } elif_block",
-    "IF ( cond_expr ) { block_main } else_block",
+    "IF ( cond_expr ) { block_main } else_block"
   ],
   "elif_block": [
     "ELIF ( cond_expr ) { block_main } elif_block",
@@ -208,7 +208,7 @@
   ],
   "loop_if_block": [
     "IF ( cond_expr ) { loop_block_main } loop_elif_block",
-    "IF ( cond_expr ) { loop_block_main } Loop_else_block",
+    "IF ( cond_expr ) { loop_block_main } Loop_else_block"
   ],
   "loop_elif_block": [
     "ELIF ( cond_expr ) { loop_block_main } loop_elif_block",
@@ -234,11 +234,13 @@
   ],
   "sub_block_stmts": [
     "if_block",
-    "while_block",
+    "do_block",
     "for_block"
   ],
-  "while_block": [
-    "WHILE ( cond_expr ) { loop_main }"
+  "do_block": [
+    "DO ( cond_expr ) { loop_main }",
+    "DO { loop_main }",
+    "DO { loop_main } IF ( cond_expr ) ;"
   ],
   "for_block": [
     "FOR ( for_params ) { loop_main }",
@@ -254,13 +256,15 @@
     "lambda_expr",
     "yield_expr",
     "comprehension_expr",
-    "obj_id"
+    "obj_id",
+    "func_expr",
+    "AWAIT async_expr",
+    "async_expr"
   ],
   "for_params": [
     "DOLLAR IDENTIFIER extension = int_math_expr ; comp_expr ; for_math_expr ;",
-    "; comp_expr ; int_math_expr",
-    "; ; int_math_expr",
-    "DOLLAR IDENTIFIER extension = int_math_expr ; ; int_math_expr"
+    "int_math_expr",
+    "cond_expr ; int_math_expr"
   ],
   "for_math_expr": [
     "IDENTIFIER lit_assignment_ops int_math_expr",
@@ -303,7 +307,7 @@
   ],
   "n_func_params": [
     ", DOLLAR IDENTIFIER extension n_func_params",
-    "@ IDENTIFIER extension n_func_params"
+    "@ IDENTIFIER extension n_func_params",
     ", optional_params",
     "&"
   ],
@@ -434,6 +438,7 @@
     "STRING_LITERAL",
     "obj_id",
     "func_expr",
+    "null_id",
     "( str_math_exprs )"
   ],
   "list_math_expr": [
@@ -469,10 +474,11 @@
     "&"
   ],
   "int_exp": [
-    "int_exp_ops int_types"
+    "int_increm int_exp_ops"
   ],
   "int_exp_ops": [
-    "int_increm int_exp_ops ^",
+    "^ int_exp_ops",
+    "int_increm",
     "&"
   ],
   "int_increm": [
@@ -481,13 +487,15 @@
     "int_types **",
     "( - int_types ) ++",
     "( - int_types ) --",
-    "( - int_types ) **"
+    "( - int_types ) **",
+    "int_types"
   ],
   "int_types": [
     "FLOAT_LITERAL",
     "INTEGER_LITERAL",
     "- int_types",
     "obj_id",
+    "null_id"
     "func_expr",
     "cast_expr",
     "( int_math_expr )"
@@ -517,8 +525,7 @@
   ],
   "obj_id": [
     "this_id",
-    "obj_expr dotid",
-    "null_id"
+    "obj_expr dotid"
   ],
   "id": [
     "IDENTIFIER dotid"
@@ -555,15 +562,4 @@
     ", inline_param n_inline_param",
     "&"
   ],
-  "func_params": [
-    "m_param n_m_param"
-  ],
-  "m_param": [
-    "expr",
-    "IDENTIFIER : expr"
-  ],
-  "n_m_param": [
-    ", m_param n_m_param",
-    "&"
-  ]
 }
