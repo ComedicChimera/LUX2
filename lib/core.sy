@@ -20,6 +20,20 @@ func str input($prompt : str) {
 	return result;
 }
 
+local $start : int;
+
+func local int get_next_num($step : int) {
+	do {
+		start += step;
+		yield return start;
+	}
+}
+
+func list range($min : int, $max : int) {
+	start = min;
+	return yield (value : int).append(lambda(get_next_num(1), max));
+}
+
 func str join($x : list, $delimiter : str = string.empty) {
 	return (yield (value : str) += lambda(x[y] => y) + delimiter).slice(-delimiter.length);
 }
@@ -94,7 +108,7 @@ func bin($x) {
 	return str(Thread.get_content(Thread.to_address(@x)));
 }
 
-func object DllImport($name : str) {
+func value DllImport($name : str) {
 	$content = with(io.Open(name + ".dll").read("\b"));
 
 }
