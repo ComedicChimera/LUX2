@@ -26,7 +26,8 @@
     "pointer_decl",
     "assignment",
     "fwd_decl",
-    "constructor_stmt"
+    "constructor_stmt",
+    "DELETE this_id"
   ],
   "fwd_decl": [
     "func_decl",
@@ -206,28 +207,12 @@
   "else_block": [
     "ELSE { block_main }"
   ],
-  "loop_if_block": [
-    "IF ( cond_expr ) { loop_block_main } loop_elif_block",
-    "IF ( cond_expr ) { loop_block_main } Loop_else_block"
-  ],
-  "loop_elif_block": [
-    "ELIF ( cond_expr ) { loop_block_main } loop_elif_block",
-    "ELIF ( cond_expr ) { loop_block_main } loop_else_block",
-    "&"
-  ],
-  "loop_else_block": [
-    "ELSE { loop_block_main }"
-  ],
   "block_main": [
-    "stmt",
+    "stmt block_main",
+    "BREAK ; block_main",
+    "CONTINUE ; block_main",
     "sub_blocks",
     "&"
-  ],
-  "loop_block_main": [
-    "stmt loop_block_main",
-    "while_block loop_block_main",
-    "for_block loop_block_main",
-    "loop_if_block loop_block_main"
   ],
   "sub_blocks": [
     "sub_block_stmts block_main"
@@ -238,19 +223,13 @@
     "for_block"
   ],
   "do_block": [
-    "DO ( cond_expr ) { loop_main }",
-    "DO { loop_main }",
-    "DO { loop_main } IF ( cond_expr ) ;"
+    "DO ( cond_expr ) { block_main }",
+    "DO { block_main }",
+    "DO { block_main } IF ( cond_expr ) ;"
   ],
   "for_block": [
-    "FOR ( for_params ) { loop_main }",
-    "FOR ( DOLLAR IDENTIFIER IN for_iter_params ) { loop_main }"
-  ],
-  "loop_main": [
-    "loop_block_main",
-    "BREAK loop_main",
-    "CONTINUE loop_main",
-    "&"
+    "FOR ( for_params ) { block_main }",
+    "FOR ( DOLLAR IDENTIFIER IN for_iter_params ) { block_main }"
   ],
   "for_iter_params": [
     "lambda_expr",
