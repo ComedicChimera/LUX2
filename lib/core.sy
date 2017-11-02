@@ -34,6 +34,25 @@ func list range($min : int, $max : int) {
 	return yield (value : int).append(lambda(get_next_num(1), max));
 }
 
+macro decorate(@function, $before : func = null, $after : func = null) {
+	if(value(function).params.length > 0) {
+		func value wrapper() {
+			before();
+			return function();
+			after();
+		}
+		function = wrapper;
+	}
+	else {
+		func wrapper() {
+			before();
+			function();
+			after();
+		}
+		function = wrapper;
+	}
+}
+
 func str join($x : list, $delimiter : str = string.empty) {
 	return (yield (value : str) += lambda(x[y] => y) + delimiter).slice(-delimiter.length);
 }
