@@ -27,7 +27,8 @@
     "assignment",
     "fwd_decl",
     "constructor_stmt",
-    "DELETE this_id"
+    "DELETE this_id",
+    "WITH ( with_expr )"
   ],
   "fwd_decl": [
     "func_decl",
@@ -170,7 +171,16 @@
     "struct_block",
     "interface_block",
     "type_block",
+    "with_block",
     "sub_block_stmts"
+  ],
+  "with_block": [
+    "WITH ( with_expr ) { block_main }"
+  ],
+  "with_expr": [
+    "var_decl",
+    "pointer_decl",
+    "set_expr"
   ],
   "struct_block": [
     "STRUCT id { struct_main }"
@@ -280,14 +290,20 @@
   "func_params": [
     "THIS n_func_params",
     "all_types n_func_params",
-    "DOLLAR IDENTIFIER extension n_func_params",
+    "DOLLAR IDENTIFIER func_extension n_func_params",
     "@ IDENTIFIER extension n_func_params",
     "&"
   ],
   "n_func_params": [
-    ", DOLLAR IDENTIFIER extension n_func_params",
-    "@ IDENTIFIER extension n_func_params",
+    ", DOLLAR IDENTIFIER func_extension n_func_params",
+    "@ IDENTIFIER func_extension n_func_params",
     ", optional_params",
+    "&"
+  ],
+  "func_extension": [
+    "extension",
+    "FUNC",
+    "MACRO",
     "&"
   ],
   "optional_params": [
@@ -312,7 +328,8 @@
     "ASYNC ( inline_params_decl ) { func_main }"
   ],
   "cast_expr": [
-    "all_types ( set_expr )"
+    "all_types ( set_expr )",
+    "VALUE ( set_expr )"
   ],
   "lambda_expr": [
     "LAMBDA ( IDENTIFIER => expr lambda_condition)"
@@ -474,7 +491,7 @@
     "INTEGER_LITERAL",
     "- int_types",
     "obj_id",
-    "null_id"
+    "null_id",
     "func_expr",
     "cast_expr",
     "( int_math_expr )"
@@ -518,7 +535,7 @@
     "THIS dotid"
   ],
   "dotid": [
-    ". IDENTIFIER dot_id",
+    ". IDENTIFIER dotid",
     "&"
   ],
   "func_expr": [
@@ -526,19 +543,19 @@
     "inline_func"
   ],
   "func_call": [
-    "obj_id ( func_params ) dot_id"
+    "obj_id ( func_params ) dotid"
   ],
   "inline_func": [
-    "FUNC ( inline_params_decl ) { func_main } dot_id"
+    "FUNC ( inline_params_decl ) { func_main } dotid"
   ],
   "inline_params_decl": [
     "inline_param, n_inline_param"
   ],
   "inline_param": [
-    "DOLLAR IDENTIFIER type_ext << expr"
+    "DOLLAR IDENTIFIER func << expr"
   ],
   "n_inline_param": [
     ", inline_param n_inline_param",
     "&"
-  ],
+  ]
 }
