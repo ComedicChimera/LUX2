@@ -1,157 +1,45 @@
 {
   "main": [
-    "block"
+    "block",
+    "module",
+    "&"
   ],
   "func_main": [
     "return_stmt",
-    "func_block"
+    "block"
   ],
-  "return_stmt": [
-    "func_stmt n_func_stmt"
-  ],
-  "func_stmt": [
-    "stmt",
-    "RETURN set_expr"
-  ],
-  "n_func_stmt": [
-    "; func_stmt n_func_stmt",
+  "block_main": [
+    "stmt block_main",
+    "BREAK ; block_main",
+    "CONTINUE ; block_main",
+    "sub_blocks",
     "&"
   ],
-  "stmt": [
-     "stmts ; nstmts"
-   ],
-  "stmts": [
-    "expr",
-    "var_decl",
-    "pointer_decl",
-    "assignment",
-    "fwd_decl",
-    "constructor_stmt",
-    "DELETE this_id",
-    "WITH ( with_expr )"
-  ],
-  "fwd_decl": [
-    "func_decl",
-    "macro_decl"
-  ],
-  "constructor_block": [
-    "CONSTRUCTOR id ( func_params ) { block_main }"
-  ],
-  "constructor_stmt": [
-    "CONSTRUCTOR id ( func_params )"
-  ],
-  "yield_expr": [
-    "YIELD ( VALUE extension ) lit_assignment_ops lambda_expr",
-    "YIELD ( VALUE extension ) . func_expr"
-  ],
-  "assignment": [
-    "this_id list_index lit_assignment_ops set_expr"
-  ],
-  "list_index": [
-    "[ obj_id ] list_index",
-    "[ index_expr ] list_index",
+  "type_main": [
+    "IDENTIFIER = set_expr , type_main",
+    "IDENTIFIER , type_main",
     "&"
   ],
-  "index_expr": [
-    "func_expr",
-    "math_expr",
-    "lambda_expr",
-    "comprehension_expr",
-    "yield_expr",
-    "AWAIT async_expr"
-  ],
-  "lit_assignment_ops": [
-    "+=",
-    "-=",
-    "*=",
-    "/=",
-    "%=",
-    "^=",
-    "="
-  ],
-  "pointer_decl": [
-    "DOLLAR this_id * extension = pset_expr"
-  ],
-  "nstmts": [
-    "stmts ; nstmts",
+  "struct_main": [
+    "DOLLAR THIS dot_id = set_expr struct_main ,",
+    "DOLLAR THIS dot_id , struct_main",
     "&"
   ],
-  "var_decl": [
-    "var_modifiers DOLLAR id extension = var_yield set_expr",
-    "var_modifiers AMP id extension = var_yield set_expr",
-    "var_modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
-    "var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
-  ],
-  "var_yield": [
-    "YIELD",
+  "interface_main": [
+    "func_decl ; interface_main",
     "&"
   ],
-  "var_modifiers": [
-    "access_modifiers modifiers",
-    "modifiers access_modifiers",
+  "module": [
+    "module_decl { constructor_block main } main",
     "&"
   ],
-  "var_preset": [
-    "set_expr",
-    "this",
-    "all_types"
+  "module_decl": [
+    "MODULE mod_type id"
   ],
-  "array_inst": [
-    "[ p_obj_id ]",
-    "[ INTEGER_LITERAL ]",
-    "&"
-  ],
-  "set_expr": [
-    "expr",
-    "lambda_expr",
-    "yield_expr"
-  ],
-  "pset_expr": [
-    "pointer_math"
-  ],
-  "pointer_math": [
-    "( p_bin_shift ) ++",
-    "( p_bin_shift ) --",
-    "p_bin_shift"
-  ],
-  "p_bin_shift": [
-    "pointer sp_bin_shift"
-  ],
-  "sp_bin_shift":[
-    "shifts pointer np_bin_shift"
-  ],
-  "np_bin_shift": [
-    "shifts pointer np_bin_shift",
-    "&"
-  ],
-  "shifts": [
-    "<<",
-    ">>"
-  ],
-  "pointer": [
-    "@ p_obj_id"
-  ],
-  "p_obj_id": [
-    "obj_expr . IDENTIFIER dot_id",
-    "this_id",
-    "func_expr"
-  ],
-  "extension": [
-    ": types",
-    "&"
-  ],
-  "types": [
-    "INT_TYPE array_inst",
-    "BOOL_TYPE array_inst",
-    "STRING_TYPE array_inst",
-    "FLOAT_TYPE array_inst",
-    "CHAR_TYPE array_inst",
-    "LIST_TYPE array_inst",
-    "DICTIONARY_TYPE dict_inst"
-  ],
-  "dict_inst": [
-    "[ types , types ]",
-    "&"
+  "mod_type": [
+    "ACTIVE",
+    "PASSIVE",
+    "AWAIT"
   ],
   "block": [
     "blocks n_blocks"
@@ -172,7 +60,36 @@
     "interface_block",
     "type_block",
     "with_block",
-    "sub_block_stmts"
+    "sub_block_stmts",
+    "async_block",
+    "error_block"
+  ],
+  "constructor_block": [
+    "CONSTRUCTOR id ( func_params ) inherit { block_main }"
+  ],
+  "inherit": [
+    ": id n_inherit",
+    "&"
+  ],
+  "n_inherit": [
+    ", id n_inherit",
+    "&"
+  ],
+  "error_block": [
+    "ERROR_HANDLER ( error_list , inline_func ) { main }"
+  ],
+  "error_list": [
+    "obj_id n_error_list"
+  ],
+  "n_error_list": [
+    ", error_list",
+    "&"
+  ],
+  "async_block": [
+    "async_decl { func_main }"
+  ],
+  "async_decl": [
+    "ASYNC var_modifiers func_types id ( func_params )"
   ],
   "with_block": [
     "WITH ( with_expr ) { block_main }"
@@ -188,22 +105,8 @@
   "inferface_block": [
     "INTERFACE id { interface_main }"
   ],
-  "interface_main": [
-    "func_decl ; interface_main",
-    "&"
-  ],
   "type_block": [
     "TYPE id { type_main }"
-  ],
-  "type_main": [
-    "IDENTIFIER = set_expr , type_main",
-    "IDENTIFIER , type_main",
-    "&"
-  ],
-  "struct_main": [
-    "DOLLAR THIS dot_id = set_expr struct_main ,",
-    "DOLLAR THIS dot_id , struct_main",
-    "&"
   ],
   "if_block": [
     "IF ( cond_expr ) { block_main } elif_block",
@@ -216,13 +119,6 @@
   ],
   "else_block": [
     "ELSE { block_main }"
-  ],
-  "block_main": [
-    "stmt block_main",
-    "BREAK ; block_main",
-    "CONTINUE ; block_main",
-    "sub_blocks",
-    "&"
   ],
   "sub_blocks": [
     "sub_block_stmts block_main"
@@ -240,6 +136,20 @@
   "for_block": [
     "FOR ( for_params ) { block_main }",
     "FOR ( DOLLAR IDENTIFIER IN for_iter_params ) { block_main }"
+  ],
+  "multi_type": [
+    "( e_types n_e_types )"
+  ],
+  "e_types": [
+    "all_types",
+    "FUNC",
+    "MACRO",
+    "MODULE",
+    "id"
+  ],
+  "n_e_types": [
+    ", e_types n_e_types",
+    "&"
   ],
   "for_iter_params": [
     "lambda_expr",
@@ -285,12 +195,14 @@
   ],
   "func_types": [
     "all_types",
+    "multi_type",
+    "VALUE",
     "&"
   ],
   "func_params": [
     "THIS n_func_params",
     "all_types n_func_params",
-    "DOLLAR IDENTIFIER func_extension n_func_params",
+    "DOLLAR IDENTIFIER extension n_func_params",
     "@ IDENTIFIER extension n_func_params",
     "&"
   ],
@@ -300,18 +212,103 @@
     ", optional_params",
     "&"
   ],
-  "func_extension": [
-    "extension",
-    "FUNC",
-    "MACRO",
-    "&"
-  ],
   "optional_params": [
     "DOLLAR IDENTIFIER extension = set_expr n_optional_params",
     "** DOLLAR IDENTIFIER"
   ],
   "n_optional_params": [
     ", DOLLAR IDENTIFIER extension = set_expr n_optional_params",
+    "&"
+  ],
+  "stmt": [
+     "stmts ; nstmts"
+   ],
+  "stmts": [
+    "expr",
+    "var_decl",
+    "pointer_decl",
+    "assignment",
+    "fwd_decl",
+    "constructor_stmt",
+    "DELETE this_id",
+    "WITH ( with_expr )",
+    "null_decl",
+    "p_null_decl",
+    "throw_stmt"
+  ],
+  "return_stmt": [
+    "func_stmt n_func_stmt"
+  ],
+  "func_stmt": [
+    "stmt",
+    "RETURN set_expr",
+    "YIELD RETURN set_expr",
+    "&"
+  ],
+  "n_func_stmt": [
+    "; func_stmt n_func_stmt",
+    "&"
+  ],
+  "throw_stmt": [
+    "THROW STRING_LITERAL",
+    "THROW obj_id"
+  ],
+  "null_decl": [
+    "var_modifiers DOLLAR id extension",
+    "var_modifiers AMP id extension"
+  ],
+  "p_null_decl": [
+    "var_modifiers DOLLAR id * extension"
+  ],
+  "fwd_decl": [
+    "func_decl",
+    "macro_decl",
+    "async_decl"
+  ],
+  "constructor_stmt": [
+    "CONSTRUCTOR id ( func_params ) inherit"
+  ],
+  "assignment": [
+    "this_id list_index lit_assignment_ops set_expr"
+  ],
+  "pointer_decl": [
+    "DOLLAR this_id * extension = pset_expr"
+  ],
+  "nstmts": [
+    "stmts ; nstmts",
+    "&"
+  ],
+  "var_decl": [
+    "var_modifiers DOLLAR id extension = var_yield set_expr",
+    "var_modifiers AMP id extension = var_yield set_expr",
+    "var_modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
+    "var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
+  ],
+  "var_yield": [
+    "YIELD",
+    "&"
+  ],
+  "var_modifiers": [
+    "access_modifiers modifiers",
+    "modifiers access_modifiers",
+    "&"
+  ],
+  "var_preset": [
+    "set_expr",
+    "this",
+    "all_types"
+  ],
+  "types": [
+    "INT_TYPE array_inst",
+    "BOOL_TYPE array_inst",
+    "STRING_TYPE array_inst",
+    "FLOAT_TYPE array_inst",
+    "CHAR_TYPE array_inst",
+    "LIST_TYPE array_inst",
+    "DICTIONARY_TYPE dict_inst"
+  ],
+  "dict_inst": [
+    "[ types , types ]",
     "&"
   ],
   "expr": [
@@ -323,6 +320,31 @@
     "cast_expr",
     "AWAIT async_expr",
     "async_expr"
+  ],
+  "index_expr": [
+    "func_expr",
+    "math_expr",
+    "lambda_expr",
+    "comprehension_expr",
+    "yield_expr",
+    "AWAIT async_expr"
+  ],
+  "array_inst": [
+    "[ p_obj_id ]",
+    "[ INTEGER_LITERAL ]",
+    "&"
+  ],
+  "set_expr": [
+    "expr",
+    "lambda_expr",
+    "yield_expr"
+  ],
+  "pset_expr": [
+    "pointer_math"
+  ],
+  "yield_expr": [
+    "YIELD ( VALUE extension ) lit_assignment_ops lambda_expr",
+    "YIELD ( VALUE extension ) . func_expr"
   ],
   "async_expr": [
     "ASYNC ( inline_params_decl ) { func_main }"
@@ -496,47 +518,32 @@
     "cast_expr",
     "( int_math_expr )"
   ],
-  "list": [
-    "[ expr follow_list_item ]"
+  "pointer_math": [
+    "( p_bin_shift ) ++",
+    "( p_bin_shift ) --",
+    "p_bin_shift"
   ],
-  "follow_list_item": [
-    ", expr follow_list_item",
+  "p_bin_shift": [
+    "pointer sp_bin_shift"
+  ],
+  "sp_bin_shift":[
+    "shifts pointer np_bin_shift"
+  ],
+  "np_bin_shift": [
+    "shifts pointer np_bin_shift",
     "&"
   ],
-  "dict": [
-    "{ all_types : expr follow_dict_item }"
+  "shifts": [
+    "<<",
+    ">>"
   ],
-  "follow_dict_item": [
-    ", all_types : expr follow_dict_item",
-    "&"
+  "pointer": [
+    "@ p_obj_id"
   ],
-  "all_types" : [
-    "INTEGER_TYPE",
-    "FLOAT_TYPE",
-    "STRING_TYPE",
-    "CHAR_TYPE",
-    "BOOL_TYPE",
-    "LIST_TYPE",
-    "DICTIONARY_TYPE"
-  ],
-  "obj_id": [
+  "p_obj_id": [
+    "obj_expr . IDENTIFIER dot_id",
     "this_id",
-    "obj_expr dotid"
-  ],
-  "id": [
-    "IDENTIFIER dotid"
-  ],
-  "null_id": [
-    "id",
-    "NULL"
-  ],
-  "this_id": [
-    "IDENTIFIER dotid",
-    "THIS dotid"
-  ],
-  "dotid": [
-    ". IDENTIFIER dotid",
-    "&"
+    "func_expr"
   ],
   "func_expr": [
     "func_call",
@@ -557,5 +564,70 @@
   "n_inline_param": [
     ", inline_param n_inline_param",
     "&"
+  ],
+  "lit_assignment_ops": [
+    "+=",
+    "-=",
+    "*=",
+    "/=",
+    "%=",
+    "^=",
+    "="
+  ],
+  "obj_id": [
+    "this_id",
+    "obj_expr dotid"
+  ],
+  "id": [
+    "IDENTIFIER list_index dotid"
+  ],
+  "null_id": [
+    "id",
+    "NULL"
+  ],
+  "this_id": [
+    "IDENTIFIER list_index dotid",
+    "THIS dotid"
+  ],
+  "dotid": [
+    ". IDENTIFIER list_index dotid",
+    "&"
+  ],
+  "list_index": [
+    "[ obj_id ] list_index",
+    "[ index_expr ] list_index",
+    "&"
+  ],
+  "list": [
+    "[ expr follow_list_item ]"
+  ],
+  "follow_list_item": [
+    ", expr follow_list_item",
+    "&"
+  ],
+  "dict": [
+    "{ all_types : expr follow_dict_item }"
+  ],
+  "follow_dict_item": [
+    ", all_types : expr follow_dict_item",
+    "&"
+  ],
+  "extension": [
+    ": types",
+    ": FUNC",
+    ": id",
+    ": MACRO",
+    ": MODULE",
+    "multi_type",
+    "&"
+  ],
+  "all_types" : [
+    "INTEGER_TYPE",
+    "FLOAT_TYPE",
+    "STRING_TYPE",
+    "CHAR_TYPE",
+    "BOOL_TYPE",
+    "LIST_TYPE",
+    "DICTIONARY_TYPE"
   ]
 }
