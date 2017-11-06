@@ -13,7 +13,7 @@ class Grammar:
 # reads data in from json and converts it to a grammar obj
 def build_grammar():
     # opens json file
-    json_obj = json.loads(open("config/grammars.json").read())
+    json_obj = json.loads(open("src/config/grammars.json").read())
     # sets up new grammar
     grammar = Grammar()
     # adds all left hand side to non-terminals

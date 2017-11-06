@@ -9,7 +9,7 @@ class Parser:
 
     def parse(self, tokens):
         # gets grammar for gramtools
-        g = gramtools.BuildGrammar()
+        g = gramtools.build_grammar()
         # gets a set of follows to be used later
         follows = self.get_follows(g)
         # generates parsing table
@@ -152,6 +152,7 @@ class Parser:
     def follow(self, symbol, grammar):
         # sets up follow set
         follow_set = []
+        print(symbol)
 
         # avoids repeat chars
         def add_to_follow_set(char):

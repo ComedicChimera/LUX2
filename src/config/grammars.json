@@ -12,7 +12,7 @@
     "stmt block_main",
     "BREAK ; block_main",
     "CONTINUE ; block_main",
-    "sub_blocks",
+    "sub_blocks block_main",
     "&"
   ],
   "type_main": [
@@ -60,9 +60,14 @@
     "interface_block",
     "type_block",
     "with_block",
-    "sub_block_stmts",
+    "sub_blocks",
     "async_block",
     "error_block"
+  ],
+  "sub_blocks": [
+    "if_block",
+    "do_block",
+    "for_block"
   ],
   "constructor_block": [
     "CONSTRUCTOR id ( func_params ) inherit { block_main }"
@@ -82,7 +87,7 @@
     "obj_id n_error_list"
   ],
   "n_error_list": [
-    ", error_list",
+    ", obj_id n_error_list",
     "&"
   ],
   "async_block": [
@@ -119,14 +124,6 @@
   ],
   "else_block": [
     "ELSE { block_main }"
-  ],
-  "sub_blocks": [
-    "sub_block_stmts block_main"
-  ],
-  "sub_block_stmts": [
-    "if_block",
-    "do_block",
-    "for_block"
   ],
   "do_block": [
     "DO ( cond_expr ) { block_main }",
@@ -373,10 +370,10 @@
     "{ named_params }"
   ],
   "named_params": [
-    "IDENTIFIER : expr n_nmd_params"
+    "IDENTIFIER : set_expr n_nmd_params"
   ],
   "n_nmd_params": [
-    ", named_params n_nmd_params",
+    ", IDENTIFIER : set_expr",
     "&"
   ],
   "cond_expr": [

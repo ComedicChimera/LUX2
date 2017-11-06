@@ -35,7 +35,7 @@ func list range($min : int, $max : int) {
 }
 
 macro decorate(@function, $before : func = null, $after : func = null) {
-	if(value(function).params.length > 0) {
+	if(value(function).returns.length > 0) {
 		func value wrapper() {
 			before();
 			return function();
