@@ -101,7 +101,6 @@
   ],
   "with_expr": [
     "var_decl",
-    "pointer_decl",
     "set_expr"
   ],
   "struct_block": [
@@ -223,7 +222,6 @@
   "stmts": [
     "expr",
     "var_decl",
-    "pointer_decl",
     "assignment",
     "fwd_decl",
     "constructor_stmt",
@@ -267,9 +265,6 @@
   ],
   "assignment": [
     "this_id list_index lit_assignment_ops set_expr"
-  ],
-  "pointer_decl": [
-    "DOLLAR this_id * extension = pset_expr"
   ],
   "nstmts": [
     "stmts ; nstmts",
@@ -316,7 +311,8 @@
     "comprehension_expr",
     "cast_expr",
     "AWAIT async_expr",
-    "async_expr"
+    "async_expr",
+    "pointer_math"
   ],
   "index_expr": [
     "func_expr",
@@ -334,10 +330,8 @@
   "set_expr": [
     "expr",
     "lambda_expr",
-    "yield_expr"
-  ],
-  "pset_expr": [
-    "pointer_math"
+    "yield_expr",
+    "NEW id"
   ],
   "yield_expr": [
     "YIELD ( VALUE extension ) lit_assignment_ops lambda_expr",
@@ -513,7 +507,8 @@
     "null_id",
     "func_expr",
     "cast_expr",
-    "( int_math_expr )"
+    "( int_math_expr )",
+    "pointer_math"
   ],
   "pointer_math": [
     "( p_bin_shift ) ++",
@@ -593,6 +588,8 @@
   "list_index": [
     "[ obj_id ] list_index",
     "[ index_expr ] list_index",
+    "[ ] list_index",
+    "[ all_types ]",
     "&"
   ],
   "list": [

@@ -6,6 +6,10 @@
 
 #using threading;
 
+type Error {
+	InvalidValueCast = 45;
+}
+
 &stdout = new stdio.stdout();
 
 global $string.empty : str = str(null);
@@ -34,8 +38,15 @@ func list range($min : int, $max : int) {
 	return yield (value : int).append(lambda(get_next_num(1), max));
 }
 
+func dict map($la : list, $lb : list) {
+	$rt_dict : dict[];
+	value(rt_dict).keys = la;
+	value(rt_dict).values = lb;
+	return rt_dict;
+}
+
 macro decorate(@function, $before : func = null, $after : func = null) {
-	if(value(function).returns.length > 0) {
+	if(len(value(function).returns) > 0) {
 		func value wrapper() {
 			before();
 			return function();
@@ -54,7 +65,7 @@ macro decorate(@function, $before : func = null, $after : func = null) {
 }
 
 func str join($x : list, $delimiter : str = string.empty) {
-	return (yield (value : str) += lambda(x[y] => y) + delimiter).slice(-delimiter.length);
+	return (yield (value : str) += lambda(x[y] => y) + delimiter).slice(-len(delimiter));
 }
 
 func slice(str, $start : int, $end : int) {
@@ -129,5 +140,11 @@ func bin($x) {
 
 func value DllImport($name : str) {
 	$content = with(io.Open(name + ".dll").read("\b"));
+	//incomplete
+}
 
+func int len($item) {
+	onerror(Error.InvalidValueCast, func() { throw "Unable to retrieve the length of the item specified."; }) {
+		return value(item).length;
+	}
 }
