@@ -625,6 +625,11 @@
     "CHAR_TYPE",
     "BOOL_TYPE",
     "LIST_TYPE",
-    "DICTIONARY_TYPE"
+    "DICTIONARY_TYPE",
+    "deref_op all_types"
+  ],
+  "deref_op": [
+    "* deref_op",
+    "&"
   ]
 }
