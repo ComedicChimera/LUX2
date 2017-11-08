@@ -1,5 +1,5 @@
 # import errormodule as er
-import ASTtools as AST
+import src.ASTtools as AST
 # from util import *
 symbol_table = {}
 

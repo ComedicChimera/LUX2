@@ -1,6 +1,8 @@
-import gramtools
-import errormodule as er
-import ASTtools
+import src.gramtools as gramtools
+import src.errormodule as er
+import src.ASTtools as ASTtools
+
+recurring_items = []
 
 
 class Parser:
@@ -150,9 +152,13 @@ class Parser:
         return first_list
 
     def follow(self, symbol, grammar):
+        global recurring_items
         # sets up follow set
         follow_set = []
-        print(symbol)
+
+        if symbol not in recurring_items:
+            recurring_items.append(symbol)
+            print(symbol)
 
         # avoids repeat chars
         def add_to_follow_set(char):

@@ -1,11 +1,11 @@
 import subprocess
 from inspect import signature
 import os
-import lexer
-import syc_parser
-import errormodule as er
-import ASTtools
-import semantic_analyzer as sem
+import src.lexer as lexer
+import src.syc_parser as syc_parser
+import src.errormodule as er
+import src.ASTtools as ASTtools
+import src.semantic_analyzer as sem
 from util import *
 
 
