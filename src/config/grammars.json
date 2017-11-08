@@ -62,7 +62,11 @@
     "with_block",
     "sub_blocks",
     "async_block",
-    "error_block"
+    "error_block",
+    "new_thread_block"
+  ],
+  "new_thread_block": [
+    "ASYNC ( NEW id ) { main }"
   ],
   "sub_blocks": [
     "if_block",
