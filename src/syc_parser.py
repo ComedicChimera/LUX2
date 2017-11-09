@@ -2,8 +2,6 @@ import src.gramtools as gramtools
 import src.errormodule as er
 import src.ASTtools as ASTtools
 
-recurring_items = []
-
 
 class Parser:
     def __init__(self):
@@ -75,7 +73,7 @@ class Parser:
                         sem_stack[-1].content.append(ASTtools.Token(input_tokens[pos][0], input_tokens[pos][1]))
                     stack.pop()
                 else:
-                    er.Throw("Unexpected Token", "syntax_error", [rt_pos, len(input_tokens[pos][0])])
+                    er.throw("Unexpected Token", "syntax_error", [rt_pos, len(input_tokens[pos][0])])
                 pos += 1
         print(sem_stack)
         # return ast_string.rstrip("(") + ")" + end_symbol
@@ -115,6 +113,7 @@ class Parser:
                 follow_table[item] = symbol
         # iterates through productions getting follows
         for item in grammar.productions:
+            print("\n")
             add_to_follow_table(self.follow(item, grammar))
         return follow_table
 
@@ -152,13 +151,10 @@ class Parser:
         return first_list
 
     def follow(self, symbol, grammar):
-        global recurring_items
         # sets up follow set
         follow_set = []
 
-        if symbol not in recurring_items:
-            recurring_items.append(symbol)
-            print(symbol)
+        print(symbol)
 
         # avoids repeat chars
         def add_to_follow_set(char):
