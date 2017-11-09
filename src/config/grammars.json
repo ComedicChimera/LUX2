@@ -63,7 +63,21 @@
     "sub_blocks",
     "async_block",
     "error_block",
-    "new_thread_block"
+    "new_thread_block",
+    "if_when_block"
+  ],
+  "if_when_block": [
+    "IF ( math_expr ) { when_main }",
+    "IF ( math_expr , cond_expr ) { when_main }"
+  ],
+  "when_main": [
+    "block_main",
+    "when_stmt when_main",
+    "&"
+  ],
+  "when_stmt": [
+    "WHEN ( math_expr ) : block_main BREAK ;",
+    "DEFAULT : block_main BREAK ;"
   ],
   "new_thread_block": [
     "ASYNC ( NEW id ) { main }"
@@ -240,11 +254,14 @@
     "fwd_decl",
     "constructor_stmt",
     "DELETE this_id",
-    "WITH ( with_expr )",
+    "WITH ( with_expr ) dotid",
+    "WITH ( with_expr ) . func_expr",
     "null_decl",
     "p_null_decl",
     "throw_stmt",
-    "bin_shift_stmt"
+    "bin_shift_stmt",
+    "( expr ) . func_expr",
+    "( expr ) dotid"
   ],
   "bin_shift_stmt": [
     "this_id shifts set_expr"
@@ -358,11 +375,12 @@
     "ASYNC ( inline_params_decl ) { func_main }"
   ],
   "cast_expr": [
-    "all_types ( set_expr )",
-    "VALUE ( set_expr )"
+    "all_types ( set_expr ) dotid",
+    "VALUE ( set_expr ) dotid"
   ],
   "lambda_expr": [
-    "LAMBDA ( IDENTIFIER => expr lambda_condition )"
+    "LAMBDA ( id => expr lambda_condition ) dotid",
+    "LAMBDA ( id . func_expr => expr lambda_condition ) dotid"
   ],
   "lambda_condition": [
     "IF ( cond_expr )",
@@ -375,7 +393,7 @@
     "IDENTIFIER => expr"
   ],
   "obj_expr": [
-    "NEW id ( constructor_params )"
+    "NEW id ( constructor_params ) dotid"
   ],
   "constructor_params": [
     "{ named_params }"
@@ -525,13 +543,13 @@
     "&"
   ],
   "int_types": [
-    "FLOAT_LITERAL",
-    "INTEGER_LITERAL",
+    "FLOAT_LITERAL dotid",
+    "INTEGER_LITERAL dotid",
     "- int_types",
     "obj_id",
     "null_id",
-    "func_expr",
-    "cast_expr",
+    "func_expr dotid",
+    "cast_expr dotid",
     "( int_math_expr )",
     "p_bin_shift"
   ],
@@ -604,6 +622,7 @@
   ],
   "dotid": [
     ". IDENTIFIER list_index dotid",
+    ". func_call list_index dotid",
     "&"
   ],
   "list_index": [
