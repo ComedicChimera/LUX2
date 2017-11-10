@@ -149,7 +149,7 @@ class Console:
         print(ConsoleColors.YELLOW + "Generated AST." + ConsoleColors.WHITE)
         print(tree)
         # cleans tree
-        tree.content = ASTtools.ResolveAST(tree.content)
+        tree.content = ASTtools.resolve_ast(tree.content)
         # semantic analysis
         print(ConsoleColors.BLUE + "Running semantic analysis on AST." + ConsoleColors.WHITE)
         sem_valid_obj = sem.sem_analyze(tree)

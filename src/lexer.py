@@ -1,6 +1,7 @@
 import re
 import src.errormodule as er
 import json
+import util
 
 
 class Lexer:
@@ -10,7 +11,7 @@ class Lexer:
         # creates a default array for the tokens
         self.tokens = []
         # provides a set of tokens and their templates
-        self.tokenTypes = json.loads(open("src/config/tokens.json").read())
+        self.tokenTypes = json.loads(open(util.source_dir + "/src/config/tokens.json").read())
 
     def lex(self, code):
         phrases = {}

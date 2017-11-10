@@ -376,11 +376,11 @@
   ],
   "cast_expr": [
     "all_types ( set_expr ) dotid",
-    "VALUE ( set_expr ) dotid"
+    "VALUE ( set_expr ) dotid",
+    "obj_id ( set_expr ) dotid"
   ],
   "lambda_expr": [
-    "LAMBDA ( id => expr lambda_condition ) dotid",
-    "LAMBDA ( id . func_expr => expr lambda_condition ) dotid"
+    "LAMBDA ( id => expr lambda_condition ) dotid"
   ],
   "lambda_condition": [
     "IF ( cond_expr )",
@@ -478,8 +478,8 @@
     "&"
   ],
   "str_types": [
-    "CHAR_LITERAL",
-    "STRING_LITERAL",
+    "CHAR_LITERAL dotid",
+    "STRING_LITERAL dotid",
     "obj_id",
     "func_expr",
     "null_id",
@@ -618,6 +618,7 @@
   "this_id": [
     "IDENTIFIER list_index dotid",
     "THIS dotid",
+    "deref_op IDENTIFIER list_index dotid",
     "IDENTIFIER : : dotid"
   ],
   "dotid": [

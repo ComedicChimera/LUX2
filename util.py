@@ -11,3 +11,5 @@ class ConsoleColors:
     WHITE = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+source_dir = "C:/Users/forlo/Desktop/Coding/Github/SyClone"
