@@ -1,3 +1,5 @@
+# TODO rewrite file once parser + grammars are done
+
 # import errormodule as er
 import src.ASTtools as AST
 # from util import *

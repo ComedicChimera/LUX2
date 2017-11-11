@@ -64,6 +64,7 @@ class Console:
         else:
             raise NotImplementedError
 
+    # TODO revise function to get input directly from native system command line
     # gets input from user
     def get_input(self):
         command = ""
