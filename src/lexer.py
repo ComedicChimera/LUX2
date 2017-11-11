@@ -43,7 +43,7 @@ class Lexer:
             if counter > 3:
                 code = code.replace(" ", "~")
         if code != "~" * len(code):
-            er.Throw("lexerror", "Unknown Identifier", [x for x in code.split("~") if x != ""][0])
+            er.throw("lexerror", "Unknown Identifier", [x for x in code.split("~") if x != ""][0])
 
         # sorts them in order
         numbers = [x for x in phrases]

@@ -143,6 +143,12 @@ func value DllImport($name : str) {
 	//incomplete
 }
 
+func format(str, ** $rules) {
+	for($item in rules) {
+		this.replace("%s", str(item));
+	}
+}
+
 func int len($item) {
 	onerror(Error.InvalidValueCast, func() { throw "Unable to retrieve the length of the item specified."; }) {
 		return value(item).length;

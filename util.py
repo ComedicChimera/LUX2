@@ -13,3 +13,4 @@ class ConsoleColors:
     UNDERLINE = '\033[4m'
 
 source_dir = "C:/Users/forlo/Desktop/Coding/Github/SyClone"
+version = "0.0.1"

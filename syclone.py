@@ -7,6 +7,7 @@ import src.errormodule as er
 import src.ASTtools as ASTtools
 import src.semantic_analyzer as sem
 from util import *
+import cmd
 
 
 # the main application
@@ -19,7 +20,7 @@ class Console:
             "r": self.run,
             "install": self.install,
             "u": self.update,
-            "v": self.get_version(),
+            "v": self.get_version,
             "bug": self.debug()
         }
 
@@ -29,8 +30,10 @@ class Console:
     def debug(self):
         pass
 
-    def get_version(self):
-        pass
+    # returns the current version of SyClone
+    @staticmethod
+    def get_version():
+        print("SyClone Version: " + version)
 
     def install(self):
         pass
@@ -42,13 +45,12 @@ class Console:
         pass
 
     # brings in a file
-    def in_func(self, path):
+    def in_func(self, params):
+        if len(params) != 1:
+            raise(CustomException("Function IN does not except more that one path."))
+        path = params[0]
         if path.endswith(".sy") or path.endswith(".txt"):
             self.fileType = "source"
-        elif path.endswith(".sbc"):
-            self.fileType = "bytecode"
-        elif path.endswith(".syo"):
-            self.fileType = "object"
         else:
             raise CustomException("Invalid file type.")
         with open(path) as fileObject:
@@ -87,40 +89,25 @@ class Console:
     def evaluate_command(self, command):
         # removes unnecessary content
         command = command.strip("syc ")
-        items = command.split(" ")
-        args = []
-        # divides into args and cmds
-        for item in items:
-            if item in self.commands.keys():
-                args.append(("cmd", item))
+        # converts cmd into an object
+        cmd_obj = cmd.get_cmd_obj(command)
+        # iterates through and executes each command
+        for item in cmd_obj.commands:
+            # if it is not a known command, it will raise an exception
+            # NOTE: if this evaluates to true, the cmd object parser and the executor may be out of sync (version wise)
+            if item.name not in self.commands.keys():
+                raise(CustomException("Unknown Command."))
+            # checks to see if right numbers of params were passed (none or some)
+            if len(item.parameters) > 0 and len(signature(self.commands[item.name]).parameters) > 0:
+                self.commands[item.name](item.parameters)
+            elif len(item.parameters) == 0 and len(signature(self.commands[item.name]).parameters) == 0:
+                self.commands[item.name]()
             else:
-                args.append(("arg", item))
-        # sets up variable to see if cmd requires parameters
-        req_params = False
-        # current function
-        current_func = ""
-        for item in args:
-            # if it is a cmd it collects data about the cmd and sets current data for said cmd
-            if item[0] == "cmd":
-                # raises exception if there are not adequate params
-                if req_params:
-                    raise(CustomException("Commands arguments required."))
-                # detects data about functions
+                # throws appropriate error if not
+                if len(item.parameters) > len(signature(self.commands[item.name]).parameters):
+                    raise(CustomException("Too many parameters for function %s!" % item.name))
                 else:
-                    # decides if cmd reqs params and if it exists at all
-                    if len(signature(self.commands[item[1]]).parameters) > 0:
-                        req_params = True
-                        current_func = item[1]
-                    else:
-                        self.commands[item[1]]()
-                        req_params = False
-            else:
-                # handles passing in params
-                if not req_params:
-                    raise(CustomException("No arguments necessary."))
-                else:
-                    self.commands[current_func](item[1])
-                    req_params = False
+                    raise(CustomException("Too few parameters for function %s!" % item.name))
 
     # main compile function
     def compile(self, code, generate_file):

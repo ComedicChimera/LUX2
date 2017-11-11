@@ -255,7 +255,6 @@
     "constructor_stmt",
     "DELETE this_id",
     "WITH ( with_expr ) dotid",
-    "WITH ( with_expr ) . func_expr",
     "null_decl",
     "p_null_decl",
     "throw_stmt",
@@ -354,7 +353,23 @@
     "lambda_expr",
     "comprehension_expr",
     "yield_expr",
-    "AWAIT async_expr"
+    "AWAIT async_expr",
+    "lit_index_types dotid",
+    "lit_list_types [ index_expr ] dotid"
+  ],
+  "lit_index_types": [
+    "obj_id",
+    "INTEGER_LITERAL",
+    "STRING_LITERAL",
+    "CHAR_LITERAL",
+    "FLOAT_LITERAL",
+    "BOOL_LITERAL"
+  ],
+  "lit_list_types": [
+    "obj_id",
+    "STRING_LITERAL",
+    "list",
+    "dict"
   ],
   "array_inst": [
     "[ p_obj_id ]",
@@ -609,28 +624,25 @@
     "obj_expr dotid"
   ],
   "id": [
-    "IDENTIFIER list_index dotid"
+    "IDENTIFIER dotid",
+    "IDENTIFIER [ index_expr ] dotid"
   ],
   "null_id": [
     "id",
     "NULL"
   ],
   "this_id": [
-    "IDENTIFIER list_index dotid",
+    "IDENTIFIER [ index_expr ] dotid",
+    "IDENTIFIER dotid",
     "THIS dotid",
-    "deref_op IDENTIFIER list_index dotid",
-    "IDENTIFIER : : dotid"
+    "deref_op IDENTIFIER [ index_expr ] dotid",
+    "IDENTIFIER : : id"
   ],
   "dotid": [
-    ". IDENTIFIER list_index dotid",
-    ". func_call list_index dotid",
-    "&"
-  ],
-  "list_index": [
-    "[ obj_id ] list_index",
-    "[ index_expr ] list_index",
-    "[ ] list_index",
-    "[ all_types ]",
+    ". IDENTIFIER [ index_expr ] dotid",
+    ". func_call [ index_expr ] dotid",
+    ". IDENTIFIER dotid",
+    ". func_call [ index_expr ]",
     "&"
   ],
   "list": [

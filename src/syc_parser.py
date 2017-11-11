@@ -113,7 +113,7 @@ class Parser:
                 follow_table[item] = symbol
         # iterates through productions getting follows
         for item in grammar.productions:
-            print("\n")
+            print("\n" * 3)
             add_to_follow_table(self.follow(item, grammar))
         return follow_table
 
@@ -137,6 +137,7 @@ class Parser:
                 add_to_first_list(item[0])
             # if first item in non-terminal, recur and add the result to first list
             else:
+                print(item[0])
                 first = self.first(grammar, grammar.productions[item[0]])
                 # possibly unnecessary
                 """counter = 1
@@ -185,6 +186,7 @@ class Parser:
                             for item in follow:
                                 add_to_follow_set(item)
                         else:
+                            print(next_symbol)
                             follow = self.first(grammar, grammar.productions[next_symbol])
                             for item in follow:
                                 if item != "&":
