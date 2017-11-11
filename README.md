@@ -1,2 +1,2 @@
 # Syclone
-the git repo for the syclone compiler libs
+The Official Github Repository for the SyClone Compiler *x64 Windows Version*
