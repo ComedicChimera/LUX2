@@ -19,7 +19,7 @@ def throw(type, error, params):
                 ln_count -= 1
                 break
             ln_count += 1
-        print("\n" + ConsoleColors.RED + error + " (\'" + params + "\') [ln:" + str(ln_count) + " - " + str(t_code[ln_count].index(params) + 1) + "]:")
+        print("\nLex Error: " + ConsoleColors.RED + error + " (\'" + params + "\') [ln:" + str(ln_count) + " - " + str(t_code[ln_count].index(params) + 1) + "]:")
         print(t_code[ln_count])
         print(" " * t_code[ln_count].index(params) + "^" * len(params))
     elif type == "syntax_error":
@@ -34,7 +34,7 @@ def throw(type, error, params):
                 break
             i += 1
             length += len(item)
-        print("\n" + ConsoleColors.RED + error + " (\'" + params + "\') [ln:" + str(i) + " - " + str(params[0]) + "]:")
+        print("\nSyntax Error: " + ConsoleColors.RED + error + " (\'" + params + "\') [ln:" + str(i) + " - " + str(params[0]) + "]:")
         print(split_code[i])
         print(" " * (params[0] - length) + "^" * params[1])
     exit(0)
