@@ -1,3 +1,4 @@
+import json
 import subprocess
 from inspect import signature
 import os
@@ -144,14 +145,12 @@ class Console:
         # generates output file architecture
         if generate_file:
             os.mkdir("_build")
-            os.mkdir("_build/bin")
-            os.mkdir("_build/debug")
-            os.mkdir("_build/bin/sy_cache")
-            with open("_build/bin/sy_cache/tokens.json", "w+") as file:
+            os.mkdir("_build/sy_cache")
+            with open("_build/sy_cache/tokens.txt", "w+") as file:
                 file.write(tokens)
                 file.close()
-            with open("_build/bin/sy_cache/ast.json", "w+") as file:
-                file.write(tree)
+            with open("_build/sy_cache/ast.json", "w+") as file:
+                json.dump(tree, file)
                 file.close()
         return sem_valid_obj
 
