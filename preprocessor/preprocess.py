@@ -39,7 +39,7 @@ def match_dir(directive):
     return Directive(true_dir, split_directive)
 
 
-def main(code):
+def pre_process(code):
     dirs = re.findall("#[^;];", code)
     dir_obj_queue = []
     for item in dirs:
@@ -51,4 +51,4 @@ def main(code):
         elif item.direct != "package" and has_package_decl:
             directives[item.direct] = item.params
         else:
-            raise CustomException("Invalid directive.")
+            raise CustomException("Package Error: Unable to locate package declaration. (ensure that it is the first directive in the file)")

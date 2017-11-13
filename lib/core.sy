@@ -7,6 +7,7 @@
 #using threading;
 
 type Error {
+	AssertionError = 21;
 	InvalidValueCast = 45;
 }
 
@@ -22,6 +23,11 @@ func str input($prompt : str) {
 	stdout.out(new stdio.buffer({ content: str(x), charset: "utf8"}));
 	$result = stdout.in(new stdio.buffer({charset: "utf8"}));
 	return result;
+}
+
+macro assert($condition : bool) {
+	if(!condition)
+		throw Error.AssertionError;
 }
 
 local $start : int;
@@ -138,10 +144,7 @@ func bin($x) {
 	return str(Thread.get_content(Thread.to_address(@x)));
 }
 
-func value DllImport($name : str) {
-	$content = with(io.Open(name + ".dll").read("\b"));
-	//incomplete
-}
+func value DllImport($name : str);
 
 func format(str, ** $rules) {
 	for($item in rules) {
