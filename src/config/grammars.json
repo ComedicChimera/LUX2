@@ -331,7 +331,9 @@
     "v_m var_modifiers DOLLAR id extension = var_yield set_expr",
     "v_m var_modifiers AMP id extension = var_yield set_expr",
     "v_m var_modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
-    "v_m var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
+    "v_m var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr",
+    "v_m var_modifiers DOLLAR id extension ( var_preset )",
+    "v_m var_modifiers AMP id extension ( var_preset )"
   ],
   "v_m": [
     "VOLATILE",
