@@ -88,7 +88,7 @@
     "for_block"
   ],
   "constructor_block": [
-    "CONSTRUCTOR id ( func_params ) inherit { block_main }"
+    "scope_modifiers CONSTRUCTOR id ( func_params ) inherit { block_main }"
   ],
   "inherit": [
     ": id n_inherit",
@@ -114,7 +114,12 @@
     "async_decl => RETURN set_expr ;"
   ],
   "async_decl": [
-    "ASYNC var_modifiers func_types id ( func_params )"
+    "ASYNC async_modifiers func_types id ( func_params )"
+  ],
+  "async_modifiers": [
+    "func_modifiers",
+    "VOLATILE func_modifiers",
+    "&"
   ],
   "with_block": [
     "WITH ( with_expr ) { block_main }"
@@ -220,7 +225,7 @@
     "PRIVATE",
     "&"
   ],
-  "modifiers": [
+  "scope_modifiers": [
     "LOCAL",
     "GLOBAL",
     "&"
@@ -313,7 +318,7 @@
     "async_decl"
   ],
   "constructor_stmt": [
-    "CONSTRUCTOR id ( func_params ) inherit"
+    "scope_modifiers CONSTRUCTOR id ( func_params ) inherit"
   ],
   "assignment": [
     "this_id list_index lit_assignment_ops set_expr"
@@ -323,18 +328,22 @@
     "&"
   ],
   "var_decl": [
-    "var_modifiers DOLLAR id extension = var_yield set_expr",
-    "var_modifiers AMP id extension = var_yield set_expr",
-    "var_modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
-    "var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
+    "v_m var_modifiers DOLLAR id extension = var_yield set_expr",
+    "v_m var_modifiers AMP id extension = var_yield set_expr",
+    "v_m var_modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
+    "v_m var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr"
+  ],
+  "v_m": [
+    "VOLATILE",
+    "&"
   ],
   "var_yield": [
     "YIELD",
     "&"
   ],
   "var_modifiers": [
-    "access_modifiers modifiers",
-    "modifiers access_modifiers",
+    "access_modifiers",
+    "scope_modifiers",
     "&"
   ],
   "var_preset": [
