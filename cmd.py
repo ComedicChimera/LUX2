@@ -1,3 +1,4 @@
+# cmd parser is broken
 import re
 
 
@@ -9,39 +10,44 @@ class Command:
         self.modifiers = []
 
 
+class Token:
+    def __init__(self, type, value):
+        self.value = value
+        self.type = type
+
 class InputObject:
     def __init__(self):
         self.commands = []
-        self.command_templates = ["debug", "root", "install", "del", "i", "o", "r", "u", "v"]
+        self.command_templates = [r"\bdebug\b", r"\broot\b", r"\binstall\b", r"\bdel\b", r"\bi\b", r"\bo\b", r"\br\b", r"\bu\b", r"\bv\b"]
 
-    @staticmethod
-    def parse_components(string):
-        results = list()
-        results.append(re.findall("--\\w+", string))
-        results.append(re.findall("/\\w+", string))
-        for item in results[0]:
-            string = string.replace(item, "")
-        for item in results[1]:
-            string = string.replace(item, "")
-        results.append(re.findall("[\\w.]+", string))
-        return results
+    def get_type(self, token_str):
+        for template in self.command_templates:
+            if re.match(template, token_str):
+                return Token("Command", token_str)
+        if re.match("--\w+", token_str):
+            return Token("Modifier", token_str)
+        elif re.match("/\w+", token_str):
+            return Token("Specifier", token_str)
+        else:
+            return Token("Parameter", token_str)
+
+    def tokenize(self, string):
+        token_ndxs = {}
+        for template in self.command_templates:
+            matches = re.findall(template, string)
+            ndxs = re.finditer(template, string)
+            token_ndxs = dict(zip(ndxs, matches))
+        regexes = [r"--\w+", "/\w+", "[^ ]+"]
+        for regex in regexes:
+            matches = re.findall(regex, string)
+            ndxs = re.finditer(regex, string)
+            token_ndxs = dict(zip(ndxs, matches))
+        nums = [x for x in token_ndxs]
+        nums.sort()
+        return [self.get_type(token_ndxs[x]) for x in nums]
 
     def parse_cmd(self, string):
-        cmd_components = []
-        for template in self.command_templates:
-            matches = re.findall(re.escape(template), string)
-            for match in matches:
-                if len(string.split(match)) > 1:
-                    cmd_components.append(string.split(match)[1])
-                else:
-                    cmd_components.append(string.split(match)[0])
-                self.commands.append(Command(match))
-                string = string.replace(match, "")
-        for i in range(len(self.commands)):
-            result = self.parse_components(cmd_components[i])
-            self.commands[i].parameters = result[2]
-            self.commands[i].specifiers = result[1]
-            self.commands[i].modifiers = result[0]
+        tokens = self.tokenize(string)
 
 
 def get_cmd_obj(in_str):

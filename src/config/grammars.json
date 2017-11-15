@@ -437,7 +437,7 @@
     "IDENTIFIER => expr"
   ],
   "obj_expr": [
-    "NEW id ( constructor_params ) dotid"
+    "NEW this_id ( constructor_params ) dotid"
   ],
   "constructor_params": [
     "{ named_params }"
@@ -675,17 +675,17 @@
     "&"
   ],
   "list": [
-    "[ expr follow_list_item ]"
+    "[ set_expr follow_list_item ]"
   ],
   "follow_list_item": [
-    ", expr follow_list_item",
+    ", set_expr follow_list_item",
     "&"
   ],
   "dict": [
-    "{ all_types : expr follow_dict_item }"
+    "{ all_types : set_expr follow_dict_item }"
   ],
   "follow_dict_item": [
-    ", all_types : expr follow_dict_item",
+    ", all_types : set_expr follow_dict_item",
     "&"
   ],
   "extension": [
