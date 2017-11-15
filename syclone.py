@@ -33,20 +33,23 @@ class Console:
 
     # returns the current version of SyClone
     @staticmethod
-    def get_version():
+    def get_version(cmd_obj):
+        if len(cmd_obj.parameters) > 0:
+            raise(CustomException("Function GET_VERSION does not except parameters."))
         print("SyClone Version: " + version)
 
-    def install(self):
+    def install(self, cmd_obj):
         pass
 
-    def update(self):
+    def update(self, cmd_obj):
         pass
 
-    def out_func(self):
+    def out_func(self, cmd_obj):
         pass
 
     # brings in a file
-    def in_func(self, params):
+    def in_func(self, cmd_obj):
+        params = cmd_obj.parameters
         if len(params) != 1:
             raise(CustomException("Function IN does not except more that one path."))
         path = params[0]
@@ -59,7 +62,9 @@ class Console:
                 self.currentFile += item
 
     # runs a file
-    def run(self):
+    def run(self, cmd_obj):
+        if len(cmd_obj.parameters) > 0:
+            raise(CustomException("Function RUN does not except parameters."))
         if self.fileType == "source":
             self.compile(" " + self.currentFile, False)
         else:
@@ -99,7 +104,7 @@ class Console:
             # NOTE: if this evaluates to true, the cmd object parser and the executor may be out of sync (version wise)
             if item.name not in self.commands.keys():
                 raise(CustomException("Unknown Command."))
-            # checks to see if right numbers of params were passed (none or some)
+            """checks to see if right numbers of params were passed (none or some)
             if len(item.parameters) > 0 and len(signature(self.commands[item.name]).parameters) > 0:
                 self.commands[item.name](item.parameters)
             elif len(item.parameters) == 0 and len(signature(self.commands[item.name]).parameters) == 0:
@@ -109,7 +114,8 @@ class Console:
                 if len(item.parameters) > len(signature(self.commands[item.name]).parameters):
                     raise(CustomException("Too many parameters for function %s!" % item.name))
                 else:
-                    raise(CustomException("Too few parameters for function %s!" % item.name))
+                    raise(CustomException("Too few parameters for function %s!" % item.name))"""
+            self.commands[item.name](item)
 
     # main compile function
     def compile(self, code, generate_file):
