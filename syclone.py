@@ -47,7 +47,6 @@ class Console:
 
     # brings in a file
     def in_func(self, params):
-        print(params)
         if len(params) != 1:
             raise(CustomException("Function IN does not except more that one path."))
         path = params[0]
