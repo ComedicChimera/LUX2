@@ -12,5 +12,10 @@ class ConsoleColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+
+def set_source_dir(path):
+    global source_dir
+    source_dir = path
+
 source_dir = "C:/Users/forlo/Desktop/Coding/Github/SyClone"
 version = "0.0.1"

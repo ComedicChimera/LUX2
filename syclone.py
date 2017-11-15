@@ -22,7 +22,8 @@ class Console:
             "install": self.install,
             "u": self.update,
             "v": self.get_version,
-            "bug": self.debug()
+            "bug": self.debug,
+            "set_path": self.set_path
         }
 
         self.currentFile = ""
@@ -60,6 +61,13 @@ class Console:
         with open(path) as fileObject:
             for item in fileObject:
                 self.currentFile += item
+
+    @staticmethod
+    def set_path(cmd_obj):
+        if len(cmd_obj.parameters) != 1:
+            raise(CustomException("Function SET_PATH excepts only one parameter."))
+        set_source_dir(cmd_obj.parameters[0])
+        print("Source dir changed to '%s'." % cmd_obj.parameters[0])
 
     # runs a file
     def run(self, cmd_obj):
@@ -104,17 +112,6 @@ class Console:
             # NOTE: if this evaluates to true, the cmd object parser and the executor may be out of sync (version wise)
             if item.name not in self.commands.keys():
                 raise(CustomException("Unknown Command."))
-            """checks to see if right numbers of params were passed (none or some)
-            if len(item.parameters) > 0 and len(signature(self.commands[item.name]).parameters) > 0:
-                self.commands[item.name](item.parameters)
-            elif len(item.parameters) == 0 and len(signature(self.commands[item.name]).parameters) == 0:
-                self.commands[item.name]()
-            else:
-                # throws appropriate error if not
-                if len(item.parameters) > len(signature(self.commands[item.name]).parameters):
-                    raise(CustomException("Too many parameters for function %s!" % item.name))
-                else:
-                    raise(CustomException("Too few parameters for function %s!" % item.name))"""
             self.commands[item.name](item)
 
     # main compile function

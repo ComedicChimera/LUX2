@@ -20,11 +20,11 @@ class Token:
 class InputObject:
     def __init__(self):
         self.commands = []
-        self.command_templates = [r"\bdebug\b", r"\broot\b", r"\binstall\b", r"\bdel\b", r"\bi\b", r"\bo\b", r"\br\b", r"\bu\b", r"\bv\b"]
+        self.command_templates = [r"\bset_path\b", r"\bdebug\b", r"\broot\b", r"\binstall\b", r"\bdel\b", r"\bi\b", r"\bo\b", r"\br\b", r"\bu\b", r"\bv\b"]
 
     @staticmethod
     def get_type(token_str):
-        clean_templates = ["debug", "root", "install", "del", "i", "v", "r", "u", "o"]
+        clean_templates = ["set_path", "debug", "root", "install", "del", "i", "v", "r", "u", "o"]
         if any(x == token_str for x in clean_templates):
             return Token("Command", token_str)
         elif re.match("--\w+", token_str):
