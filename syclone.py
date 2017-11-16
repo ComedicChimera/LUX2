@@ -103,7 +103,7 @@ class Console:
     # splits the command into its parts and executes it
     def evaluate_command(self, command):
         # removes unnecessary content
-        command = command.strip("syc ")
+        command = command[4:]
         # converts cmd into an object
         cmd_obj = cmd.get_cmd_obj(command)
         # iterates through and executes each command

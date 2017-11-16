@@ -195,4 +195,5 @@ class Parser:
                                     follow2 = self.follow(name, grammar)
                                     for item in follow2:
                                         add_to_follow_set(item)
+        print("^")
         return follow_set
