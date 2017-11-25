@@ -1,31 +1,21 @@
 import json
-import util
+import lpi
 
 
 # open a SyClone package
-def open_package(name):
-    # open the package index
-    json_obj = json.loads(open(util.source_dir + "/packages/package_index.json").read())
-    # if package is in ndx, open it from the directory specified there.
-    if name in json_obj.keys():
-        f_content = ""
-        with open(util.source_dir + json_obj[name]) as fileObj:
-            for item in fileObj:
-                f_content += item
-        # make a dependency
-        make_dependency(name, json_obj[name])
-        return f_content
-    # try to open it from the current working dir
+def include(name, is_absolute_path):
+    # tests to see if it is able to a package from the package index
     try:
-        # if this fails => file doesn't exist
-        f_content = ""
-        with open(name + ".sy") as fileObj:
-            for item in fileObj:
-                f_content += item
-        make_dependency(name, name + ".sy")
-        return f_content
-    except:
-        raise(util.CustomException("Package Error: Unable to locate the package \"%s\"."))
+        return lpi.open_package(name)
+    except Exception as e:
+        # if it can't it will try to open the path according to the users directive and if that fails it will return the default package error
+        try:
+            if is_absolute_path:
+                return open(name).read()
+            else:
+                return open(name + ".sy").read()
+        except:
+            raise e
 
 
 # adds data to a dependency file that will be use later when the compiler is acquiring packages

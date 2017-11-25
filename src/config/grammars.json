@@ -505,7 +505,7 @@
   "math_expr": [
     "str_math_expr",
     "int_math_expr",
-    "list_math_expr"
+    "list_types list_add"
   ],
   "str_math_expr": [
     "str_mul str_add"
@@ -527,10 +527,7 @@
     "obj_id",
     "func_expr",
     "null_id",
-    "( str_math_exprs )"
-  ],
-  "list_math_expr": [
-    "list_types list_add"
+    "( str_math_expr )"
   ],
   "list_add": [
     "+ list_types list_add",
@@ -542,7 +539,7 @@
     "obj_id",
     "func_expr",
     "comprehension_expr",
-    "( list_math_expr )"
+    "( list_types list_add )"
   ],
   "int_math_expr": [
     "int_mul int_add"

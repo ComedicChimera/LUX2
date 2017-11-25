@@ -1,6 +1,6 @@
 #package syccore : exe;
 
-#include stdio;
+//#include stdio;
 #include threading;
 #include io;
 
@@ -15,7 +15,7 @@ type Error {
 
 global $string.empty : str = str(null);
 
-macro print($x) => stdout.out(new stdio.buffer({ content: str(x), charset: "utf8"}));
+/*macro print($x) => stdout.out(new stdio.buffer({ content: str(x), charset: "utf8"}));
 
 macro println($x) => stdout.out(new stdio.buffer({ content: str(x) + "\n", charset: "utf8"}));
 
@@ -23,7 +23,18 @@ func str input($prompt : str) {
 	stdout.out(new stdio.buffer({ content: str(x), charset: "utf8"}));
 	$result = stdout.in(new stdio.buffer({charset: "utf8"}));
 	return result;
-}
+}*/
+
+//builtins
+macro print($x);
+
+macro println($x) => print(char(x) + '\n');
+
+macro input($prompt : str);
+
+func value DllImport($name : str);
+
+//prewritten functions
 
 macro assert($condition : bool) {
 	if(!condition)
@@ -143,8 +154,6 @@ func toUpper(char) {
 func bin($x) {
 	return str(Thread.get_content(Thread.to_address(@x)));
 }
-
-func value DllImport($name : str);
 
 func format(str, ** $rules) {
 	for($item in rules) {

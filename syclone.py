@@ -1,6 +1,5 @@
 import json
 import subprocess
-from inspect import signature
 import os
 import src.lexer as lexer
 import src.syc_parser as syc_parser
@@ -139,7 +138,7 @@ class Console:
         pr = syc_parser.Parser()
         tree = pr.parse(tokens)
         print(ConsoleColors.YELLOW + "Generated AST." + ConsoleColors.WHITE)
-        print(tree)
+        # print(tree)
         # cleans tree
         tree.content = ASTtools.resolve_ast(tree.content)
         # semantic analysis
