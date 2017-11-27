@@ -23,6 +23,7 @@ def throw(type, error, params):
         print(t_code[ln_count])
         print(" " * t_code[ln_count].index(params) + "^" * len(params))
     elif type == "syntax_error":
+        print(params)
         spaces = re.findall(r" ", code)
         params[0] += len(spaces)
         end_pos = params[0] + params[1]

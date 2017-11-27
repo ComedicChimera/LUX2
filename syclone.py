@@ -135,8 +135,8 @@ class Console:
         print("\n", end="")
         # runs ll(1) parser
         print(ConsoleColors.BLUE + "Parsing..." + ConsoleColors.WHITE)
-        pr = syc_parser.Parser()
-        tree = pr.parse(tokens)
+        pr = syc_parser.Parser(tokens)
+        tree = pr.parse()
         print(ConsoleColors.YELLOW + "Generated AST." + ConsoleColors.WHITE)
         # print(tree)
         # cleans tree
