@@ -1,1 +1,1 @@
-print("Hello, world");
+new ( new lol() ).dab().get()

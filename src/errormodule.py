@@ -4,7 +4,7 @@ from util import *
 code = ""
 
 
-def throw(type, error, params):
+def throw(type, error, params=""):
     if type == "lexerror":
         if params == "\"" or params == "\'":
             return
@@ -23,19 +23,16 @@ def throw(type, error, params):
         print(t_code[ln_count])
         print(" " * t_code[ln_count].index(params) + "^" * len(params))
     elif type == "syntax_error":
-        print(params)
-        spaces = re.findall(r" ", code)
-        params[0] += len(spaces)
-        end_pos = params[0] + params[1]
-        split_code = code.split("\n")
-        i = 0
-        length = 0
-        for item in split_code:
-            if params[0] >= length and end_pos <= length + len(item):
-                break
-            i += 1
-            length += len(item)
-        print("\nSyntax Error: " + ConsoleColors.RED + error + " (\'" + params + "\') [ln:" + str(i) + " - " + str(params[0]) + "]:")
-        print(split_code[i])
-        print(" " * (params[0] - length) + "^" * params[1])
+        error = str(error)
+        token = re.search("\'[^\']+\'", error).group()
+        line = str(int(re.search("\d+", re.search("line \d+,", error).group()).group()) - 1)
+        position = re.search("\d+", re.search("column \d+.", error).group()).group()
+        print(ConsoleColors.RED + "Unexpected Token: " + token + " at [ln:" + line + "," + position + "]")
+        l_line = code.split("\n")[int(line) - 1]
+        if l_line == '':
+            print(l_line[1:])
+        else:
+            print(code[1:])
+        print((" " * (int(position) - 1)) + ("^" * (len(token) - 2)))
+        print("\nExpected: " + error.split("\n")[1].split("[")[1].split(",")[0] + ConsoleColors.WHITE)
     exit(0)

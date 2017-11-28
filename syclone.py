@@ -6,6 +6,7 @@ import src.syc_parser as syc_parser
 import src.errormodule as er
 import src.ASTtools as ASTtools
 import src.semantic_analyzer as sem
+import src.lark_api as l
 from util import *
 import cmd
 
@@ -125,7 +126,14 @@ class Console:
     # gets semantically valid AST and catches compile time errors
     @staticmethod
     def analyze(code, generate_file):
-        # sets error module code
+        # adds code to error module
+        er.code = code
+        # calls lark api/parser
+        tree = l.parse(code)
+        print(tree)
+        print(type(tree))
+        print(tree.pretty())
+        """# sets error module code
         er.code = code
         # runs lexer
         print(ConsoleColors.BLUE + "Lexing..." + ConsoleColors.WHITE)
@@ -154,7 +162,8 @@ class Console:
             with open("_build/sy_cache/ast.json", "w+") as file:
                 json.dump(tree, file)
                 file.close()
-        return sem_valid_obj
+        return sem_valid_obj"""
+
 
 cn = Console()
 cn.get_input()
