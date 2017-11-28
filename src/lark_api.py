@@ -1,4 +1,4 @@
-from lark import Lark
+"""from lark import Lark
 import src.errormodule as er
 
 
@@ -8,4 +8,4 @@ def parse(input_str):
     try:
         return parser.parse(input_str)
     except Exception as e:
-        er.throw("syntax_error", e)
+        er.throw("syntax_error", e)"""

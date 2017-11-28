@@ -133,11 +133,14 @@ class Console:
         tokens = lx.lex(code)
         for token in tokens:
             print(token.__dict__)
+        # runs tokens in parser
+        parser = syc_parser.Parser(tokens)
+        tree = parser.parse()
         # calls lark api/parser
-        tree = l.parse(code)
-        print(tree)
+        # tree = l.parse(code)
+        """print(tree)
         print(type(tree))
-        print(tree.pretty())
+        print(tree.pretty())"""
         """# sets error module code
         er.code = code
         # runs lexer
