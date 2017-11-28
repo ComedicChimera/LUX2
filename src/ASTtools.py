@@ -1,15 +1,5 @@
-# default AST node class
-class ASTNode:
-    def __init__(self, name):
-        self.name = name
-        self.content = []
-
-
-# token class for ASTs
-class Token:
-    def __init__(self, type, value):
-        self.type = type
-        self.value = value
+from util import Token
+from util import ASTNode
 
 
 # cleans AST so that they are more readable

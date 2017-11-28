@@ -2,6 +2,21 @@ class CustomException(Exception):
     pass
 
 
+# token class for ASTs
+class Token:
+    def __init__(self, type, value, ndx):
+        self.type = type
+        self.value = value
+        self.ndx = ndx
+
+
+# default AST node class
+class ASTNode:
+    def __init__(self, name):
+        self.name = name
+        self.content = []
+
+
 class ConsoleColors:
     MAGENTA = '\033[35m'
     BLUE = '\033[34m'

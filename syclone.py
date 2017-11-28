@@ -128,6 +128,11 @@ class Console:
     def analyze(code, generate_file):
         # adds code to error module
         er.code = code
+        # gets the tokens from the Lexer
+        lx = lexer.Lexer()
+        tokens = lx.lex(code)
+        for token in tokens:
+            print(token.__dict__)
         # calls lark api/parser
         tree = l.parse(code)
         print(tree)

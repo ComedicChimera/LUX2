@@ -1,0 +1,25 @@
+counter = 0
+        for type in self.tokenTypes:
+            counter += 1
+            regex = ["IDENTIFIER", "CHAR_LITERAL", "STRING_LITERAL", "BOOL_LITERAL", "INTEGER_LITERAL", "FLOAT_LITERAL"]
+            if type in regex:
+                rx = re.compile(self.tokenTypes[type])
+                tokens = rx.findall(code)
+                if len(tokens) > 0:
+                    for item in tokens:
+                        ndx = code.find(item)
+                        phrases[ndx] = (item.strip("~"), type)
+                        code = code.replace(item, "~" * len(item), 1)
+            else:
+                code = code.replace(" ", "~")
+                rx = re.compile(re.escape(self.tokenTypes[type]))
+                tokens = rx.findall(code)
+                if len(tokens) > 0:
+                    for item in tokens:
+                        ndx = code.find(item)
+                        phrases[ndx] = (item.strip("~"), type)
+                        code = code.replace(item, "~" * len(item), 1)
+            if counter > 3:
+                code = code.replace(" ", "~")
+        if code != "~" * len(code):
+            er.throw("lexerror", "Unknown Identifier", [x for x in code.split("~") if x != ""][0])

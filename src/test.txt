@@ -1,1 +1,1 @@
-new ( new lol() ).dab().get()
+$x : int = 23;
