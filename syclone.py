@@ -1,12 +1,12 @@
-import json
 import subprocess
 import os
+
+import sys
+
 import src.lexer as lexer
 import src.syc_parser as syc_parser
 import src.errormodule as er
-import src.ASTtools as ASTtools
 import src.semantic_analyzer as sem
-import src.lark_api as l
 from util import *
 import cmd
 
@@ -119,7 +119,7 @@ class Console:
         print(ConsoleColors.BOLD + "Starting Compiler..." + ConsoleColors.WHITE)
         print("\n", end="")
         # run preprocessor
-        print("Running Preprocessor...\n")
+        print(ConsoleColors.BLUE + "Running Preprocessor...\n")
         p_code = code
         self.analyze(p_code, generate_file)
 
@@ -131,45 +131,20 @@ class Console:
         # gets the tokens from the Lexer
         lx = lexer.Lexer()
         tokens = lx.lex(code)
+        print("Lex Successful: Found %d tokens." % len(tokens))
         # runs tokens in parser
         parser = syc_parser.Parser(tokens)
-        tree = parser.parse()
-        print(tree.__dict__)
+        tree = object()
+        try:
+            tree = parser.parse()
+        except RecursionError:
+            print(ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
+            exit(1)
+        print(tree.pretty())
+        print("Generated AST - Digest: %d, %dB." % (len(tree.pretty()), sys.getsizeof(tree)))
         # calls lark api/parser
         # tree = l.parse(code)
-        """print(tree)
-        print(type(tree))
-        print(tree.pretty())"""
-        """# sets error module code
-        er.code = code
-        # runs lexer
-        print(ConsoleColors.BLUE + "Lexing..." + ConsoleColors.WHITE)
-        lx = lexer.Lexer()
-        tokens = lx.lex(code)
-        print((ConsoleColors.YELLOW + "Found {0} tokens." + ConsoleColors.WHITE).format(len(tokens)))
-        print("\n", end="")
-        # runs ll(1) parser
-        print(ConsoleColors.BLUE + "Parsing..." + ConsoleColors.WHITE)
-        pr = syc_parser.Parser(tokens)
-        tree = pr.parse()
-        print(ConsoleColors.YELLOW + "Generated AST." + ConsoleColors.WHITE)
-        # print(tree)
-        # cleans tree
-        tree.content = ASTtools.resolve_ast(tree.content)
-        # semantic analysis
-        print(ConsoleColors.BLUE + "Running semantic analysis on AST." + ConsoleColors.WHITE)
-        sem_valid_obj = sem.sem_analyze(tree)
-        # generates output file architecture
-        if generate_file:
-            os.mkdir("_build")
-            os.mkdir("_build/sy_cache")
-            with open("_build/sy_cache/tokens.txt", "w+") as file:
-                file.write(tokens)
-                file.close()
-            with open("_build/sy_cache/ast.json", "w+") as file:
-                json.dump(tree, file)
-                file.close()
-        return sem_valid_obj"""
+        return tree
 
 
 cn = Console()

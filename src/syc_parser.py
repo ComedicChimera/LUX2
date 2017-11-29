@@ -1,3 +1,5 @@
+import sys
+
 import src.gramtools as gramtools
 from util import ASTNode
 from util import Token
@@ -12,62 +14,44 @@ class Parser:
         self.follow_table = {}
 
     # main parsing method
-    @staticmethod
-    def run_parser(table, grammar, input_tokens):
+    def run_parser(self, table, grammar):
         # primes stack and ect.
         # position in input
         pos = 0
-        # ast_string = ""
         header = ""
         # stack declaration
         stack = ["$", grammar.start_symbol]
         # stack for holding building AST
         sem_stack = [ASTNode(grammar.start_symbol)]
-        input_tokens.append(Token("$", "$", 0))
+        self.input_buffer.append(Token("$", "$", 0))
         # enter cycle
         while len(stack) > 0:
-            print(stack)
-            print(pos)
-            print(input_tokens[pos].type)
             if stack[len(stack) - 1] == "queue":
                 # handles closing of ASTs
-                # ast_string += ")"
                 sem_stack[-2].content.append(sem_stack[-1])
                 sem_stack.pop()
                 stack.pop()
                 continue
             # handles nonterminals
             elif stack[len(stack) - 1] in grammar.nonterminals:
-                if header != "":
-                    # ast_string += header
-                    sem_stack.append(ASTNode(header))
-                    header = ""
-                # nt = stack.pop() + "("
                 nt = stack.pop()
-                header = nt
-                if table[nt][input_tokens[pos].type] != ["$"]:
-                    stack += reversed(table[nt][input_tokens[pos].type] + ["queue"])
+                sem_stack.append(ASTNode(nt))
+                if table[nt][self.input_buffer[pos].type] != ["$"]:
+                    stack += reversed(table[nt][self.input_buffer[pos].type] + ["queue"])
             # handles epsilon
             elif stack[-1] == "&":
                 stack.pop()
                 if stack[-1] == "queue":
                     stack.pop()
-                    # ast_string = ast_string[:len(ast_string) - 1]
                     sem_stack.pop()
             # handles terminals
             else:
-                if stack[len(stack) - 1] == input_tokens[pos].type:
-                    if header != "":
-                        # ast_string += header
-                        sem_stack.append(ASTNode(header))
-                        header = ""
-                    if input_tokens[pos].type != "$":
-                        # ast_string += "[" + input[pos][0] + "," + input[pos][1] + "]"
-                        sem_stack[-1].content.append(input_tokens[pos])
+                if stack[len(stack) - 1] == self.input_buffer[pos].type:
+                    if self.input_buffer[pos].type != "$":
+                        sem_stack[-1].content.append(self.input_buffer[pos])
                     stack.pop()
                 else:
-                    print("error")
-                    er.throw("Unexpected Token", "syntax_error", input_tokens[pos])
+                    er.throw("syntax_error", "Unexpected Token", [self.input_buffer[pos], stack[-1]])
                 pos += 1
         return sem_stack[0]
 
@@ -102,8 +86,6 @@ class Parser:
 
         # avoids repeat chars
         def add_to_follow_set(char):
-            print(char)
-            print(follow_set)
             if char not in follow_set:
                 follow_set.append(char)
 
@@ -116,54 +98,44 @@ class Parser:
             for subPro in production:
                 # checks if the given symbol is the sub-productions
                 if symbol in subPro:
-                    # print(subPro)
                     # finds its location
                     ndx = subPro.index(symbol)
-                    # each evaluates a follow patterns as dictated by follow docs
-                    # aB
-                    if ndx > len(subPro) - 1 and symbol != name:
+                    # each evaluates a follow pattern
+                    if ndx >= len(subPro) - 1 and symbol != name:
                         follow = self.follow(name, grammar)
                         for item in follow:
                             add_to_follow_set(item)
                     elif ndx < len(subPro) - 1:
-                        next_symbol = subPro[ndx + 1]
-                        # terminals
-                        if next_symbol in grammar.terminals:
-                            add_to_follow_set(next_symbol)
-                        # aB&
-                        elif next_symbol == "&":
-                            follow = self.follow(name, grammar)
-                            for item in follow:
-                                add_to_follow_set(item)
-                        # aBc
-                        else:
-                            for nt_follow in self.follow(next_symbol, grammar):
-                                add_to_follow_set(nt_follow)
+                        follows = self.evaluate_follow(grammar, subPro, ndx, name, symbol)
+                        for item in follows:
+                            add_to_follow_set(item)
         self.follow_table[symbol] = follow_set
         return follow_set
 
-    """def non_terminal_follow(self, grammar, name, sub_pro, ndx):
-        nt_follow_set = []
-        next_symbol = sub_pro[ndx + 1]
+    # evaluate standard follow
+    def evaluate_follow(self, grammar, subPro, ndx, name, symbol):
+        # sets up follow set
+        follow_set = []
 
-        def add_to_nt_follow_set(char):
-            if char not in nt_follow_set:
-                nt_follow_set.append(char)
+        # avoids repeat chars
+        def add_to_follow_set(char):
+            if char not in follow_set:
+                follow_set.append(char)
 
-        if next_symbol in grammar.terminals:
-            return [next_symbol]
-        firsts = self.first(grammar, grammar.productions[next_symbol])
-        for first in firsts:
-            if first != "&":
-                add_to_nt_follow_set(first)
+        follows = self.first(grammar, [subPro[ndx + 1:]])
+        for follow in follows:
+            if follow != "&":
+                add_to_follow_set(follow)
             else:
-                if ndx + 2 < len(sub_pro):
-                    for nt_follow in self.non_terminal_follow(grammar, name, sub_pro, ndx + 1):
-                        add_to_nt_follow_set(nt_follow)
+                if ndx + 2 < len(subPro) - 1:
+                    follows2 = self.evaluate_follow(grammar, subPro[ndx + 2:], ndx, name, symbol)
+                    for follow2 in follows2:
+                        add_to_follow_set(follow2)
                 else:
-                    for nt_follow in self.follow(name, grammar):
-                        add_to_nt_follow_set(nt_follow)
-        return nt_follow_set"""
+                    follows3 = self.follow(name, grammar)
+                    for follow3 in follows3:
+                        add_to_follow_set(follow3)
+        return follow_set
 
     # first function
     def first(self, grammar, production):
@@ -179,22 +151,42 @@ class Parser:
             else:
                 if obj not in first_list:
                     first_list.append(obj)
+
+        # iterate through productions
         for sub_pro in production:
             # if first item is a terminal, add to first list
             if sub_pro[0] in grammar.terminals or sub_pro[0] == "&":
                 add_to_first_list(sub_pro[0])
             # if first item in non-terminal, recur and add the result to first list
             else:
-                first = self.first(grammar, grammar.productions[sub_pro[0]])
-                add_to_first_list(first)
-            return first_list
+                add_to_first_list(self.non_terminal_first(grammar, sub_pro, 0))
+        return first_list
+        
+    # handles non_terminals in first
+    def non_terminal_first(self, grammar, production, pos):
+        firsts = []
+        first = self.first(grammar, grammar.productions[production[pos]])
+        for item in first:
+            if item != "&":
+                firsts.append(item)
+            else:
+                if len(production) - 1 > pos + 1:
+                    if production[pos + 1] in grammar.nonterminals:
+                        firsts += self.non_terminal_first(grammar, production, pos + 1)
+                    else:
+                        firsts.append(production[pos + 1])
+                else:
+                    firsts.append(item)
+        return firsts
 
     def parse(self):
         # loads in the grammar
         g = gramtools.build_grammar()
+        print("Loaded Grammar: %dB." % sys.getsizeof(g))
         # generate parsing table
         p_table = self.generate_table(g)
+        print("Generated Parsing Table: %dB." % sys.getsizeof(p_table))
         # returns result of parsing function
-        return self.run_parser(p_table, g, self.input_buffer)
+        return self.run_parser(p_table, g)
 
 

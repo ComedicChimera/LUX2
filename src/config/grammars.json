@@ -269,8 +269,7 @@
   ],
   "stmt": [
      "stmts ; nstmts"
-   ],
-  "stmts": [
+   ],  "stmts": [
     "expr",
     "var_decl",
     "assignment",

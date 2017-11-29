@@ -32,10 +32,11 @@ class Lexer:
     @staticmethod
     def clear_comments(code):
         # removes all multi-line comments
-        multi_line_comments = re.findall(re.compile("/\*.*\n*\*/"), code)
+        multi_line_comments = re.findall(re.compile("/\*.*\*/", re.MULTILINE | re.DOTALL), code)
         for item in multi_line_comments:
             code = code.replace(item, "", 1)
         single_line_comments = re.findall(re.compile("//.*\n"), code)
         for item in single_line_comments:
             code = code.replace(item, "", 1)
+        print(code)
         return code

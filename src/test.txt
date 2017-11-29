@@ -1,2 +1,4 @@
-//&x : module (this);
-3 + 4
+/*&x : module (this);
+a + b * c + (d * e)
+34 + myFunc().result ^ 98*/
+2 ^ 3 ^ 3

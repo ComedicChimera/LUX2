@@ -1,10 +1,20 @@
 {
-  "start": [
-    "INTEGER_LITERAL add_sub_ops"
+  "E": [
+    "T E'"
   ],
-  "add_sub_ops": [
-    "+ INTEGER_LITERAL add_sub_ops",
-    "- INTEGER_LITERAL add_sub_ops",
+  "E'": [
+    "+ T E'",
     "&"
+  ],
+  "T": [
+    "F T'"
+  ],
+  "T'": [
+    "* F T'",
+    "&"
+  ],
+  "F": [
+    "IDENTIFIER",
+    "( E )"
   ]
 }

@@ -1,0 +1,66 @@
+{
+  "math_expr": [
+    "mul_div add_sub_ops",
+    "string + string math_expr",
+    "&"
+  ],
+  "add_sub_ops": [
+    "+ mul_div add_sub_ops",
+    "- mul_div add_sub_ops",
+    "&"
+  ],
+  "mul_div": [
+    "exp mul_div_ops",
+    "string * string",
+    "&"
+  ],
+  "mul_div_ops": [
+    "* exp mul_div_ops",
+    "/ exp mul_div_ops",
+    "% exp mul_div_ops",
+    "&"
+  ],
+  "exp": [
+    "math_types exp_ops"
+  ],
+  "exp_ops": [
+    "^ math_types exp_ops",
+    "&"
+  ],
+  "math_types": [
+    "int_increm",
+    "FLOAT_LITERAL"
+  ],
+  "int_increm": [
+    "int_obj prefix"
+  ],
+  "prefix": [
+    "++",
+    "--",
+    "**",
+    "&"
+  ],
+  "int_obj": [
+    "this_id",
+    "INTEGER_LITERAL"
+  ],
+  "this_id": [
+    "THIS dot_id",
+    "id"
+  ],
+  "id": [
+    "IDENTIFIER func_call dot_id"
+  ],
+  "dot_id": [
+    ". IDENTIFIER func_call dot_id",
+    "&"
+  ],
+  "func_call": [
+    "( func_params )",
+    "&"
+  ],
+  "func_params": [
+    "IDENTIFIER",
+    "&"
+  ]
+}

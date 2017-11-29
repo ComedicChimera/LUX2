@@ -9,12 +9,21 @@ class Token:
         self.value = value
         self.ndx = ndx
 
+    def pretty(self):
+        return "Token(%s, %s)" % (self.type, self.value)
+
 
 # default AST node class
 class ASTNode:
     def __init__(self, name):
         self.name = name
         self.content = []
+
+    def pretty(self):
+        pretty_string = self.name + ":["
+        for item in self.content:
+            pretty_string += item.pretty() + ","
+        return pretty_string[:len(pretty_string) - 1] + "]"
 
 
 class ConsoleColors:

@@ -1,0 +1,36 @@
+                        """next_symbol = subPro[ndx + 1]
+                        # terminals
+                        if next_symbol in grammar.terminals:
+                            add_to_follow_set(next_symbol)
+                        # aB&
+                        elif next_symbol == "&":
+                            follow = self.follow(name, grammar)
+                            for item in follow:
+                                add_to_follow_set(item)
+                        # aBc
+                        else:
+                            for nt_follow in self.follow(next_symbol, grammar):
+                                add_to_follow_set(nt_follow)"""
+
+                            """def non_terminal_follow(self, grammar, name, sub_pro, ndx):
+        nt_follow_set = []
+        next_symbol = sub_pro[ndx + 1]
+
+        def add_to_nt_follow_set(char):
+            if char not in nt_follow_set:
+                nt_follow_set.append(char)
+
+        if next_symbol in grammar.terminals:
+            return [next_symbol]
+        firsts = self.first(grammar, grammar.productions[next_symbol])
+        for first in firsts:
+            if first != "&":
+                add_to_nt_follow_set(first)
+            else:
+                if ndx + 2 < len(sub_pro):
+                    for nt_follow in self.non_terminal_follow(grammar, name, sub_pro, ndx + 1):
+                        add_to_nt_follow_set(nt_follow)
+                else:
+                    for nt_follow in self.follow(name, grammar):
+                        add_to_nt_follow_set(nt_follow)
+        return nt_follow_set"""
