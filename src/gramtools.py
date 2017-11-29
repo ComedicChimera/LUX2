@@ -14,8 +14,8 @@ class Grammar:
 # reads data in from json and converts it to a grammar obj
 def build_grammar():
     # opens json file
-    json_obj = json.loads(open(util.source_dir + "/src/config/grammars.json").read())
-    # json_obj = json.loads(open(util.source_dir + "/src/config/test_grammar.json").read())
+    # json_obj = json.loads(open(util.source_dir + "/src/config/grammars.json").read())
+    json_obj = json.loads(open(util.source_dir + "/src/config/test_grammar.json").read())
     # sets up new grammar
     grammar = Grammar()
     # adds all left hand side to non-terminals

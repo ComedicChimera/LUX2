@@ -22,8 +22,6 @@ class Lexer:
             matches = re.finditer(self.tokenTypes[token], code)
             for match in matches:
                 if match.group(0) != "" and match.start() not in phrases.keys():
-                    print(match.group(0))
-                    print(token)
                     phrases[match.start()] = Token(token, match.group(0), match.start())
         # sorts them in order
         numbers = [x for x in phrases]

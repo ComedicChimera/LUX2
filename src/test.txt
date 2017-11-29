@@ -1,1 +1,2 @@
-$x : int = 23;
+//&x : module (this);
+3 + 4

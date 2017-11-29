@@ -23,10 +23,12 @@ class Parser:
         stack = ["$", grammar.start_symbol]
         # stack for holding building AST
         sem_stack = [ASTNode(grammar.start_symbol)]
-        input_tokens.append(("", "$"))
+        input_tokens.append(Token("$", "$", 0))
         # enter cycle
         while len(stack) > 0:
-            print(sem_stack)
+            print(stack)
+            print(pos)
+            print(input_tokens[pos].type)
             if stack[len(stack) - 1] == "queue":
                 # handles closing of ASTs
                 # ast_string += ")"
@@ -59,14 +61,14 @@ class Parser:
                         # ast_string += header
                         sem_stack.append(ASTNode(header))
                         header = ""
-                    if input_tokens[pos] != "$":
+                    if input_tokens[pos].type != "$":
                         # ast_string += "[" + input[pos][0] + "," + input[pos][1] + "]"
                         sem_stack[-1].content.append(input_tokens[pos])
                     stack.pop()
                 else:
-                    er.throw("Unexpected Token", "syntax_error", input_tokens)
+                    print("error")
+                    er.throw("Unexpected Token", "syntax_error", input_tokens[pos])
                 pos += 1
-        print("Returning")
         return sem_stack[0]
 
     # generates the parsing table
@@ -80,7 +82,7 @@ class Parser:
             # checks through each sub-production for the main production
             for sub_pro in grammar.productions[production]:
                 # gets first
-                first = self.first(grammar=grammar, production=sub_pro)
+                first = self.first(grammar=grammar, production=[sub_pro])
                 # if there is an epsilon, gets follows
                 for item in first:
                     if item == "&":
@@ -100,6 +102,8 @@ class Parser:
 
         # avoids repeat chars
         def add_to_follow_set(char):
+            print(char)
+            print(follow_set)
             if char not in follow_set:
                 follow_set.append(char)
 
@@ -133,12 +137,12 @@ class Parser:
                                 add_to_follow_set(item)
                         # aBc
                         else:
-                            for nt_follow in self.non_terminal_follow(grammar, name, subPro, ndx):
+                            for nt_follow in self.follow(next_symbol, grammar):
                                 add_to_follow_set(nt_follow)
         self.follow_table[symbol] = follow_set
         return follow_set
 
-    def non_terminal_follow(self, grammar, name, sub_pro, ndx):
+    """def non_terminal_follow(self, grammar, name, sub_pro, ndx):
         nt_follow_set = []
         next_symbol = sub_pro[ndx + 1]
 
@@ -159,7 +163,7 @@ class Parser:
                 else:
                     for nt_follow in self.follow(name, grammar):
                         add_to_nt_follow_set(nt_follow)
-        return nt_follow_set
+        return nt_follow_set"""
 
     # first function
     def first(self, grammar, production):
@@ -175,19 +179,22 @@ class Parser:
             else:
                 if obj not in first_list:
                     first_list.append(obj)
-        # if first item is a terminal, add to first list
-        if production[0] in grammar.terminals or production[0] == "&":
-            add_to_first_list(production[0])
-        # if first item in non-terminal, recur and add the result to first list
-        else:
-            first = self.first(grammar, grammar.productions[production[0]])
-            add_to_first_list(first)
-        return first_list
+        for sub_pro in production:
+            # if first item is a terminal, add to first list
+            if sub_pro[0] in grammar.terminals or sub_pro[0] == "&":
+                add_to_first_list(sub_pro[0])
+            # if first item in non-terminal, recur and add the result to first list
+            else:
+                first = self.first(grammar, grammar.productions[sub_pro[0]])
+                add_to_first_list(first)
+            return first_list
 
     def parse(self):
         # loads in the grammar
         g = gramtools.build_grammar()
         # generate parsing table
         p_table = self.generate_table(g)
+        # returns result of parsing function
+        return self.run_parser(p_table, g, self.input_buffer)
 
 
