@@ -21,11 +21,11 @@
     "&"
   ],
   "exp": [
-    "math_types exp_ops"
+    "math_types ^ exp",
+    "exp_types"
   ],
-  "exp_ops": [
-    "^ math_types exp_ops",
-    "&"
+  "exp_types": [
+    "math_types"
   ],
   "math_types": [
     "int_increm",
