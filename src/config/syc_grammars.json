@@ -1,7 +1,11 @@
 {
   "math_expr": [
     "mul_div add_sub_ops",
-    "string + string math_expr",
+    "string concat",
+    "&"
+  ],
+  "concat": [
+    "+ string math_expr",
     "&"
   ],
   "add_sub_ops": [
@@ -62,5 +66,9 @@
   "func_params": [
     "IDENTIFIER",
     "&"
+  ],
+  "string": [
+    "STRING dot_id",
+    "CHAR dot_id"
   ]
 }
