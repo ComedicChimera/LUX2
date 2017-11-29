@@ -1,11 +1,18 @@
 {
   "math_expr": [
     "mul_div add_sub_ops",
-    "string concat",
+    "multi_concat_str concat",
     "&"
   ],
   "concat": [
-    "+ string math_expr",
+    "+ multi_concat_str concat",
+    "&"
+  ],
+  "multi_concat_str": [
+    "string multi_concat"
+  ],
+  "multi_concat": [
+    "* INTEGER dot_id multi_concat",
     "&"
   ],
   "add_sub_ops": [
