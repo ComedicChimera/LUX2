@@ -1,6 +1,57 @@
 {
+  "equation": [
+    "or n_equation"
+  ],
+  "n_equation": [
+    "comparison_op or n_equation",
+    "&"
+  ],
+  "comparison_op": [
+    "==",
+    ">=",
+    "<=",
+    "===",
+    "!==",
+    "!=",
+    ">",
+    "<"
+  ],
+  "or": [
+    "xor n_or"
+  ],
+  "n_or": [
+    "OR xor n_or",
+    "&"
+  ],
+  "xor": [
+    "and n_xor"
+  ],
+  "n_xor": [
+    "XOR and n_xor",
+    "&"
+  ],
+  "and": [
+    "not n_and"
+  ],
+  "n_and": [
+    "AND not n_and",
+    "&"
+  ],
+  "not": [
+    "! shift",
+    "shift"
+  ],
+  "shift": [
+    "expression n_shift"
+  ],
+  "n_shift": [
+    "<< expression n_shift",
+    ">> expression n_shift",
+    "&"
+  ],
   "expression": [
-    "term add_sub_op"
+    "term add_sub_op",
+    "bool"
   ],
   "add_sub_op": [
     "+ term add_sub_op",
@@ -59,5 +110,12 @@
   "number": [
     "INTEGER_LITERAL",
     "FLOAT_LITERAL"
+  ],
+  "bool": [
+    "BOOL_LITERAL bool_trailer"
+  ],
+  "bool_trailer": [
+    " . base trailer",
+    "&"
   ]
 }
