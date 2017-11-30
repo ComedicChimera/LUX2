@@ -135,7 +135,12 @@
     "inline_function"
   ],
   "inline_function": [
-    "FUNC ( inline_params ) { }"
+    "FUNC ( inline_params ) { }",
+    "await ASYNC ( inline_params ) { }"
+  ],
+  "await": [
+    "AWAIT",
+    "&"
   ],
   "inline_params": [
     "DOLLAR IDENTIFIER << expr inline_params",
