@@ -36,7 +36,7 @@ class Parser:
                 nt = stack.pop()
                 sem_stack.append(ASTNode(nt))
                 if self.input_buffer[pos].type not in table[nt]:
-                    er.throw("syntax_error", "Unexpected Token", self.input_buffer[pos])
+                    er.throw("syntax_error", "Unexpected Token", [self.input_buffer[pos], [str(x) for x in table[nt].keys()]])
                 if table[nt][self.input_buffer[pos].type] != ["$"]:
                     stack += reversed(table[nt][self.input_buffer[pos].type] + ["queue"])
             # handles epsilon
@@ -80,7 +80,6 @@ class Parser:
 
     # follow function
     def follow(self, symbol, grammar):
-        print(symbol)
         if symbol in self.follow_table.keys():
             return self.follow_table[symbol]
         # sets up follow set
@@ -153,8 +152,6 @@ class Parser:
             else:
                 if obj not in first_list:
                     first_list.append(obj)
-
-        print(production)
         # iterate through productions
         for sub_pro in production:
             # if first item is a terminal, add to first list

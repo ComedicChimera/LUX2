@@ -1,29 +1,44 @@
 {
+  "expression": [
+    "term add_sub_op"
+  ],
+  "add_sub_op": [
+    "+ term add_sub_op",
+    "- term add_sub_op",
+    "&"
+  ],
+  "term": [
+    "factor mul_div_mod_op"
+  ],
+  "mul_div_mod_op": [
+    "* factor mul_div_mod_op",
+    "/ factor mul_div_mod_op",
+    "% factor mul_div_mod_op",
+    "&"
+  ],
   "factor": [
-    "prefix factor",
-    "power"
+    "unary_atom exp_op"
+  ],
+  "exp_op": [
+    "^ unary_atom exp_op",
+    "&"
+  ],
+  "unary_atom": [
+    "prefix atom",
+    "atom"
   ],
   "prefix": [
     "-",
-    "@",
-    "dereference_op"
+    "* deref_op",
+    "@"
   ],
-  "dereference_op": [
-    "* n_deref"
-  ],
-  "n_deref": [
+  "deref_op": [
     "*",
     "&"
   ],
-  "power": [
-    "atom power_op"
-  ],
-  "power_op": [
-    "^ factor",
-    "&"
-  ],
   "atom": [
-    "base trailer"
+    "base trailer",
+    "( expression )"
   ],
   "trailer": [
     "[ ] trailer",
@@ -34,7 +49,8 @@
   "base": [
     "string",
     "number",
-    "IDENTIFIER"
+    "IDENTIFIER",
+    "THIS"
   ],
   "string": [
     "STRING_LITERAL",

@@ -1,1 +1,2 @@
-3 + 2 ^ -4
+//3 + 2 ^ -4
+-("hi there" + "fello humans" + this.myStr()[]) - 43
