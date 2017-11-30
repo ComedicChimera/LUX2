@@ -1,81 +1,47 @@
 {
-  "math_expr": [
-    "mul_div add_sub_ops",
-    "multi_concat_str concat",
-    "&"
-  ],
-  "concat": [
-    "+ multi_concat_str concat",
-    "&"
-  ],
-  "multi_concat_str": [
-    "string multi_concat"
-  ],
-  "multi_concat": [
-    "* INTEGER dot_id multi_concat",
-    "&"
-  ],
-  "add_sub_ops": [
-    "+ mul_div add_sub_ops",
-    "- mul_div add_sub_ops",
-    "&"
-  ],
-  "mul_div": [
-    "exp mul_div_ops",
-    "string * string",
-    "&"
-  ],
-  "mul_div_ops": [
-    "* exp mul_div_ops",
-    "/ exp mul_div_ops",
-    "% exp mul_div_ops",
-    "&"
-  ],
-  "exp": [
-    "math_types ^ exp",
-    "exp_types"
-  ],
-  "exp_types": [
-    "math_types"
-  ],
-  "math_types": [
-    "int_increm",
-    "FLOAT_LITERAL"
-  ],
-  "int_increm": [
-    "int_obj prefix"
+  "factor": [
+    "prefix factor",
+    "power"
   ],
   "prefix": [
-    "++",
-    "--",
-    "**",
+    "-",
+    "@",
+    "dereference_op"
+  ],
+  "dereference_op": [
+    "* n_deref"
+  ],
+  "n_deref": [
+    "*",
     "&"
   ],
-  "int_obj": [
-    "this_id",
-    "INTEGER_LITERAL"
+  "power": [
+    "atom power_op"
   ],
-  "this_id": [
-    "THIS dot_id",
-    "id"
-  ],
-  "id": [
-    "IDENTIFIER func_call dot_id"
-  ],
-  "dot_id": [
-    ". IDENTIFIER func_call dot_id",
+  "power_op": [
+    "^ factor",
     "&"
   ],
-  "func_call": [
-    "( func_params )",
+  "atom": [
+    "base trailer"
+  ],
+  "trailer": [
+    "[ ] trailer",
+    "( ) trailer",
+    ". base trailer",
     "&"
   ],
-  "func_params": [
-    "IDENTIFIER",
-    "&"
+  "base": [
+    "string",
+    "number",
+    "IDENTIFIER"
   ],
   "string": [
-    "STRING dot_id",
-    "CHAR dot_id"
+    "STRING_LITERAL",
+    "CHAR_LITERAL"
+  ],
+  "number": [
+    "INTEGER_LITERAL",
+    "FLOAT_LITERAL"
   ]
 }

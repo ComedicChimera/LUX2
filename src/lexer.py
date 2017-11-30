@@ -23,6 +23,7 @@ class Lexer:
             for match in matches:
                 if match.group(0) != "" and match.start() not in phrases.keys():
                     phrases[match.start()] = Token(token, match.group(0), match.start())
+                    code = code.replace(match.group(0), "\0" * len(match.group(0)))
         # sorts them in order
         numbers = [x for x in phrases]
         numbers.sort()
@@ -35,8 +36,7 @@ class Lexer:
         multi_line_comments = re.findall(re.compile("/\*.*\*/", re.MULTILINE | re.DOTALL), code)
         for item in multi_line_comments:
             code = code.replace(item, "", 1)
-        single_line_comments = re.findall(re.compile("//.*\n"), code)
+        single_line_comments = re.findall(re.compile("//.*\n*"), code)
         for item in single_line_comments:
             code = code.replace(item, "", 1)
-        print(code)
         return code

@@ -18,7 +18,6 @@ class Parser:
         # primes stack and ect.
         # position in input
         pos = 0
-        header = ""
         # stack declaration
         stack = ["$", grammar.start_symbol]
         # stack for holding building AST
@@ -32,10 +31,12 @@ class Parser:
                 sem_stack.pop()
                 stack.pop()
                 continue
-            # handles nonterminals
+            # handles non terminals
             elif stack[len(stack) - 1] in grammar.nonterminals:
                 nt = stack.pop()
                 sem_stack.append(ASTNode(nt))
+                if self.input_buffer[pos].type not in table[nt]:
+                    er.throw("syntax_error", "Unexpected Token", self.input_buffer[pos])
                 if table[nt][self.input_buffer[pos].type] != ["$"]:
                     stack += reversed(table[nt][self.input_buffer[pos].type] + ["queue"])
             # handles epsilon
@@ -79,6 +80,7 @@ class Parser:
 
     # follow function
     def follow(self, symbol, grammar):
+        print(symbol)
         if symbol in self.follow_table.keys():
             return self.follow_table[symbol]
         # sets up follow set
@@ -152,6 +154,7 @@ class Parser:
                 if obj not in first_list:
                     first_list.append(obj)
 
+        print(production)
         # iterate through productions
         for sub_pro in production:
             # if first item is a terminal, add to first list
