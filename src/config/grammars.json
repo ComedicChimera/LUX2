@@ -1,4 +1,34 @@
 {
+  "expr": [
+    "object_declaration",
+    "lambda",
+    "comprehension",
+    "equation"
+  ],
+  "object_declaration": [
+    "NEW id ( constructor ) trailer"
+  ],
+  "constructor": [
+    "{ constructor_params }",
+    "&"
+  ],
+  "constructor_params": [
+    "IDENTIFIER : expr constructor_params",
+    "&"
+  ],
+  "lambda": [
+    "LAMBDA ( lambda_expr )"
+  ],
+  "lambda_expr": [
+    "atom [ IDENTIFIER ] => expr lambda_if"
+  ],
+  "lambda_if": [
+    "IF equation",
+    "&"
+  ],
+  "comprehension": [
+    "[ atom ^ ( IDENTIFIER => expr ) ]"
+  ],
   "equation": [
     "or n_equation"
   ],
@@ -92,8 +122,8 @@
     "( expression )"
   ],
   "trailer": [
-    "[ ] trailer",
-    "( ) trailer",
+    "[ equation ] trailer",
+    "( func_params ) trailer",
     ". base trailer",
     "&"
   ],
@@ -101,7 +131,15 @@
     "string",
     "number",
     "IDENTIFIER",
-    "THIS"
+    "THIS",
+    "inline_function"
+  ],
+  "inline_function": [
+    "FUNC ( inline_params ) { }"
+  ],
+  "inline_params": [
+    "DOLLAR IDENTIFIER << expr inline_params",
+    "&"
   ],
   "string": [
     "STRING_LITERAL",
@@ -116,6 +154,28 @@
   ],
   "bool_trailer": [
     " . base trailer",
+    "&"
+  ],
+  "list": [
+    "[ list_builder ]"
+  ],
+  "list_builder": [
+    "expr n_list",
+    "&"
+  ],
+  "n_list": [
+    ", expr n_list",
+    "&"
+  ],
+  "dict": [
+    "{ dict_builder }"
+  ],
+  "dict_builder": [
+    "base : expr n_dict",
+    "&"
+  ],
+  "n_dict": [
+    ", base : expr n_dict",
     "&"
   ]
 }
