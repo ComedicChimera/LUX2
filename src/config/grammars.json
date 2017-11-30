@@ -1,707 +1,121 @@
 {
-  "main": [
-    "block",
-    "module",
+  "equation": [
+    "or n_equation"
+  ],
+  "n_equation": [
+    "comparison_op or n_equation",
     "&"
   ],
-  "func_main": [
-    "return_stmt",
-    "block"
+  "comparison_op": [
+    "==",
+    ">=",
+    "<=",
+    "===",
+    "!==",
+    "!=",
+    ">",
+    "<"
   ],
-  "block_main": [
-    "stmt block_main",
-    "BREAK ; block_main",
-    "CONTINUE ; block_main",
-    "sub_blocks block_main",
+  "or": [
+    "xor n_or"
+  ],
+  "n_or": [
+    "OR xor n_or",
     "&"
   ],
-  "type_main": [
-    "IDENTIFIER = set_expr , type_main",
-    "IDENTIFIER , type_main",
+  "xor": [
+    "and n_xor"
+  ],
+  "n_xor": [
+    "XOR and n_xor",
     "&"
   ],
-  "struct_main": [
-    "DOLLAR THIS dot_id = set_expr struct_main ,",
-    "DOLLAR THIS dot_id , struct_main",
+  "and": [
+    "not n_and"
+  ],
+  "n_and": [
+    "AND not n_and",
     "&"
   ],
-  "interface_main": [
-    "func_decl ; interface_main",
+  "not": [
+    "! shift",
+    "shift"
+  ],
+  "shift": [
+    "expression n_shift"
+  ],
+  "n_shift": [
+    "<< expression n_shift",
+    ">> expression n_shift",
     "&"
   ],
-  "module": [
-    "module_decl { constructor_block main } main",
+  "expression": [
+    "term add_sub_op",
+    "bool"
+  ],
+  "add_sub_op": [
+    "+ term add_sub_op",
+    "- term add_sub_op",
     "&"
   ],
-  "module_decl": [
-    "MODULE mod_type id"
+  "term": [
+    "factor mul_div_mod_op"
   ],
-  "mod_type": [
-    "ACTIVE",
-    "PASSIVE",
-    "AWAIT"
-  ],
-  "block": [
-    "blocks n_blocks"
-  ],
-  "blocks": [
-    "stmt",
-    "block_stmts"
-  ],
-  "n_blocks": [
-    "blocks n_blocks",
+  "mul_div_mod_op": [
+    "* factor mul_div_mod_op",
+    "/ factor mul_div_mod_op",
+    "% factor mul_div_mod_op",
     "&"
   ],
-  "block_stmts": [
-    "func_block",
-    "macro_block",
-    "constructor_block",
-    "struct_block",
-    "interface_block",
-    "type_block",
-    "with_block",
-    "sub_blocks",
-    "async_block",
-    "error_block",
-    "new_thread_block",
-    "if_when_block"
+  "factor": [
+    "unary_atom exp_op"
   ],
-  "if_when_block": [
-    "IF ( math_expr ) { when_main }",
-    "IF ( math_expr , cond_expr ) { when_main }"
-  ],
-  "when_main": [
-    "block_main",
-    "when_stmt when_main",
+  "exp_op": [
+    "^ unary_atom exp_op",
     "&"
   ],
-  "when_stmt": [
-    "WHEN ( math_expr ) : block_main BREAK ;",
-    "DEFAULT : block_main BREAK ;"
-  ],
-  "new_thread_block": [
-    "ASYNC ( NEW id ) { main }"
-  ],
-  "sub_blocks": [
-    "if_block",
-    "do_block",
-    "for_block"
-  ],
-  "constructor_block": [
-    "scope_modifiers CONSTRUCTOR id ( func_params ) inherit { block_main }"
-  ],
-  "inherit": [
-    ": id n_inherit",
-    "&"
-  ],
-  "n_inherit": [
-    ", id n_inherit",
-    "&"
-  ],
-  "error_block": [
-    "ERROR_HANDLER ( error_list , inline_func ) { main }"
-  ],
-  "error_list": [
-    "obj_id n_error_list"
-  ],
-  "n_error_list": [
-    ", obj_id n_error_list",
-    "&"
-  ],
-  "async_block": [
-    "async_decl { func_main }",
-    "async_decl => stmts ;",
-    "async_decl => RETURN set_expr ;"
-  ],
-  "async_decl": [
-    "ASYNC async_modifiers func_types id ( func_params )"
-  ],
-  "async_modifiers": [
-    "func_modifiers",
-    "VOLATILE func_modifiers",
-    "&"
-  ],
-  "with_block": [
-    "WITH ( with_expr ) { block_main }"
-  ],
-  "with_expr": [
-    "var_decl",
-    "set_expr"
-  ],
-  "struct_block": [
-    "STRUCT id { struct_main }"
-  ],
-  "inferface_block": [
-    "INTERFACE id { interface_main }"
-  ],
-  "type_block": [
-    "TYPE id { type_main }"
-  ],
-  "if_block": [
-    "IF ( cond_expr ) { block_main } elif_block",
-    "IF ( cond_expr ) { block_main } else_block",
-    "IF ( cond_expr ) stmts ; elif_block",
-    "IF ( cond_expr ) stmts ; else_block"
-  ],
-  "elif_block": [
-    "ELIF ( cond_expr ) { block_main } elif_block",
-    "ELIF ( cond_expr ) { block_main } else_block",
-    "ELIF ( cond_expr ) stmts ; elif_block",
-    "ELIF ( cond_expr ) stmts ; else_block",
-    "&"
-  ],
-  "else_block": [
-    "ELSE { block_main }",
-    "ELSE stmts ;"
-  ],
-  "do_block": [
-    "DO ( cond_expr ) { block_main }",
-    "DO { block_main }",
-    "DO { block_main } IF ( cond_expr ) ;",
-    "DO ( cond_expr ) stmts ;"
-  ],
-  "for_block": [
-    "FOR ( for_params ) { block_main }",
-    "FOR ( for_params ) stmts ;",
-    "FOR ( DOLLAR IDENTIFIER IN for_iter_params ) { block_main }",
-    "FOR ( DOLLAR IDENTIFIER IN for_iter_params ) stmts ;"
-  ],
-  "multi_type": [
-    "( e_types n_e_types )"
-  ],
-  "e_types": [
-    "all_types",
-    "FUNC",
-    "MACRO",
-    "MODULE",
-    "id"
-  ],
-  "n_e_types": [
-    ", e_types n_e_types",
-    "&"
-  ],
-  "for_iter_params": [
-    "lambda_expr",
-    "yield_expr",
-    "comprehension_expr",
-    "obj_id",
-    "func_expr",
-    "AWAIT async_expr",
-    "async_expr"
-  ],
-  "for_params": [
-    "DOLLAR IDENTIFIER extension = int_math_expr ; comp_expr ; for_math_expr ;",
-    "int_math_expr",
-    "cond_expr ; int_math_expr"
-  ],
-  "for_math_expr": [
-    "IDENTIFIER lit_assignment_ops int_math_expr",
-    "IDENTIFIER ++",
-    "IDENTIFIER --",
-    "IDENTIFIER **"
-  ],
-  "func_block": [
-    "func_decl { func_main }",
-    "func_decl => stmts ;",
-    "func_decl => RETURN set_expr ;"
-  ],
-  "macro_block": [
-    "macro_decl { block_main }",
-    "macro_decl => stmts ;"
-  ],
-  "func_decl": [
-    "FUNC func_modifiers func_types id ( func_params )"
-  ],
-  "macro_decl": [
-    "MACRO func_modifiers id ( macro_params )"
-  ],
-  "func_modifiers": [
-    "var_modifiers",
-    "FINAL var_modifiers",
-    "&"
-  ],
-  "access_modifiers": [
-    "PROTECTED",
-    "PRIVATE",
-    "&"
-  ],
-  "scope_modifiers": [
-    "LOCAL",
-    "GLOBAL",
-    "&"
-  ],
-  "func_types": [
-    "all_types",
-    "multi_type",
-    "VALUE",
-    "&"
-  ],
-  "func_params": [
-    "THIS n_func_params",
-    "all_types n_func_params",
-    "DOLLAR IDENTIFIER func_extension n_func_params",
-    "@ IDENTIFIER func_extension n_func_params",
-    "&"
-  ],
-  "n_func_params": [
-    ", DOLLAR IDENTIFIER func_extension n_func_params",
-    "@ IDENTIFIER func_extension n_func_params",
-    ", optional_params",
-    "&"
-  ],
-  "optional_params": [
-    "DOLLAR IDENTIFIER extension = set_expr n_optional_params",
-    "** DOLLAR IDENTIFIER"
-  ],
-  "n_optional_params": [
-    ", DOLLAR IDENTIFIER extension = set_expr n_optional_params",
-    "&"
-  ],
-  "macro_params": [
-    "DOLLAR IDENTIFIER func_extension n_macro_params",
-    "THIS n_macro_params",
-    "all_types n_macro_params",
-    "&"
-  ],
-  "n_macro_params": [
-    ", DOLLAR IDENTIFIER func_extension n_macro_params",
-    "&"
-  ],
-  "stmt": [
-     "stmts ; nstmts"
-   ],  "stmts": [
-    "expr",
-    "var_decl",
-    "assignment",
-    "fwd_decl",
-    "constructor_stmt",
-    "DELETE this_id",
-    "WITH ( with_expr ) dotid",
-    "null_decl",
-    "p_null_decl",
-    "throw_stmt",
-    "bin_shift_stmt",
-    "( expr ) . func_expr",
-    "( expr ) dotid"
-  ],
-  "bin_shift_stmt": [
-    "this_id shifts set_expr"
-  ],
-  "return_stmt": [
-    "func_stmt n_func_stmt"
-  ],
-  "func_stmt": [
-    "stmt",
-    "RETURN set_expr",
-    "YIELD RETURN set_expr",
-    "&"
-  ],
-  "n_func_stmt": [
-    "; func_stmt n_func_stmt",
-    "&"
-  ],
-  "throw_stmt": [
-    "THROW STRING_LITERAL",
-    "THROW obj_id"
-  ],
-  "null_decl": [
-    "var_modifiers DOLLAR id extension",
-    "var_modifiers AMP id extension"
-  ],
-  "p_null_decl": [
-    "var_modifiers DOLLAR id * extension"
-  ],
-  "fwd_decl": [
-    "func_decl",
-    "macro_decl",
-    "async_decl"
-  ],
-  "constructor_stmt": [
-    "scope_modifiers CONSTRUCTOR id ( func_params ) inherit"
-  ],
-  "assignment": [
-    "this_id list_index lit_assignment_ops set_expr"
-  ],
-  "nstmts": [
-    "stmts ; nstmts",
-    "&"
-  ],
-  "var_decl": [
-    "v_m var_modifiers DOLLAR id extension = var_yield set_expr",
-    "v_m var_modifiers AMP id extension = var_yield set_expr",
-    "v_m var_modifiers DOLLAR id extension ( var_preset ) lit_assignment_ops set_expr",
-    "v_m var_modifiers AMP id extension ( var_preset ) lit_assignment_ops set_expr",
-    "v_m var_modifiers DOLLAR id extension ( var_preset )",
-    "v_m var_modifiers AMP id extension ( var_preset )"
-  ],
-  "v_m": [
-    "VOLATILE",
-    "&"
-  ],
-  "var_yield": [
-    "YIELD",
-    "&"
-  ],
-  "var_modifiers": [
-    "access_modifiers",
-    "scope_modifiers",
-    "&"
-  ],
-  "var_preset": [
-    "set_expr",
-    "this",
-    "all_types"
-  ],
-  "types": [
-    "INT_TYPE array_inst",
-    "BOOL_TYPE array_inst",
-    "STRING_TYPE array_inst",
-    "FLOAT_TYPE array_inst",
-    "CHAR_TYPE array_inst",
-    "LIST_TYPE array_inst",
-    "DICTIONARY_TYPE dict_inst"
-  ],
-  "dict_inst": [
-    "[ types , types ]",
-    "&"
-  ],
-  "expr": [
-    "cond_expr",
-    "obj_expr",
-    "math_expr",
-    "func_expr",
-    "comprehension_expr",
-    "cast_expr",
-    "AWAIT async_expr",
-    "async_expr"
-  ],
-  "index_expr": [
-    "func_expr",
-    "math_expr",
-    "lambda_expr",
-    "comprehension_expr",
-    "yield_expr",
-    "AWAIT async_expr",
-    "lit_index_types dotid",
-    "lit_list_types [ index_expr ] dotid"
-  ],
-  "lit_index_types": [
-    "obj_id",
-    "INTEGER_LITERAL",
-    "STRING_LITERAL",
-    "CHAR_LITERAL",
-    "FLOAT_LITERAL",
-    "BOOL_LITERAL"
-  ],
-  "lit_list_types": [
-    "obj_id",
-    "STRING_LITERAL",
-    "list",
-    "dict"
-  ],
-  "array_inst": [
-    "[ p_obj_id ]",
-    "[ INTEGER_LITERAL ]",
-    "&"
-  ],
-  "set_expr": [
-    "expr",
-    "lambda_expr",
-    "yield_expr",
-    "NEW id"
-  ],
-  "yield_expr": [
-    "YIELD ( VALUE extension ) lit_assignment_ops lambda_expr",
-    "YIELD ( VALUE extension ) . func_expr"
-  ],
-  "async_expr": [
-    "ASYNC ( inline_params_decl ) { func_main }"
-  ],
-  "cast_expr": [
-    "all_types ( set_expr ) dotid",
-    "VALUE ( set_expr ) dotid",
-    "obj_id ( set_expr ) dotid"
-  ],
-  "lambda_expr": [
-    "LAMBDA ( id => expr lambda_condition ) dotid"
-  ],
-  "lambda_condition": [
-    "IF ( cond_expr )",
-    "&"
-  ],
-  "comprehension_expr": [
-    "[ obj_id ^ ( lambda_comprehension ) ]"
-  ],
-  "lambda_comprehension": [
-    "IDENTIFIER => expr"
-  ],
-  "obj_expr": [
-    "NEW this_id ( constructor_params ) dotid"
-  ],
-  "constructor_params": [
-    "{ named_params }"
-  ],
-  "named_params": [
-    "IDENTIFIER : set_expr n_nmd_params"
-  ],
-  "n_nmd_params": [
-    ", IDENTIFIER : set_expr",
-    "&"
-  ],
-  "cond_expr": [
-    "xor_op OR xor_op",
-    "xor_op"
-  ],
-  "xor_op": [
-    "and_op XOR and_op",
-    "and_op"
-  ],
-  "and_op": [
-    "not_op AND not_op",
-    "not_op"
-  ],
-  "not_op": [
-    "! comp_expr",
-    "comp_expr"
-  ],
-  "comp_expr": [
-    "bool_expr == no_math_comp_expr",
-    "bool_expr != no_math_comp_expr",
-    "bool_expr === no_math_comp_expr",
-    "bool_expr !== no_math_comp_expr",
-    "math_expr == comp_expr",
-    "math_expr != comp_expr",
-    "math_expr === comp_expr",
-    "math_expr !== comp_expr",
-    "int_math_expr > comp_expr",
-    "int_math_expr < comp_expr",
-    "int_math_expr >= comp_expr",
-    "int_math_expr <= comp_expr",
-    "math_expr",
-    "BOOL_LITERAL",
-    "( comp_expr )"
-  ],
-  "no_math_comp_expr": [
-    "bool_expr == no_math_comp_expr",
-    "bool_expr != no_math_comp_expr",
-    "bool_expr === no_math_comp_expr",
-    "bool_expr !== no_math_comp_expr",
-    "math_expr == comp_expr",
-    "math_expr != comp_expr",
-    "math_expr === comp_expr",
-    "math_expr !== comp_expr",
-    "int_math_expr > comp_expr",
-    "int_math_expr < comp_expr",
-    "int_math_expr >= comp_expr",
-    "int_math_expr <= comp_expr",
-    "BOOL_LITERAL",
-    "( no_math_comp_expr )"
-  ],
-  "bool_expr": [
-    "BOOL_LITERAL",
-    "math_expr"
-  ],
-  "math_expr": [
-    "str_math_expr",
-    "int_math_expr",
-    "list_types list_add"
-  ],
-  "str_math_expr": [
-    "str_mul str_add"
-  ],
-  "str_add": [
-    "+ str_mul_expr str_add",
-    "&"
-  ],
-  "str_mul_expr": [
-    "str_types str_mul"
-  ],
-  "str_mul": [
-    "* str_types str_mul",
-    "&"
-  ],
-  "str_types": [
-    "CHAR_LITERAL dotid",
-    "STRING_LITERAL dotid",
-    "obj_id",
-    "func_expr",
-    "null_id",
-    "( str_math_expr )"
-  ],
-  "list_add": [
-    "+ list_types list_add",
-    "&"
-  ],
-  "list_types": [
-    "list",
-    "dict",
-    "obj_id",
-    "func_expr",
-    "comprehension_expr",
-    "( list_types list_add )"
-  ],
-  "int_math_expr": [
-    "int_mul int_add"
-  ],
-  "int_add": [
-    "+ int_mul int_add",
-    "- int_mul int_add",
-    "&"
-  ],
-  "int_mul": [
-    "int_exp int_mul_ops"
-  ],
-  "int_mul_ops": [
-    "* int_exp int_mul_ops",
-    "/ int_expr int_mul_ops",
-    "% int_expr int_mul_ops",
-    "&"
-  ],
-  "int_exp": [
-    "int_bin_shift int_exp_ops"
-  ],
-  "int_exp_ops": [
-    "^ int_exp_ops",
-    "int_bin_shift",
-    "&"
-  ],
-  "int_bin_shift": [
-    "int_increm shifts int_increm n_bin_shift",
-    "int_increm"
-  ],
-  "int_increm": [
-    "int_types ++",
-    "int_types --",
-    "int_types **",
-    "int_types"
-  ],
-  "n_bin_shift": [
-    "shifts int_increm n_bin_shift",
-    "&"
-  ],
-  "int_types": [
-    "FLOAT_LITERAL dotid",
-    "INTEGER_LITERAL dotid",
-    "- int_types",
-    "obj_id",
-    "null_id",
-    "func_expr dotid",
-    "cast_expr dotid",
-    "( int_math_expr )",
-    "p_bin_shift"
-  ],
-  "p_bin_shift": [
-    "pointer sp_bin_shift"
-  ],
-  "sp_bin_shift":[
-    "shifts pointer np_bin_shift"
-  ],
-  "np_bin_shift": [
-    "shifts pointer np_bin_shift",
-    "&"
-  ],
-  "shifts": [
-    "<<",
-    ">>"
-  ],
-  "pointer": [
-    "@ p_obj_id"
-  ],
-  "p_obj_id": [
-    "obj_expr . IDENTIFIER dot_id",
-    "this_id",
-    "func_expr"
-  ],
-  "func_expr": [
-    "func_call",
-    "inline_func"
-  ],
-  "func_call": [
-    "obj_id ( func_params ) dotid"
-  ],
-  "inline_func": [
-    "FUNC ( inline_params_decl ) { func_main } dotid"
-  ],
-  "inline_params_decl": [
-    "inline_param n_inline_param"
-  ],
-  "inline_param": [
-    "DOLLAR IDENTIFIER func_extension << set_expr"
-  ],
-  "n_inline_param": [
-    ", DOLLAR IDENTIFIER func_extension << set_expr n_inline_param",
-    "&"
-  ],
-  "lit_assignment_ops": [
-    "+=",
-    "-=",
-    "*=",
-    "/=",
-    "%=",
-    "^=",
-    "="
-  ],
-  "obj_id": [
-    "this_id",
-    "obj_expr dotid"
-  ],
-  "id": [
-    "IDENTIFIER dotid",
-    "IDENTIFIER [ index_expr ] dotid"
-  ],
-  "null_id": [
-    "id",
-    "NULL"
-  ],
-  "this_id": [
-    "IDENTIFIER [ index_expr ] dotid",
-    "IDENTIFIER dotid",
-    "THIS dotid",
-    "deref_op IDENTIFIER [ index_expr ] dotid",
-    "IDENTIFIER : : id"
-  ],
-  "dotid": [
-    ". IDENTIFIER [ index_expr ] dotid",
-    ". func_call [ index_expr ] dotid",
-    ". IDENTIFIER dotid",
-    ". func_call [ index_expr ]",
-    "&"
-  ],
-  "list": [
-    "[ set_expr follow_list_item ]"
-  ],
-  "follow_list_item": [
-    ", set_expr follow_list_item",
-    "&"
-  ],
-  "dict": [
-    "{ all_types : set_expr follow_dict_item }"
-  ],
-  "follow_dict_item": [
-    ", all_types : set_expr follow_dict_item",
-    "&"
-  ],
-  "extension": [
-    ": types",
-    ": FUNC",
-    ": id",
-    ": MACRO",
-    ": MODULE",
-    "multi_type",
-    "&"
-  ],
-  "all_types" : [
-    "INTEGER_TYPE",
-    "FLOAT_TYPE",
-    "STRING_TYPE",
-    "CHAR_TYPE",
-    "BOOL_TYPE",
-    "LIST_TYPE",
-    "DICTIONARY_TYPE",
-    "deref_op all_types"
+  "unary_atom": [
+    "prefix atom",
+    "atom"
+  ],
+  "prefix": [
+    "-",
+    "* deref_op",
+    "@"
   ],
   "deref_op": [
-    "* deref_op",
+    "*",
+    "&"
+  ],
+  "atom": [
+    "base trailer",
+    "( expression )"
+  ],
+  "trailer": [
+    "[ ] trailer",
+    "( ) trailer",
+    ". base trailer",
+    "&"
+  ],
+  "base": [
+    "string",
+    "number",
+    "IDENTIFIER",
+    "THIS"
+  ],
+  "string": [
+    "STRING_LITERAL",
+    "CHAR_LITERAL"
+  ],
+  "number": [
+    "INTEGER_LITERAL",
+    "FLOAT_LITERAL"
+  ],
+  "bool": [
+    "BOOL_LITERAL bool_trailer"
+  ],
+  "bool_trailer": [
+    " . base trailer",
     "&"
   ]
 }
