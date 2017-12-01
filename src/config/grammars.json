@@ -4,12 +4,30 @@
     "&"
   ],
   "stmts": [
-    "variable_declaration",
-    "THROW expr",
-    "DELETE atom",
-    "expr_assignment"
+    "variable_decl_stmt",
+    "throw_stmt",
+    "del_stmt",
+    "break_stmt",
+    "continue_stmt",
+    "return_stmt",
+    "assignment_expr"
   ],
-  "variable_declaration": [
+  "break_stmt": [
+    "BREAK"
+  ],
+  "continue_stmt": [
+    "CONTINUE"
+  ],
+  "return_stmt": [
+    "RETURN expr"
+  ],
+  "throw_stmt": [
+    "THROW expr"
+  ],
+  "del_stmt": [
+    "DELETE atom"
+  ],
+  "variable_decl_stmt": [
     "DOLLAR id extension initializer",
     "AMP id extension initializer"
   ],
@@ -17,7 +35,7 @@
     "( expr ) assignment_ops expr",
     "= expr"
   ],
-  "expr_assignment": [
+  "assignment_expr": [
     "expr assignment"
   ],
   "assignment": [
@@ -25,7 +43,7 @@
     "&"
   ],
   "core_id": [
-    "=",
+    "assignment_ops ",
     ", full_assignment ,"
   ],
   "full_assignment": [
