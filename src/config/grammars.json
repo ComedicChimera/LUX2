@@ -1,4 +1,47 @@
 {
+  "block": [
+    "blocks block"
+    "stmt block",
+    "&"
+  ],
+  "blocks": [
+    "if_block",
+    "do_block",
+    "macro_block",
+    "with_block",
+    "func_block",
+    "struct_block",
+    "type_block",
+    "interface_block"
+  ],
+  
+  "if_block": [
+    "IF ( equation n_if_expr ) if_stmts"
+  ],
+  "n_if_expr": [
+    ", equation",
+    "&"
+  ],
+  "if_stmts": [
+    "{ if_main } if_follow_block",
+    "if main if_follow_block"
+  ],
+  "if_follow_block": [
+    "elif_block",
+    "else_block",
+    "&"
+  ],
+  "elif_block": [
+    "ELIF ( equation ) elif_stmts"
+  ],
+  "elif_stmts": [
+    "{ block }",
+    "block"
+  ],
+  "else_block": [
+    "ELSE elif_stmts"
+  ],
+
   "stmt": [
     "stmts ; stmt",
     "&"
@@ -53,7 +96,7 @@
     "object_declaration",
     "lambda",
     "comprehension",
-    "inline_generator",
+    "yield_expr",
     "equation"
   ],
   "object_declaration": [
@@ -80,8 +123,15 @@
   "comprehension": [
     "[ atom ^ ( IDENTIFIER => expr ) ]"
   ],
+  "yield_expr": [
+    "YIELD yield_params"
+  ],
+  "yield_params": [
+    "inline_generator",
+    "return_stmt"
+  ],
   "inline_generator": [
-    "YIELD ( VALUE extension ) yield_effect"
+    "( VALUE extension ) yield_effect"
   ],
   "yield_effect": [
     "assignment_ops yield_expr",
