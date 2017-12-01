@@ -1,3 +1,4 @@
-//3 + 2 ^ -4
-//-("hi there" + "fello humans" + this.myStr()[]) - 43
-3 + 2 > !5 ^ 1 == false
+print (content: "Hello, world!");
+2 + 3;
+yield (value : int) += lambda(x[y] => y * 2);
+$x : list[char] = [ 'a', 'b', 'c' ];

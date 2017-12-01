@@ -36,6 +36,8 @@ class Parser:
                 nt = stack.pop()
                 sem_stack.append(ASTNode(nt))
                 if self.input_buffer[pos].type not in table[nt]:
+                    print(table[nt])
+                    print(stack)
                     er.throw("syntax_error", "Unexpected Token", [self.input_buffer[pos], [str(x) for x in table[nt].keys()]])
                 if table[nt][self.input_buffer[pos].type] != ["$"]:
                     stack += reversed(table[nt][self.input_buffer[pos].type] + ["queue"])
@@ -170,7 +172,7 @@ class Parser:
             if item != "&":
                 firsts.append(item)
             else:
-                if len(production) - 1 > pos + 1:
+                if len(production) - 1 >= pos + 1:
                     if production[pos + 1] in grammar.nonterminals:
                         firsts += self.non_terminal_first(grammar, production, pos + 1)
                     else:

@@ -1,8 +1,25 @@
 {
+  "stmt": [
+    "stmts ; stmt",
+    "&"
+  ],
+  "stmts": [
+    "variable_declaration",
+    "expr"
+  ],
+  "variable_declaration": [
+    "DOLLAR id extension initializer",
+    "AMP id extension initializer"
+  ],
+  "initializer": [
+    "( expr ) assignment_ops expr",
+    "= expr"
+  ],
   "expr": [
     "object_declaration",
     "lambda",
     "comprehension",
+    "inline_generator",
     "equation"
   ],
   "object_declaration": [
@@ -28,6 +45,17 @@
   ],
   "comprehension": [
     "[ atom ^ ( IDENTIFIER => expr ) ]"
+  ],
+  "inline_generator": [
+    "YIELD ( VALUE extension ) yield_effect"
+  ],
+  "yield_effect": [
+    "assignment_ops yield_expr",
+    ". atom"
+  ],
+  "yield_expr": [
+    "lambda",
+    "atom"
   ],
   "equation": [
     "or n_equation"
@@ -127,12 +155,24 @@
     ". base trailer",
     "&"
   ],
+  "func_params": [
+    "expr n_param",
+    "IDENTIFIER : expr n_param",
+    "&"
+  ],
+  "n_param": [
+    ", expr n_param",
+    ", IDENTIFIER : expr n_param",
+    "&"
+  ],
   "base": [
     "string",
     "number",
     "IDENTIFIER",
     "THIS",
-    "inline_function"
+    "inline_function",
+    "list",
+    "dict"
   ],
   "inline_function": [
     "FUNC ( inline_params ) { }",
@@ -182,5 +222,64 @@
   "n_dict": [
     ", base : expr n_dict",
     "&"
+  ],
+  "assignment_ops": [
+    "+=",
+    "-=",
+    "/=",
+    "*=",
+    "^=",
+    "%=",
+    "="
+  ],
+  "extension": [
+    ": types",
+    "&"
+  ],
+  "types": [
+    "pure_types",
+    "LIST_TYPE list_modifier",
+    "DICT_TYPE dict_modifier"
+  ],
+  "list_modifier": [
+    "[ e_types ]",
+    "&"
+  ],
+  "dict_modifier": [
+    "[ d_types ]"
+  ],
+  "d_types": [
+    "pure_types n_d_types",
+    "&"
+  ],
+  "n_d_types": [
+    ", dict_expr_types",
+    "&"
+  ],
+  "dict_expr_types": [
+    "types",
+    "id"
+  ],
+  "e_types": [
+    "types",
+    "&"
+  ],
+  "id": [
+    "THIS . IDENTIFIER dot_id",
+    "IDENTIFIER dot_id",
+    "pure_types dot_id",
+    "DICT dot_id",
+    "LIST dot_id"
+  ],
+  "dot_id": [
+    ". IDENTIFIER dot_id",
+    "&"
+  ],
+  "pure_types": [
+    "CHAR_TYPE",
+    "BOOL_TYPE",
+    "INT_TYPE",
+    "FLOAT_TYPE",
+    "STRING_TYPE"
   ]
 }
