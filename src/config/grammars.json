@@ -1,6 +1,6 @@
 {
   "block": [
-    "blocks block"
+    "blocks block",
     "stmt block",
     "&"
   ],
@@ -23,8 +23,8 @@
     "&"
   ],
   "if_stmts": [
-    "{ if_main } if_follow_block",
-    "if main if_follow_block"
+    "{ block } if_follow_block",
+    "block if_follow_block"
   ],
   "if_follow_block": [
     "elif_block",
@@ -35,8 +35,8 @@
     "ELIF ( equation ) elif_stmts"
   ],
   "elif_stmts": [
-    "{ block }",
-    "block"
+    "{ block } if_follow_block",
+    "block if_follow_block"
   ],
   "else_block": [
     "ELSE elif_stmts"
@@ -134,10 +134,10 @@
     "( VALUE extension ) yield_effect"
   ],
   "yield_effect": [
-    "assignment_ops yield_expr",
+    "assignment_ops inline_generator_expr",
     ". atom"
   ],
-  "yield_expr": [
+  "inline_generator_expr": [
     "lambda",
     "atom"
   ],

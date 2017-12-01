@@ -3,3 +3,4 @@ print (content: "Hello, world!");
 yield (value : int) += lambda(x[y] => y * 2);
 $x : list[char] = [ 'a', 'b', 'c' ];
 x, b = 2 * 5, x + [ "lol" ];
+if (x > 3) print(x);
