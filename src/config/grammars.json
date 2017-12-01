@@ -5,7 +5,9 @@
   ],
   "stmts": [
     "variable_declaration",
-    "expr"
+    "THROW expr",
+    "DELETE atom",
+    "expr_assignment"
   ],
   "variable_declaration": [
     "DOLLAR id extension initializer",
@@ -14,6 +16,20 @@
   "initializer": [
     "( expr ) assignment_ops expr",
     "= expr"
+  ],
+  "expr_assignment": [
+    "expr assignment"
+  ],
+  "assignment": [
+    "core_id expr",
+    "&"
+  ],
+  "core_id": [
+    "=",
+    ", full_assignment ,"
+  ],
+  "full_assignment": [
+    "id trailer core_id expr"
   ],
   "expr": [
     "object_declaration",

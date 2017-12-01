@@ -1,4 +1,5 @@
 print (content: "Hello, world!");
-2 + 3;
+&b = 2 + 3;
 yield (value : int) += lambda(x[y] => y * 2);
 $x : list[char] = [ 'a', 'b', 'c' ];
+x, b = 2 * 5, x + [ "lol" ];
