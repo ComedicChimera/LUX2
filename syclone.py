@@ -5,8 +5,7 @@ import sys
 
 import src.lexer as lexer
 import src.syc_parser as syc_parser
-import src.errormodule as er
-import src.semantic_analyzer as sem
+from src.ASTtools import get_ast
 from util import *
 import cmd
 
@@ -143,8 +142,9 @@ class Console:
         # print(tree.pretty())
         # print(tree.to_str())
         # print("Generated AST - Digest: %d, %dB." % (len(tree.to_str()), sys.getsizeof(tree)))
-        print("Generated AST: %dB" % sys.getsizeof(tree))
-        return tree
+        ast = get_ast(tree)
+        print("Generated AST: %dB" % sys.getsizeof(ast))
+        return ast
 
 
 cn = Console()

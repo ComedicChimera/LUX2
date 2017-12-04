@@ -1,8 +1,8 @@
 import sys
 
 import src.gramtools as gramtools
-from util import ASTNode
-from util import Token
+from src.ASTtools import ASTNode
+from src.ASTtools import Token
 import src.errormodule as er
 
 # update parsing algorithm

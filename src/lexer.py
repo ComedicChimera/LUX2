@@ -1,5 +1,5 @@
 import re
-from util import Token
+from src.ASTtools import Token
 import json
 import util
 import src.errormodule as er
