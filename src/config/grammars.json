@@ -242,7 +242,14 @@
     "&"
   ],
   "assignment": [
-    "id trailer assignment_expr"
+    "id_types trailer assignment_expr"
+  ],
+  "id_types": [
+    "IDENTIFIER",
+    "THIS",
+    "pure_types",
+    "DICT",
+    "LIST"
   ],
   "assignment_expr": [
     "core_id expr",
@@ -428,7 +435,8 @@
     "inline_function",
     "list",
     "dict",
-    "type_cast"
+    "type_cast",
+    "NULL"
   ],
   "inline_function": [
     "FUNC ( inline_params ) { }",
