@@ -1,6 +1,10 @@
 print(content: "Hello, world!");
 $x = x.myVar()[1];
 &b = 2 + 3;
+// test
+
+/* test2
+ test 3*/
 $x : list[char] = [ 'a', 'b', 'c' ];
 x, b = 2 * 5, x + [ "lol" ];
 if (x > 3):

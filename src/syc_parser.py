@@ -186,10 +186,10 @@ class Parser:
     def parse(self):
         # loads in the grammar
         g = gramtools.build_grammar()
-        print("Loaded Grammar: %dB" % sys.getsizeof(g))
+        # print("Loaded Grammar: %dB" % sys.getsizeof(g.__dict__))
         # generate parsing table
         p_table = self.generate_table(g)
-        print("Generated Parsing Table: %dB" % sys.getsizeof(p_table))
+        # print("Generated Parsing Table: %dB" % sys.getsizeof(p_table))
         # returns result of parsing function
         return self.run_parser(p_table, g)
 

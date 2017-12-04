@@ -130,7 +130,7 @@ class Console:
         tokens = lx.lex(code)
         # for token in tokens:
         #    print(token.to_str())
-        print("Lex Successful: Found %d tokens" % len(tokens))
+        print("Lex Successful: Found %d tokens\n" % len(tokens))
         # runs tokens in parser
         parser = syc_parser.Parser(tokens)
         tree = object()
@@ -143,7 +143,9 @@ class Console:
         # print(tree.to_str())
         # print("Generated AST - Digest: %d, %dB." % (len(tree.to_str()), sys.getsizeof(tree)))
         ast = get_ast(tree)
-        print("Generated AST: %dB" % sys.getsizeof(ast))
+        ast_string = ast.to_str()
+        ast_len = len(ast_string)
+        print("Parse Successful:\n\tTree Size: %dB\n\tReduction Grade: %d%s" % (sys.getsizeof(ast_string), ((ast_len / len(tree.to_str())) * 100), "%"))
         return ast
 
 
