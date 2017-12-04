@@ -1,6 +1,52 @@
-print (content: "Hello, world!");
+print(content: "Hello, world!");
+$x = x.myVar()[1];
 &b = 2 + 3;
-yield (value : int) += lambda(x[y] => y * 2);
 $x : list[char] = [ 'a', 'b', 'c' ];
 x, b = 2 * 5, x + [ "lol" ];
-if (x > 3) print(x);
+if (x > 3):
+    print(x);
+else {
+    do {
+        print("Test");
+    } when ( false );
+}
+for($item in array) {
+    print(item);
+}
+switch(x) {
+    case 3:
+        break;
+    def:
+        break;
+}
+
+struct Point {
+    $x : int,
+    $y : int
+}
+
+interface IFunctions {
+    func void test();
+}
+
+type Color {
+    GREEN,
+    BLUE,
+    RED
+}
+
+macro dab() {
+    print("I dabbed...");
+}
+
+func private int test($p1 : str, $p2 = 34, ** $p3 : str) {
+    dab();
+}
+
+constructor myObject() : IFunctions;
+
+module private active myModule : Point {
+    constructor();
+
+    async void run() => print("lol");
+}

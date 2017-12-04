@@ -2,6 +2,7 @@ import re
 from util import Token
 import json
 import util
+import src.errormodule as er
 
 
 class Lexer:
@@ -17,13 +18,14 @@ class Lexer:
         phrases = {}
         # removes comments and whitespace
         code = self.clear_comments(code)
+        er.code = code
         # checks for all direct matches
         for token in self.tokenTypes:
-            matches = re.finditer(self.tokenTypes[token], code)
+            matches = re.finditer(re.compile(self.tokenTypes[token]), code)
             for match in matches:
                 if match.group(0) != "" and match.start() not in phrases.keys():
                     phrases[match.start()] = Token(token, match.group(0), match.start())
-                    code = code.replace(match.group(0), "\0" * len(match.group(0)))
+                    code = re.sub(self.tokenTypes[token], " " * len(match.group(0)), code, 1)
         # sorts them in order
         numbers = [x for x in phrases]
         numbers.sort()

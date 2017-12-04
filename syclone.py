@@ -126,12 +126,12 @@ class Console:
     # gets semantically valid AST and catches compile time errors
     @staticmethod
     def analyze(code, generate_file):
-        # adds code to error module
-        er.code = code
         # gets the tokens from the Lexer
         lx = lexer.Lexer()
         tokens = lx.lex(code)
-        print("Lex Successful: Found %d tokens." % len(tokens))
+        # for token in tokens:
+        #    print(token.to_str())
+        print("Lex Successful: Found %d tokens" % len(tokens))
         # runs tokens in parser
         parser = syc_parser.Parser(tokens)
         tree = object()
@@ -140,10 +140,10 @@ class Console:
         except RecursionError:
             print(ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
             exit(1)
-        print(tree.pretty())
-        print("Generated AST - Digest: %d, %dB." % (len(tree.pretty()), sys.getsizeof(tree)))
-        # calls lark api/parser
-        # tree = l.parse(code)
+        # print(tree.pretty())
+        # print(tree.to_str())
+        # print("Generated AST - Digest: %d, %dB." % (len(tree.to_str()), sys.getsizeof(tree)))
+        print("Generated AST: %dB" % sys.getsizeof(tree))
         return tree
 
 

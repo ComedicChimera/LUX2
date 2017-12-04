@@ -23,12 +23,22 @@ def get_position(ndx):
 def throw(type, error, params):
     if type == "syntax_error":
         print("")
-        token = params[0]
-        pos = get_position(token.ndx)
-        print(ConsoleColors.RED + "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):" % (error, token.value, pos[0] + 1, pos[1]))
-        print(code.split("\n")[pos[0]])
-        print(" " * pos[1], end="")
-        print("^" * len(token.value))
-        if not isinstance(params[1], list):
-            print("\nExpected: '%s'" % params[1])
+        if params[0].type == "$":
+            token = params[0]
+            pos = get_position(token.ndx)
+            print(ConsoleColors.RED + "[Syntax Error] - Invalid End of Program, (ln:%d, pos:%d):" % (pos[0] + 1, pos[1]))
+            print(code.split("\n")[pos[0]])
+            print(" " * pos[1], end="")
+            print("^" * len(token.value))
+            if not isinstance(params[1], list):
+                print("\nExpected: '%s'" % params[1])
+        else:
+            token = params[0]
+            pos = get_position(token.ndx)
+            print(ConsoleColors.RED + "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):" % (error, token.value, pos[0] + 1, pos[1]))
+            print(code.split("\n")[pos[0]])
+            print(" " * pos[1], end="")
+            print("^" * len(token.value))
+            if not isinstance(params[1], list):
+                print("\nExpected: '%s'" % params[1])
     exit(0)

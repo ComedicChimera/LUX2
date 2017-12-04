@@ -1,59 +1,217 @@
 {
-  "block": [
-    "blocks block",
-    "stmt block",
+    "main": [
+    "block_stmt main",
+    "stmt ; main",
     "&"
   ],
-  "blocks": [
+  "block": [
+    "{ main }",
+    ": stmt ;"
+  ],
+  "block_stmt": [
+    "module_block",
+    "constructor_block",
+    "async_block",
+    "func_block",
+    "macro_block",
+    "type_block",
+    "interface_block",
+    "struct_block",
     "if_block",
     "do_block",
-    "macro_block",
-    "with_block",
-    "func_block",
-    "struct_block",
-    "type_block",
-    "interface_block"
+    "for_block",
+    "switch_stmt",
+    "with_block"
   ],
-  
-  "if_block": [
-    "IF ( equation n_if_expr ) if_stmts"
+  "module_block": [
+    "MODULE modifiers module_type id inherit { module_main }"
   ],
-  "n_if_expr": [
-    ", equation",
+  "module_type": [
+    "ACTIVE",
+    "PASSIVE",
+    "AWAIT"
+  ],
+  "module_main": [
+    "module_constructor main"
+  ],
+  "module_constructor": [
+    "CONSTRUCTOR ( ) constructional_block"
+  ],
+  "constructor_block": [
+    "CONSTRUCTOR modifiers IDENTIFIER dot_id ( func_params_decl ) inherit constructional_block"
+  ],
+  "inherit": [
+    ": id inherit",
     "&"
   ],
-  "if_stmts": [
-    "{ block } if_follow_block",
-    "block if_follow_block"
+  "constructional_block": [
+    "functional_block",
+    ";"
   ],
-  "if_follow_block": [
-    "elif_block",
+  "async_block": [
+    "ASYNC modifiers rt_type id ( func_params_decl ) functional_block"
+  ],
+  "func_block": [
+    "FUNC modifiers rt_type id ( func_params_decl ) functional_block"
+  ],
+  "rt_type": [
+    "types",
+    "id",
+    "VOID"
+  ],
+  "func_params_decl": [
+    "func_param_prefix IDENTIFIER extension params_extension n_func_params",
+    "THIS n_func_params",
+    "** func_param_prefix IDENTIFIER extension",
+    "&"
+  ],
+  "params_extension": [
+    "= expr",
+    "&"
+  ],
+  "func_param_prefix": [
+    "@",
+    "DOLLAR",
+    "AMP"
+  ],
+  "n_func_params": [
+    ", n_func_param n_func_params",
+    "&"
+  ],
+  "n_func_param": [
+    "func_param_prefix IDENTIFIER extension params_extension",
+    "** func_param_prefix IDENTIFIER extension"
+  ],
+  "macro_block": [
+    "MACRO modifiers id ( macro_params_decl ) functional_block"
+  ],
+  "functional_block": [
+    "{ main }",
+    "=> stmt ;"
+  ],
+  "modifiers": [
+    "VOLATILE modifiers",
+    "scope_modifiers modifiers",
+    "access_modifiers modifiers",
+    "&"
+  ],
+  "scope_modifiers": [
+    "LOCAL",
+    "GLOBAL"
+  ],
+  "access_modifiers": [
+    "PRIVATE",
+    "PROTECTED"
+  ],
+  "macro_params_decl": [
+    "DOLLAR IDENTIFIER extension n_var",
+    "&"
+  ],
+  "type_block": [
+    "TYPE id { type_main }"
+  ],
+  "type_main": [
+    "IDENTIFIER n_type"
+  ],
+  "n_type": [
+    ", IDENTIFIER n_type",
+    "&"
+  ],
+  "interface_block": [
+    "INTERFACE id { interface_main }"
+  ],
+  "interface_main": [
+    "FUNC modifiers rt_type id ( func_params_decl ) ; interface_main",
+    "&"
+  ],
+  "struct_block": [
+    "STRUCT id { struct_main }"
+  ],
+  "struct_main": [
+    "DOLLAR IDENTIFIER extension n_var"
+  ],
+  "n_var": [
+    ", DOLLAR IDENTIFIER extension n_var",
+    "&"
+  ],
+  "if_block": [
+    "IF ( equation ) block if_follow"
+  ],
+  "if_follow": [
+    "elif_block if_follow",
     "else_block",
     "&"
   ],
   "elif_block": [
-    "ELIF ( equation ) elif_stmts"
-  ],
-  "elif_stmts": [
-    "{ block } if_follow_block",
-    "block if_follow_block"
+    "ELIF ( equation ) block"
   ],
   "else_block": [
-    "ELSE elif_stmts"
+    "ELSE block"
   ],
-
-  "stmt": [
-    "stmts ; stmt",
+  "do_block": [
+    "DO do_expr block do_when"
+  ],
+  "do_expr": [
+    "( equation )",
     "&"
   ],
-  "stmts": [
-    "variable_decl_stmt",
+  "do_when": [
+    "WHEN ( equation ) ;",
+    "&"
+  ],
+  "for_block": [
+    "FOR ( DOLLAR IDENTIFIER extension for_expr ) block"
+  ],
+  "for_expr": [
+    "for_each",
+    "for_iter"
+  ],
+  "for_each": [
+    "IN expr"
+  ],
+  "for_iter": [
+    "for_init ; for_condition ; for_operation"
+  ],
+  "for_init": [
+    "initializer"
+  ],
+  "for_condition": [
+    "equation",
+    "&"
+  ],
+  "for_operation": [
+    "assignment",
+    "&"
+  ],
+  "switch_stmt": [
+    "SWITCH ( expression ) { switch_block }"
+  ],
+  "switch_block": [
+    "block_stmt switch_block",
+    "stmt ; switch_block",
+    "case switch_block",
+    "default switch_block",
+    "&"
+  ],
+  "case": [
+    "CASE expr block"
+  ],
+  "default": [
+    "DEFAULT block"
+  ],
+  "with_block": [
+    "WITH ( stmt ) block"
+  ],
+  "stmt": [
+    "modifiers variable_decl_stmt",
     "throw_stmt",
     "del_stmt",
     "break_stmt",
     "continue_stmt",
     "return_stmt",
-    "assignment_expr"
+    "generator_stmt",
+    "assignment",
+    "&"
   ],
   "break_stmt": [
     "BREAK"
@@ -75,46 +233,42 @@
     "AMP id extension initializer"
   ],
   "initializer": [
-    "( expr ) assignment_ops expr",
-    "= expr"
+    "( expr ) modify_assignment",
+    "= expr",
+    "&"
   ],
-  "assignment_expr": [
-    "expr assignment"
+  "modify_assignment": [
+    "assignment_ops expr",
+    "&"
   ],
   "assignment": [
+    "id trailer assignment_expr"
+  ],
+  "assignment_expr": [
     "core_id expr",
     "&"
   ],
+  "full_assignment": [
+    "atom core_id expr"
+  ],
   "core_id": [
-    "assignment_ops ",
+    "assignment_ops",
+    "=",
     ", full_assignment ,"
   ],
-  "full_assignment": [
-    "id trailer core_id expr"
-  ],
   "expr": [
-    "object_declaration",
     "lambda",
     "comprehension",
-    "yield_expr",
+    "generator_expr",
+    "inline_generator",
+    "with_expr",
     "equation"
-  ],
-  "object_declaration": [
-    "NEW id ( constructor ) trailer"
-  ],
-  "constructor": [
-    "{ constructor_params }",
-    "&"
-  ],
-  "constructor_params": [
-    "IDENTIFIER : expr constructor_params",
-    "&"
   ],
   "lambda": [
     "LAMBDA ( lambda_expr )"
   ],
   "lambda_expr": [
-    "atom [ IDENTIFIER ] => expr lambda_if"
+    "atom => expr lambda_if"
   ],
   "lambda_if": [
     "IF equation",
@@ -123,23 +277,34 @@
   "comprehension": [
     "[ atom ^ ( IDENTIFIER => expr ) ]"
   ],
-  "yield_expr": [
-    "YIELD yield_params"
-  ],
-  "yield_params": [
-    "inline_generator",
-    "return_stmt"
-  ],
   "inline_generator": [
-    "( VALUE extension ) yield_effect"
+    "YIELD ( VALUE extension ) inline_gen_effect"
   ],
-  "yield_effect": [
+  "inline_gen_effect": [
     "assignment_ops inline_generator_expr",
     ". atom"
   ],
   "inline_generator_expr": [
     "lambda",
     "atom"
+  ],
+  "generator_stmt": [
+    "RETURN yield_safe_expr"
+  ],
+  "yield_safe_expr": [
+    "object_declaration",
+    "lambda",
+    "comprehension",
+    "YIELD inline_generator",
+    "equation"
+  ],
+  "type_cast": [
+    "pure_types ( expr )",
+    "LIST ( expr )",
+    "DICT ( expr )"
+  ],
+  "with_expr": [
+    "WITH ( expr )"
   ],
   "equation": [
     "or n_equation"
@@ -230,8 +395,12 @@
     "&"
   ],
   "atom": [
-    "base trailer",
+    "new base trailer",
     "( expression )"
+  ],
+  "new": [
+    "NEW",
+    "&"
   ],
   "trailer": [
     "[ equation ] trailer",
@@ -240,13 +409,15 @@
     "&"
   ],
   "func_params": [
-    "expr n_param",
-    "IDENTIFIER : expr n_param",
+    "expr named_param n_param",
+    "&"
+  ],
+  "named_param": [
+    ": expr",
     "&"
   ],
   "n_param": [
-    ", expr n_param",
-    ", IDENTIFIER : expr n_param",
+    ", expr named_param n_param",
     "&"
   ],
   "base": [
@@ -256,7 +427,8 @@
     "THIS",
     "inline_function",
     "list",
-    "dict"
+    "dict",
+    "type_cast"
   ],
   "inline_function": [
     "FUNC ( inline_params ) { }",
@@ -321,9 +493,10 @@
     "&"
   ],
   "types": [
-    "pure_types",
-    "LIST_TYPE list_modifier",
-    "DICT_TYPE dict_modifier"
+    "deref_op pure_types",
+    "deref_op LIST_TYPE list_modifier",
+    "deref_op DICT_TYPE dict_modifier",
+    "deref_op id"
   ],
   "list_modifier": [
     "[ e_types ]",
@@ -350,10 +523,7 @@
   ],
   "id": [
     "THIS . IDENTIFIER dot_id",
-    "IDENTIFIER dot_id",
-    "pure_types dot_id",
-    "DICT dot_id",
-    "LIST dot_id"
+    "IDENTIFIER dot_id"
   ],
   "dot_id": [
     ". IDENTIFIER dot_id",

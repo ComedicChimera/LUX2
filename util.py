@@ -2,6 +2,9 @@ class CustomException(Exception):
     pass
 
 
+indent = ""
+
+
 # token class for ASTs
 class Token:
     def __init__(self, type, value, ndx):
@@ -10,7 +13,10 @@ class Token:
         self.ndx = ndx
 
     def pretty(self):
-        return "Token(%s, %s)" % (self.type, self.value)
+        return "\n" + indent + "Token('%s', '%s')\n" % (self.type, self.value)
+
+    def to_str(self):
+        return "Token('%s', '%s')" % (self.type, self.value)
 
 
 # default AST node class
@@ -20,10 +26,20 @@ class ASTNode:
         self.content = []
 
     def pretty(self):
-        pretty_string = self.name + ":["
+        global indent
+        indent += " "
+        pretty_string = "\n" + indent + self.name + ":[\n"
+        indent += " "
         for item in self.content:
-            pretty_string += item.pretty() + ","
-        return pretty_string[:len(pretty_string) - 1] + "]"
+            pretty_string += item.pretty()
+        indent = indent[:len(indent) - 2]
+        return pretty_string + "\n" + indent + " ]\n"
+
+    def to_str(self):
+        str_string = self.name + ":["
+        for item in self.content:
+            str_string += item.to_str()
+        return str_string + "]"
 
 
 class ConsoleColors:

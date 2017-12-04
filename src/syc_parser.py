@@ -22,7 +22,7 @@ class Parser:
         stack = ["$", grammar.start_symbol]
         # stack for holding building AST
         sem_stack = [ASTNode(grammar.start_symbol)]
-        self.input_buffer.append(Token("$", "$", 0))
+        self.input_buffer.append(Token("$", "$", self.input_buffer[-1].ndx))
         # enter cycle
         while len(stack) > 0:
             if stack[len(stack) - 1] == "queue":
@@ -36,8 +36,6 @@ class Parser:
                 nt = stack.pop()
                 sem_stack.append(ASTNode(nt))
                 if self.input_buffer[pos].type not in table[nt]:
-                    print(table[nt])
-                    print(stack)
                     er.throw("syntax_error", "Unexpected Token", [self.input_buffer[pos], [str(x) for x in table[nt].keys()]])
                 if table[nt][self.input_buffer[pos].type] != ["$"]:
                     stack += reversed(table[nt][self.input_buffer[pos].type] + ["queue"])
@@ -75,6 +73,9 @@ class Parser:
                     if item == "&":
                         follow = self.follow(production, grammar)
                         for f in follow:
+                            if f in parsing_table[production]:
+                                print(f)
+                                print(production)
                             parsing_table[production][f] = sub_pro
                     else:
                         parsing_table[production][item] = sub_pro
@@ -82,6 +83,7 @@ class Parser:
 
     # follow function
     def follow(self, symbol, grammar):
+
         if symbol in self.follow_table.keys():
             return self.follow_table[symbol]
         # sets up follow set
@@ -184,10 +186,10 @@ class Parser:
     def parse(self):
         # loads in the grammar
         g = gramtools.build_grammar()
-        print("Loaded Grammar: %dB." % sys.getsizeof(g))
+        print("Loaded Grammar: %dB" % sys.getsizeof(g))
         # generate parsing table
         p_table = self.generate_table(g)
-        print("Generated Parsing Table: %dB." % sys.getsizeof(p_table))
+        print("Generated Parsing Table: %dB" % sys.getsizeof(p_table))
         # returns result of parsing function
         return self.run_parser(p_table, g)
 
