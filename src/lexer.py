@@ -37,8 +37,10 @@ class Lexer:
         # removes all multi-line comments
         multi_line_comments = re.findall(re.compile("/\*.*\*/", re.MULTILINE | re.DOTALL), code)
         for item in multi_line_comments:
-            code = code.replace(item, "", 1)
+            code = code.replace(item, (" " * (len(item) - 1)) + "\n", 1)
         single_line_comments = re.findall(re.compile("//.*\n*"), code)
         for item in single_line_comments:
-            code = code.replace(item, "", 1)
+            new_comment = item.replace("[^\n]", " ")
+            print(new_comment)
+            code = code.replace(item, new_comment, 1)
         return code
