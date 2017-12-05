@@ -1,5 +1,5 @@
 {
-    "main": [
+  "main": [
     "block_stmt main",
     "stmt ; main",
     "&"
@@ -296,7 +296,7 @@
     "atom"
   ],
   "generator_stmt": [
-    "RETURN yield_safe_expr"
+    "YIELD RETURN yield_safe_expr"
   ],
   "yield_safe_expr": [
     "object_declaration",
@@ -502,10 +502,13 @@
     "&"
   ],
   "types": [
-    "deref_op pure_types",
-    "deref_op LIST_TYPE list_modifier",
-    "deref_op DICT_TYPE dict_modifier",
-    "deref_op id"
+    "deref_op simple_types"
+  ],
+  "simple_types": [
+    "pure_types",
+    "LIST_TYPE list_modifier",
+    "DICT_TYPE dict_modifier",
+    "id"
   ],
   "list_modifier": [
     "[ e_types ]",

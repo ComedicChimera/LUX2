@@ -6,6 +6,7 @@ import sys
 import src.lexer as lexer
 import src.syc_parser as syc_parser
 from src.ASTtools import get_ast
+from src.semantic_analyzer import prove
 from util import *
 import cmd
 
@@ -131,7 +132,7 @@ class Console:
         # for token in tokens:
         #    print(token.to_str())
         print("Lex Successful: Found %d tokens\n" % len(tokens))
-        # runs tokens in parser
+        # runs tokens through parser
         parser = syc_parser.Parser(tokens)
         tree = object()
         try:
@@ -139,14 +140,13 @@ class Console:
         except RecursionError:
             print(ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
             exit(1)
-        # print(tree.pretty())
-        # print(tree.to_str())
-        # print("Generated AST - Digest: %d, %dB." % (len(tree.to_str()), sys.getsizeof(tree)))
+        # simplify ast
         ast = get_ast(tree)
         ast_string = ast.to_str()
         ast_len = len(ast_string)
         print("Parse Successful:\n\tTree Size: %dB\n\tReduction Grade: %d%s" % (sys.getsizeof(ast_string), ((ast_len / len(tree.to_str())) * 100), "%"))
-        return ast
+        semantic_ast = prove(ast)
+        return semantic_ast
 
 
 cn = Console()
