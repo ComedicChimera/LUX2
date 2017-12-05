@@ -308,7 +308,8 @@
   "type_cast": [
     "pure_types ( expr )",
     "LIST ( expr )",
-    "DICT ( expr )"
+    "DICT ( expr )",
+    "VALUE ( expr )"
   ],
   "with_expr": [
     "WITH ( expr )"
