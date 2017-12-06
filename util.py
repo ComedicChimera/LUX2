@@ -17,5 +17,5 @@ def set_source_dir(path):
     global source_dir
     source_dir = path
 
-source_dir = "C:/Users/forlo/Desktop/Coding/Github/SyClone"
+source_dir = "C:/Users/forlo/Desktop/Coding/SyClone"
 version = "0.0.1"

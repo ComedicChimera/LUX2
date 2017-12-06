@@ -28,7 +28,7 @@ def println(pos, len_carrots):
 
 
 def get_tree_string(tree):
-    string = 0
+    string = ""
     for item in tree.content:
         if isinstance(item, Token):
             string += item.value
@@ -57,10 +57,10 @@ def throw(type, error, params):
     elif type == "semantic_error":
         if isinstance(params, Token):
             pos = get_position(params.ndx)
-            print(ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):" % (params.value, error, pos[0] + 1, pos[1]))
+            print(ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):" % (error, params.value, pos[0] + 1, pos[1]))
             println(pos, len(params.value))
         else:
             pos = get_position(params.content[0].ndx)
-            print(ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):" % (get_tree_string(params), error, pos[0] + 1, pos[1]))
+            print(ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):" % (error, get_tree_string(params), pos[0] + 1, pos[1]))
             println(pos, len(get_tree_string(params)))
     exit(0)
