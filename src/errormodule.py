@@ -1,5 +1,6 @@
 import re
 from util import *
+from src.ASTtools import Token
 
 code = ""
 
@@ -20,25 +21,46 @@ def get_position(ndx):
     return [line, ndx]
 
 
+def println(pos, len_carrots):
+    print(code.split("\n")[pos[0]])
+    print(" " * pos[1], end="")
+    print("^" * len_carrots)
+
+
+def get_tree_string(tree):
+    string = 0
+    for item in tree.content:
+        if isinstance(item, Token):
+            string += item.value
+        else:
+            string += get_tree_string(item)
+    return string
+
+
 def throw(type, error, params):
+    print("")
     if type == "syntax_error":
-        print("")
         if params[0].type == "$":
             token = params[0]
             pos = get_position(token.ndx)
             print(ConsoleColors.RED + "[Syntax Error] - Invalid End of Program, (ln:%d, pos:%d):" % (pos[0] + 1, pos[1]))
-            print(code.split("\n")[pos[0]])
-            print(" " * pos[1], end="")
-            print("^" * len(token.value))
+            println(pos, len(token.value))
             if not isinstance(params[1], list):
                 print("\nExpected: '%s'" % params[1])
         else:
             token = params[0]
             pos = get_position(token.ndx)
             print(ConsoleColors.RED + "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):" % (error, token.value, pos[0] + 1, pos[1]))
-            print(code.split("\n")[pos[0]])
-            print(" " * pos[1], end="")
-            print("^" * len(token.value))
+            println(pos, len(token.value))
             if not isinstance(params[1], list):
                 print("\nExpected: '%s'" % params[1])
+    elif type == "semantic_error":
+        if isinstance(params, Token):
+            pos = get_position(params.ndx)
+            print(ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):" % (params.value, error, pos[0] + 1, pos[1]))
+            println(pos, len(params.value))
+        else:
+            pos = get_position(params.content[0].ndx)
+            print(ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):" % (get_tree_string(params), error, pos[0] + 1, pos[1]))
+            println(pos, len(get_tree_string(params)))
     exit(0)

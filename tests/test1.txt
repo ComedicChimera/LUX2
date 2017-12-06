@@ -61,3 +61,6 @@ module private active myModule : Point {
 
     async void run() => print("lol");
 }
+
+// lex error test
+~
