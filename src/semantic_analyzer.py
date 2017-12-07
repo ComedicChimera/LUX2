@@ -95,6 +95,17 @@ class SemanticAnalyzer:
         else:
             throw("semantic_error", "Redeclared Identifier", token)
 
+    def check_modifiers(self, modifiers, name):
+        used_modifiers = []
+        for modifier in modifiers:
+            if len(used_modifiers) > 3:
+                throw("semantic_error", "Unable to apply contradicting modifiers", modifier)
+            if modifiers in used_modifiers:
+                throw("semantic_error", "Redundant modifiers", modifier)
+            if "." not in name and modifier.type in ["PRIVATE", "PROTECTED"]:
+                throw("semantic_error", "Unable to apply access modifier to ungrouped entity.", modifier)
+            used_modifiers.append(modifier)
+
     # the global semantic check function
     def semantic_assert(self, ast, context):
         if context == "variable_decl_stmt":
@@ -105,7 +116,13 @@ class SemanticAnalyzer:
                     var_type = ExpressionEvaluator.get_type_from_extension(ast.content[2])
                 self.declare(name, {"data_type": var_type}, ast.content[1])
             elif len(ast.content) > 3 and isinstance(ast.content[0], ASTNode):
-                pass
+                modifiers = self.unwind(ast.content[0])
+                name = get_tree_string(ast.content[2])
+                self.check_modifiers(modifiers, name)
+                var_type = DataType()
+                if ast.content[3].name == "extension":
+                    var_type = ExpressionEvaluator.get_type_from_extension(ast.content[3])
+                self.declare(name, {"data_type": var_type, "modifiers": modifiers}, ast.content[2])
             else:
                 throw("semantic_error", "Unable to determine type of variable", ast.content[1])
 
