@@ -1,2 +1,3 @@
-$x : int;
+$x : dict[float, str];
 print(x);
+$x : dict[float, str];

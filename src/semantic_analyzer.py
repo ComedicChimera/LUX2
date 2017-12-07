@@ -3,12 +3,14 @@ from src.errormodule import throw
 from src.errormodule import get_tree_string
 
 
+# default data type class
 class DataType:
     def __init__(self):
         self.data_type = ""
         self.pointer = ""
 
 
+# default Dictionary data type
 class DictType(DataType):
     def __init__(self):
         DataType.__init__(self)
@@ -16,31 +18,48 @@ class DictType(DataType):
         self.value_type = DataType()
 
 
+# default List data type
 class ListType(DataType):
     def __init__(self):
         DataType.__init__(self)
         self.elem_type = DataType()
 
 
+# evaluates different expressions to get types
 class ExpressionEvaluator:
     def __init__(self):
         pass
 
+    # gets a data type from the extension node
     @staticmethod
     def get_type_from_extension(extension):
         return ExpressionEvaluator.get_data_type(extension.content[1].content)
 
+    # given a "types" object, generate a data type object
     @staticmethod
     def get_data_type(content):
         var_type = DataType()
         for item in content:
             if isinstance(item, Token):
-                pass
+                if item.type == "LIST_TYPE":
+                    var_type = ListType()
+                    var_type.data_type = "LIST_TYPE"
+                elif item.type == "DICT_TYPE":
+                    var_type = DictType()
+                    var_type.data_type = "DICT_TYPE"
+                else:
+                    var_type.data_type = item.type
             elif item.name == "deref_op":
                 var_type.pointer = get_tree_string(item)
             else:
                 # handle types and collections
-                print(content)
+                if item.name == "pure_types":
+                    var_type.data_type = item.content[0].type
+                elif item.name == "list_modifier":
+                    var_type.elem_type = ExpressionEvaluator.get_data_type(item.content[1].content)
+                elif item.name == "dict_modifier":
+                    var_type.key_type = ExpressionEvaluator.get_data_type(item.content[1].content[0].content)
+                    var_type.value_type = ExpressionEvaluator.get_data_type(item.content[1].content[2].content)
         return var_type
 
 
@@ -58,24 +77,46 @@ class SemanticAnalyzer:
         self.scope = 0
         self.semantics = ["variable_decl_stmt", "assignment", "atom"]
 
-    def declare(self, var):
-        pass
+    # unwraps a tree into a list of its elements
+    def unwind(self, tree):
+        t_list = []
+        for item in tree.content:
+            if isinstance(item, Token):
+                t_list.append(item)
+            else:
+                t_list += self.unwind(item)
+        return t_list
 
+    # declares a new variable
+    def declare(self, name, modifiers, token):
+        var = Variable(name, modifiers)
+        if var not in SemanticAnalyzer.symbol_table[self.scope]:
+            SemanticAnalyzer.symbol_table[self.scope][-1].append(var)
+        else:
+            throw("semantic_error", "Redeclared Identifier", token)
+
+    # the global semantic check function
     def semantic_assert(self, ast, context):
         if context == "variable_decl_stmt":
-            if len(ast.content) > 2:
-                name = ast.content[1]
+            if len(ast.content) > 2 and isinstance(ast.content[0], Token):
+                name = get_tree_string(ast.content[1])
                 var_type = DataType()
                 if ast.content[2].name == "extension":
                     var_type = ExpressionEvaluator.get_type_from_extension(ast.content[2])
-                self.declare(name)
+                self.declare(name, {"data_type": var_type}, ast.content[1])
+            elif len(ast.content) > 3 and isinstance(ast.content[0], ASTNode):
+                pass
             else:
                 throw("semantic_error", "Unable to determine type of variable", ast.content[1])
 
+    # matches a tree to its correct assertion
     def match(self, x):
         if isinstance(x, ASTNode):
             if x.name == "block":
                 self.scope += 1
+                if self.scope not in SemanticAnalyzer.symbol_table.keys():
+                    SemanticAnalyzer.symbol_table[self.scope] = []
+                SemanticAnalyzer.symbol_table[self.scope].append([])
                 self.evaluate(x)
                 self.scope -= 1
             elif x.name in self.semantics:
@@ -83,12 +124,14 @@ class SemanticAnalyzer:
             else:
                 self.evaluate(x)
 
+    # evaluates an AST
     def evaluate(self, ast):
         for item in ast.content:
             self.match(item)
         return ast
 
 
+# the main check function
 def prove(ast):
     sem = SemanticAnalyzer()
     return sem.evaluate(ast)

@@ -512,27 +512,17 @@
     "id"
   ],
   "list_modifier": [
-    "[ e_types ]",
+    "[ e_types ]"
+  ],
+  "e_types": [
+    "types",
     "&"
   ],
   "dict_modifier": [
     "[ d_types ]"
   ],
   "d_types": [
-    "pure_types n_d_types",
-    "&"
-  ],
-  "n_d_types": [
-    ", dict_expr_types",
-    "&"
-  ],
-  "dict_expr_types": [
-    "types",
-    "id"
-  ],
-  "e_types": [
-    "types",
-    "&"
+    "types , types"
   ],
   "id": [
     "THIS . IDENTIFIER dot_id",

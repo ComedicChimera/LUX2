@@ -7,6 +7,7 @@ import src.lexer as lexer
 import src.syc_parser as syc_parser
 from src.ASTtools import get_ast
 from src.semantic_analyzer import prove
+import src.semantic_analyzer as sem
 from util import *
 import cmd
 
