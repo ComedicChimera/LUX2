@@ -89,13 +89,15 @@ class SemanticAnalyzer:
 
     # declares a new variable
     def declare(self, name, modifiers, token):
+        print(SemanticAnalyzer.symbol_table[self.scope][-1])
         var = Variable(name, modifiers)
-        if var not in SemanticAnalyzer.symbol_table[self.scope]:
+        if var.__dict__ not in [x.__dict__ for x in SemanticAnalyzer.symbol_table[self.scope][-1]]:
             SemanticAnalyzer.symbol_table[self.scope][-1].append(var)
         else:
             throw("semantic_error", "Redeclared Identifier", token)
 
-    def check_modifiers(self, modifiers, name):
+    @staticmethod
+    def check_modifiers(modifiers, name):
         used_modifiers = []
         for modifier in modifiers:
             if len(used_modifiers) > 3:
@@ -137,6 +139,8 @@ class SemanticAnalyzer:
                 self.evaluate(x)
                 self.scope -= 1
             elif x.name in self.semantics:
+                if self.scope not in SemanticAnalyzer.symbol_table.keys():
+                    SemanticAnalyzer.symbol_table[self.scope] = [[]]
                 self.semantic_assert(x, x.name)
             else:
                 self.evaluate(x)
