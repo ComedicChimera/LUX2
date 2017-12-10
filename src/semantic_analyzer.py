@@ -1,17 +1,32 @@
 from src.semantics import SemanticNode, SemanticToken, get_attributes
-from src.ASTtools import ASTNode
+from src.ASTtools import ASTNode, AST
 
 
 symbol_table = {}
 
 
 class SemanticAnalyzer:
-    def __init__(self):
+    def __init__(self, sem_ast):
         self.previous_buffer = []
         self.mode = ""
         self.scope = 0
+        self.tree = sem_ast
 
-    def check(self, sem_ast):
+    def get_next(self, tree):
+        for item in tree.content:
+            if isinstance(item, ASTNode):
+                yield self.get_next(item)
+            else:
+                yield item
+
+    def analyze(self):
+        for item in self.get_next(self.tree):
+            if item.attributes[0].endswith("mode"):
+                self.mode = item.attributes[0]
+            if isinstance(item, SemanticNode):
+                self.check(item)
+
+    def check(self, item):
         pass
 
 
@@ -33,5 +48,5 @@ def get_semantic_tree(ast):
 
 def prove(ast):
     sem_ast = get_semantic_tree(ast)
-    SemanticAnalyzer().check(sem_ast)
+    SemanticAnalyzer(sem_ast).analyze()
     return ast
