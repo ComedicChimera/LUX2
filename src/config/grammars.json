@@ -203,7 +203,7 @@
     "WITH ( stmt ) block"
   ],
   "stmt": [
-    "modifiers variable_decl_stmt",
+    "variable_declaration",
     "throw_stmt",
     "del_stmt",
     "break_stmt",
@@ -227,6 +227,9 @@
   ],
   "del_stmt": [
     "DELETE atom"
+  ],
+  "variable_declaration": [
+    "modifiers variable_decl_stmt"
   ],
   "variable_decl_stmt": [
     "DOLLAR id extension initializer",

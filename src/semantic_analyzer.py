@@ -1,9 +1,18 @@
-from src.sem_tools import SemanticNode, SemanticToken
+from src.semantics import SemanticNode, SemanticToken, get_attributes
 from src.ASTtools import ASTNode
-from src.attributes import get_attributes
 
 
 symbol_table = {}
+
+
+class SemanticAnalyzer:
+    def __init__(self):
+        self.previous_buffer = []
+        self.mode = ""
+        self.scope = 0
+
+    def check(self, sem_ast):
+        pass
 
 
 def convert(item):
@@ -23,4 +32,6 @@ def get_semantic_tree(ast):
 
 
 def prove(ast):
+    sem_ast = get_semantic_tree(ast)
+    SemanticAnalyzer().check(sem_ast)
     return ast
