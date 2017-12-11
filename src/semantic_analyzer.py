@@ -14,15 +14,28 @@ class SemanticAnalyzer:
 
     def get_next(self, tree):
         for item in tree.content:
-            if isinstance(item, ASTNode):
+            if isinstance(item, SemanticNode):
+                yield item
                 yield self.get_next(item)
             else:
                 yield item
+
+    def declare(self):
+        next_item = self.get_next(self.tree)
+        while True:
+            if isinstance(next_item, SemanticToken):
+                if next_item.type == ";":
+                    return
+            elif next_item.name == "id":
+                pass
+
 
     def analyze(self):
         for item in self.get_next(self.tree):
             if item.attributes[0].endswith("mode"):
                 self.mode = item.attributes[0]
+                if self.mode == "var_mode":
+                    self.declare()
             if isinstance(item, SemanticNode):
                 self.check(item)
 
