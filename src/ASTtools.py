@@ -49,25 +49,3 @@ class AST:
         for item in self.content:
             string += item.pretty()
         return string
-
-
-# removes unnecessary nodes from AST
-def reduce(ast):
-    content = ast.content
-    if len(content) == 1:
-        if isinstance(content[0], Token):
-            return ast
-        else:
-            return reduce(content[0])
-    else:
-        for num in range(len(content)):
-            item = content[num]
-            if isinstance(item, ASTNode):
-                content[num] = reduce(item)
-        return ast
-
-
-# convert parse tree to AST
-def get_ast(parse_tree):
-    ast = reduce(AST(parse_tree))
-    return ast

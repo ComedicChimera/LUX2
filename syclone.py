@@ -5,9 +5,8 @@ import sys
 
 import src.lexer as lexer
 import src.syc_parser as syc_parser
-from src.ASTtools import get_ast
+from src.ASTtools import AST
 from src.semantic_analyzer import prove
-import src.semantic_analyzer as sem
 from util import *
 import cmd
 
@@ -142,10 +141,9 @@ class Console:
             print(ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
             exit(1)
         # simplify ast
-        ast = get_ast(tree)
+        ast = AST(tree)
         ast_string = ast.to_str()
-        ast_len = len(ast_string)
-        print("Parse Successful:\n\tTree Size: %dB\n\tReduction Grade: %d%s" % (sys.getsizeof(ast_string), ((ast_len / len(tree.to_str())) * 100), "%"))
+        print("Parse Successful:\n\tTree Size: %dB" % sys.getsizeof(ast_string))
         semantic_ast = prove(ast)
         return semantic_ast
 
