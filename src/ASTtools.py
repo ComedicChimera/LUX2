@@ -1,16 +1,9 @@
-
-indent = ""
-
-
 # token class for ASTs
 class Token:
     def __init__(self, type, value, ndx):
         self.type = type
         self.value = value
         self.ndx = ndx
-
-    def pretty(self):
-        return "\n" + indent + "Token('%s', '%s')\n" % (self.type, self.value)
 
     def to_str(self):
         return "Token('%s', '%s')" % (self.type, self.value)
@@ -21,16 +14,6 @@ class ASTNode:
     def __init__(self, name):
         self.name = name
         self.content = []
-
-    def pretty(self):
-        global indent
-        indent += " "
-        pretty_string = "\n" + indent + self.name + ":[\n"
-        indent += " "
-        for item in self.content:
-            pretty_string += item.pretty()
-        indent = indent[:len(indent) - 2]
-        return pretty_string + "\n" + indent + " ]\n"
 
     def to_str(self):
         str_string = self.name + ":["
