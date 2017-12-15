@@ -25,6 +25,7 @@ def construct_symbol_table(ast):
         if isinstance(item, ASTNode):
             if item.name == "block":
                 new_scope()
+            construct_symbol_table(item)
         else:
             if item.type in declarations:
                 add_to_symbol_table(declarations[item.type](item))

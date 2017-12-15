@@ -23,6 +23,7 @@ class DataTypes(Enum):
 class DataType:
     def __init__(self):
         self.data_type = DataTypes()
+        self.pointer = []
 
 
 class ListType(DataType):
@@ -40,7 +41,7 @@ class DictType(DataType):
 
 class Variable:
     def __init__(self):
-        self.name = ""
+        self.name = Identifier()
         self.group = []
         self.modifiers = []
         self.data_structure = DataStructure()
@@ -50,6 +51,7 @@ class TypedVariable(Variable):
     def __init__(self):
         Variable.__init__(self)
         self.data_type = DataType()
+        self.is_const = False
 
 
 class Function(Variable):
@@ -59,3 +61,10 @@ class Function(Variable):
         self.parameters = []
         self.is_macro = False
         self.is_async = False
+
+
+class Identifier:
+    def __init__(self):
+        self.name = ""
+        self.is_instance = False
+        self.core_type = DataTypes()
