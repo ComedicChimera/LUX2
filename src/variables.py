@@ -4,6 +4,8 @@ import src.infer as infer
 
 
 def compile_identifier(id):
+    if len(id.content) < 2:
+        return [id.content[0].value, []]
     return id.content
 
 
@@ -23,10 +25,10 @@ def var_parse(variable):
     var = semantics.TypedVariable()
     for item in variable.content:
         if item.name == "modifiers":
-            properties += item.content
-        elif item.name == "var_decl_stmt":
+            properties += infer.unparse(item)
+        elif item.name == "variable_decl_stmt":
             var = variable_declaration_parse(item)
-            var.properties = properties
+            var.modifiers = properties
     return var
 
 

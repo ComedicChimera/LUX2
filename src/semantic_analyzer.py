@@ -26,9 +26,9 @@ def construct_symbol_table(ast):
             if item.name == "block":
                 new_scope()
             construct_symbol_table(item)
-        else:
-            if item.type in declarations:
-                add_to_symbol_table(declarations[item.type](item))
+            if item.name in declarations:
+                print(declarations[item.name](item).__dict__)
+                add_to_symbol_table(declarations[item.name](item))
 
 
 def prove(ast):

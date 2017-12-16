@@ -93,6 +93,7 @@
     "VOLATILE modifiers",
     "scope_modifiers modifiers",
     "access_modifiers modifiers",
+    "FINAL modifiers",
     "&"
   ],
   "scope_modifiers": [
@@ -302,7 +303,6 @@
     "YIELD RETURN yield_safe_expr"
   ],
   "yield_safe_expr": [
-    "object_declaration",
     "lambda",
     "comprehension",
     "YIELD inline_generator",
@@ -407,7 +407,7 @@
     "&"
   ],
   "atom": [
-    "new base trailer",
+    "await new base trailer",
     "( expression )"
   ],
   "new": [
@@ -445,7 +445,7 @@
   ],
   "inline_function": [
     "FUNC ( inline_params ) { }",
-    "await ASYNC ( inline_params ) { }"
+    "ASYNC ( inline_params ) { }"
   ],
   "await": [
     "AWAIT",

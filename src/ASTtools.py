@@ -30,5 +30,5 @@ class AST:
     def to_str(self):
         string = ""
         for item in self.content:
-            string += item.pretty()
+            string += item.to_str()
         return string
