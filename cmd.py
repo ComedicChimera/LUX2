@@ -1,4 +1,3 @@
-# cmd parser is broken
 import re
 import util
 

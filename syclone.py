@@ -1,14 +1,14 @@
-import subprocess
 import os
-
+import subprocess
 import sys
 
-import src.lexer as lexer
-import src.syc_parser as syc_parser
-from src.ASTtools import AST
-from src.semantic_analyzer import prove
-from util import *
+import src.parser.syc_parser as syc_parser
+from src.parser.ASTtools import AST
+
 import cmd
+import src.parser.lexer as lexer
+from src.semantics.semantic_analyzer import check
+from util import *
 
 
 # the main application
@@ -143,8 +143,8 @@ class Console:
         # simplify ast
         ast = AST(tree)
         ast_string = ast.to_str()
-        print("Parse Successful:\n\tTree Size: %dB" % sys.getsizeof(ast_string))
-        semantic_ast = prove(ast)
+        print("Parse Successful:\n\tTree Size: %dB\n" % sys.getsizeof(ast_string))
+        semantic_ast = check(ast)
         return semantic_ast
 
 

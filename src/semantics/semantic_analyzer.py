@@ -1,5 +1,5 @@
-from src.ASTtools import ASTNode
-import src.variables as variables
+import src.semantics.variables as variables
+from src.parser.ASTtools import ASTNode
 
 symbol_table = {}
 
@@ -28,8 +28,10 @@ def construct_symbol_table(ast):
             construct_symbol_table(item)
             if item.name in declarations:
                 print(declarations[item.name](item).__dict__)
+                print(declarations[item.name](item).data_type.__dict__)
                 add_to_symbol_table(declarations[item.name](item))
 
 
-def prove(ast):
+# the main semantic checker function
+def check(ast):
     construct_symbol_table(ast)

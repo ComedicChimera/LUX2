@@ -1,8 +1,9 @@
-import re
-from src.ASTtools import Token
 import json
-import util
+import re
+
 import src.errormodule as er
+import util
+from src.parser.ASTtools import Token
 
 
 class Lexer:

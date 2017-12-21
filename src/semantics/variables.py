@@ -1,12 +1,13 @@
-import src.semantics as semantics
-from src.ASTtools import Token
-import src.infer as infer
+import src.semantics.semantics as semantics
+import src.semantics.infer as infer
+from src.parser.ASTtools import Token
 
 
 def compile_identifier(id):
     if len(id.content) < 2:
         return [id.content[0].value, []]
-    return id.content
+    else:
+        return [id.content[-1].value, infer.unparse(id.content[1:])]
 
 
 def create_variable(properties):
@@ -46,7 +47,7 @@ def variable_declaration_parse(var_decl):
                 properties["name"] = iden[0]
                 properties["group"] = iden[1]
             elif item.name == "extension":
-                properties["data_type"] = infer.from_extension(item)
+                properties["data_type"] = infer.from_type(item.content[1])
                 return create_variable(properties)
             elif item.name == "initializer":
                 properties["data_type"] = infer.from_assignment(item)

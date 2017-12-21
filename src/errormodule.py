@@ -1,6 +1,7 @@
 import re
+
+from src.parser.ASTtools import Token
 from util import *
-from src.ASTtools import Token
 
 code = ""
 
