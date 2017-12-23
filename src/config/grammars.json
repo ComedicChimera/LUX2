@@ -109,7 +109,7 @@
     "&"
   ],
   "type_block": [
-    "TYPE id { type_main }"
+    "TYPE modifiers id { type_main }"
   ],
   "type_main": [
     "IDENTIFIER n_type"
@@ -119,14 +119,14 @@
     "&"
   ],
   "interface_block": [
-    "INTERFACE id { interface_main }"
+    "INTERFACE modifiers id { interface_main }"
   ],
   "interface_main": [
     "FUNC modifiers rt_type id ( func_params_decl ) ; interface_main",
     "&"
   ],
   "struct_block": [
-    "STRUCT id { struct_main }"
+    "STRUCT modifiers id { struct_main }"
   ],
   "struct_main": [
     "DOLLAR IDENTIFIER extension n_var"

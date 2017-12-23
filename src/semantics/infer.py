@@ -21,6 +21,27 @@ def unparse(ast):
     return unwind_list
 
 
+def remove_periods(group):
+    group = unparse(group[0])
+    n_group = []
+    x = 1
+    for item in group:
+        if x % 2 == 0:
+            n_group.append(item)
+    return n_group
+
+
+def compile_identifier(id):
+    if len(id.content) < 2:
+        if id.content[0].type == "THIS":
+            return ["", [], True]
+        return [id.content[0].value, [], False]
+    else:
+        if id.content[0].type == "THIS":
+            return [id.content[-1].value, remove_periods(id.content[1:]), True]
+        return [id.content[-1].value, remove_periods(id.content[1:]), False]
+
+
 def from_simple(simple, c_type):
     if isinstance(simple.content[0], Token):
         if simple.content[0].type == "LIST_TYPE":

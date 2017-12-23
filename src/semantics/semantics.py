@@ -52,7 +52,6 @@ class TypedVariable(Variable):
     def __init__(self):
         Variable.__init__(self)
         self.data_type = DataType()
-        self.is_const = False
 
 
 class Function(Variable):
@@ -60,6 +59,20 @@ class Function(Variable):
         Variable.__init__(self)
         self.return_type = DataType()
         self.parameters = []
-        self.is_macro = False
+        self.data_structure = DataStructure.FUNCTION
         self.is_async = False
+
+
+class ModuleTypes(Enum):
+    ACTIVE = 0
+    PASSIVE = 1
+    AWAIT = 2
+
+
+class Module(Variable):
+    def __init__(self):
+        Variable.__init__(self)
+        self.data_structure = DataStructure.MODULE
+        self.mod_type = ModuleTypes.ACTIVE
+        self.inherit = []
 

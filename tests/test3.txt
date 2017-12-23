@@ -3,3 +3,7 @@ print(x);
 $x : dict[float, str];
 
 $y : str = "Hi";
+
+struct z {
+    $x : int
+}
