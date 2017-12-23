@@ -12,7 +12,10 @@ declarations = {
     "struct_block": variables.struct_parse,
     "interface_block": variables.struct_parse,
     "type_block": variables.struct_parse,
-    "module_block": variables.module_parse
+    "module_block": variables.module_parse,
+    "func_block": variables.func_parse,
+    "macro_block": variables.macro_parse,
+    "async_block": variables.func_parse
 }
 
 

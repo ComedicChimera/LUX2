@@ -63,12 +63,70 @@ def variable_declaration_parse(var_decl):
     return var
 
 
+# parses functions
 def func_parse(func):
-    pass
+    # holder
+    func_var = semantics.Function()
+    # parsing loop
+    for item in func.content[1:]:
+        # avoid tokens
+        if isinstance(item, Token):
+            if item.type == "ASYNC":
+                func_var.is_async = True
+            continue
+        # generate modifiers
+        if item.name == "modifiers":
+            func_var.modifiers = infer.unparse(item)
+        # generate identifier
+        elif item.name == "id":
+            identifier = infer.compile_identifier(item)
+            func_var.name = identifier[0]
+            func_var.group = identifier[1]
+            if identifier[2]:
+                throw("semantic_error", "Invalid Identifier", item.content[0])
+        # generate return type
+        elif item.name == "rt_type":
+            if isinstance(item.content[0], Token):
+                func_var.return_type = None
+            elif item.content[0].name == "id":
+                # TODO check identifier
+                func_var.return_type = infer.compile_identifier(item.content[0])
+            else:
+                func_var.return_type = infer.from_type(item.content[0].content)
+        # parse the function params
+        # TODO add param function
+        elif item.name == "func_params_decl":
+            pass
 
 
+# parses macros
 def macro_parse(macro):
-    pass
+    # holder
+    macro_var = semantics.Function()
+    # set the data structure
+    macro_var.data_structure = semantics.DataStructure.MACRO
+    # set the *pseudo* return type
+    macro_var.return_type = None
+    # parsing loop
+    for item in macro.content[1:]:
+        # avoid tokens
+        if isinstance(item, Token):
+            continue
+        # generate modifiers
+        if item.name == "modifiers":
+            macro_var.modifiers = infer.unparse(item)
+        # generate identifier
+        elif item.name == "id":
+            identifier = infer.compile_identifier(item)
+            macro_var.name = identifier[0]
+            macro_var.group = identifier[1]
+            if identifier[2]:
+                throw("semantic_error", "Invalid Identifier", item.content[0])
+        # parse the parameters
+        # TODO parse the parameters
+        elif item.name == "macro_params_decl":
+            pass
+    return macro_var
 
 
 # parsed structs, interfaces, and types
