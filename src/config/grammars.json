@@ -21,7 +21,8 @@
     "do_block",
     "for_block",
     "switch_stmt",
-    "with_block"
+    "with_block",
+    "except_block"
   ],
   "module_block": [
     "MODULE modifiers module_type id inherit { module_main }"
@@ -202,6 +203,13 @@
   ],
   "with_block": [
     "WITH ( stmt ) block"
+  ],
+  "except_block": [
+    "EXCEPT ( id , atom ) handle_block"
+  ],
+  "handle_block": [
+    "{ main }",
+    "&"
   ],
   "stmt": [
     "variable_declaration",
