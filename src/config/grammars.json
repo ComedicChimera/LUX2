@@ -209,7 +209,7 @@
   ],
   "handle_block": [
     "{ main }",
-    "&"
+    ";"
   ],
   "stmt": [
     "variable_declaration",
