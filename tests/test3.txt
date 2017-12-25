@@ -7,3 +7,5 @@ $y : str = "Hi";
 struct z {
     $x : int
 }
+
+macro group.myMacro(this, $m : int) => return 12;

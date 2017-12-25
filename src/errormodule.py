@@ -32,7 +32,7 @@ def get_tree_string(tree):
     string = ""
     for item in tree.content:
         if isinstance(item, Token):
-            string += item.value
+            string += item.value + " "
         else:
             string += get_tree_string(item)
     return string

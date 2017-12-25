@@ -2,6 +2,7 @@ import src.semantics.semantics as semantics
 import src.semantics.infer as infer
 from src.parser.ASTtools import Token
 from src.errormodule import throw
+from src.semantics.parameters import parse_parameters
 
 
 # main variable parsing method
@@ -73,6 +74,8 @@ def func_parse(func):
         if isinstance(item, Token):
             if item.type == "ASYNC":
                 func_var.is_async = True
+            elif item.type == "CONSTRUCTOR":
+                func_var.is_constructor = True
             continue
         # generate modifiers
         if item.name == "modifiers":
@@ -94,9 +97,9 @@ def func_parse(func):
             else:
                 func_var.return_type = infer.from_type(item.content[0].content)
         # parse the function params
-        # TODO add param function
         elif item.name == "func_params_decl":
-            pass
+            func_var = parse_parameters(item)
+    return func_var
 
 
 # parses macros
@@ -118,14 +121,19 @@ def macro_parse(macro):
         # generate identifier
         elif item.name == "id":
             identifier = infer.compile_identifier(item)
+            print(identifier)
             macro_var.name = identifier[0]
             macro_var.group = identifier[1]
             if identifier[2]:
                 throw("semantic_error", "Invalid Identifier", item.content[0])
         # parse the parameters
-        # TODO parse the parameters
         elif item.name == "macro_params_decl":
-            pass
+            macro_var.parameters = parse_parameters(item)
+            if macro_var.parameters[0].instance_marker and len(macro_var.group) == 0:
+                throw("semantic_error", "Macro cannot be instance macro", macro)
+            elif macro_var.parameters[0].instance_marker:
+                macro_var.parameters.pop(0)
+                macro_var.is_instance = True
     return macro_var
 
 
@@ -150,10 +158,6 @@ def struct_parse(struct):
     struct_var.group = identifier[1]
     struct_var.is_instance = identifier[2]
     return struct_var
-
-
-def constructor_parse(constructor):
-    pass
 
 
 # module parser

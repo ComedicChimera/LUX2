@@ -61,6 +61,7 @@ class Function(Variable):
         self.parameters = []
         self.data_structure = DataStructure.FUNCTION
         self.is_async = False
+        self.is_constructor = False
 
 
 class ModuleTypes(Enum):

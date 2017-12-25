@@ -107,6 +107,7 @@
   ],
   "macro_params_decl": [
     "DOLLAR IDENTIFIER extension n_var",
+    "THIS n_var",
     "&"
   ],
   "type_block": [

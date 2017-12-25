@@ -1,7 +1,7 @@
 import src.semantics.variables as variables
 from src.parser.ASTtools import ASTNode
 
-symbol_table = {}
+symbol_table = []
 
 scope = 0
 
@@ -15,7 +15,8 @@ declarations = {
     "module_block": variables.module_parse,
     "func_block": variables.func_parse,
     "macro_block": variables.macro_parse,
-    "async_block": variables.func_parse
+    "async_block": variables.func_parse,
+    "constructor_block": variables.func_parse
 }
 
 

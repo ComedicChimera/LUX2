@@ -38,8 +38,8 @@ def compile_identifier(id):
         return [id.content[0].value, [], False]
     else:
         if id.content[0].type == "THIS":
-            return [id.content[-1].value, remove_periods(id.content[1:]), True]
-        return [id.content[-1].value, remove_periods(id.content[1:]), False]
+            return [unparse(id)[-1].value, remove_periods(unparse(id)[:-1]), True]
+        return [unparse(id)[-1].value, remove_periods(id.content[1:]), False]
 
 
 def from_simple(simple, c_type):
