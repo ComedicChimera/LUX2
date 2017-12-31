@@ -1,5 +1,6 @@
 from src.parser.ASTtools import Token
 from src.semantics.semantics import DataType, DataTypes, ListType, DictType
+import src.semantics.operators as op
 
 
 str_to_enum = {
@@ -22,13 +23,15 @@ def unparse(ast):
 
 
 def remove_periods(group):
-    group = unparse(group[0])
+    group = [group.content[0]] + unparse(group.content[1])
     n_group = []
-    x = 1
+    x = 0
     for item in group:
         if x % 2 == 0:
             n_group.append(item)
-    return n_group
+        x += 1
+    n_group.pop()
+    return [x.value for x in n_group]
 
 
 def compile_identifier(id):
@@ -38,8 +41,8 @@ def compile_identifier(id):
         return [id.content[0].value, [], False]
     else:
         if id.content[0].type == "THIS":
-            return [unparse(id)[-1].value, remove_periods(unparse(id)[:-1]), True]
-        return [unparse(id)[-1].value, remove_periods(id.content[1:]), False]
+            return [unparse(id)[-1].value, remove_periods(id), True]
+        return [unparse(id)[-1].value, remove_periods(id), False]
 
 
 def from_simple(simple, c_type):
@@ -67,5 +70,16 @@ def from_type(data_type):
         return from_simple(data_type.content[0], rt_type)
 
 
-def from_assignment(assign):
-    return assign
+operator_functions = {
+    "lambda_comprehension": op.lambda_comprehension,
+    "expression": op.math_operator
+}
+
+
+def from_assignment(assign, scope):
+    for item in assign.content:
+        if not isinstance(item, Token):
+            if item.name in operator_functions.keys():
+                operator_functions[item.name](item, scope)
+            else:
+                from_assignment(item, scope)

@@ -26,6 +26,7 @@ def check_optional(p):
 def parse_parameters(params):
     n_params = []
     param = []
+    is_func = False
     for item in params.content:
         if isinstance(item, ASTNode):
             if item.name == "n_var":
@@ -33,11 +34,17 @@ def parse_parameters(params):
                 n_params += parse_parameters(item)
                 break
             elif item.name == "n_func_params":
+                is_func = True
                 n_params.append(generate_func_parameter(param))
                 n_params.append(generate_func_parameter(item.content[1].content))
                 n_params += parse_parameters(item.content[2])
                 break
         param.append(item)
+    else:
+        if is_func:
+            n_params.append(generate_func_parameter(param))
+        else:
+            n_params.append(generate_macro_parameter(param))
     check_optional(n_params)
     return n_params
 

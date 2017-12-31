@@ -54,6 +54,12 @@ class TypedVariable(Variable):
         self.data_type = DataType()
 
 
+class Structure(Variable):
+    def __init__(self):
+        Variable.__init__(self)
+        self.members = []
+
+
 class Function(Variable):
     def __init__(self):
         Variable.__init__(self)

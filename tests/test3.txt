@@ -8,4 +8,4 @@ struct z {
     $x : int
 }
 
-macro group.myMacro(this, $m : int) => return 12;
+macro group.myMacro(this, $m : int) => print(12);

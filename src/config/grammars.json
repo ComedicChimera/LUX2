@@ -453,8 +453,8 @@
     "NULL"
   ],
   "inline_function": [
-    "FUNC ( inline_params ) { }",
-    "ASYNC ( inline_params ) { }"
+    "FUNC ( inline_params ) functional_block",
+    "ASYNC ( inline_params ) functional_block"
   ],
   "await": [
     "AWAIT",

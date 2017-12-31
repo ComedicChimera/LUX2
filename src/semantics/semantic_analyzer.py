@@ -37,6 +37,7 @@ def add_to_symbol_table(var):
     current_level.append(var)
 
 
+# builds the symbol table
 def construct_symbol_table(ast):
     global scope
     for item in ast.content:
@@ -47,10 +48,15 @@ def construct_symbol_table(ast):
             construct_symbol_table(item)
             scope = prev_scope
             if item.name in declarations:
-                print(declarations[item.name](item).__dict__)
-                add_to_symbol_table(declarations[item.name](item))
+                if item.name in ["func_block", "variable_declaration"]:
+                    print(declarations[item.name](item, scope).__dict__)
+                    add_to_symbol_table(declarations[item.name](item, scope))
+                else:
+                    print(declarations[item.name](item).__dict__)
+                    add_to_symbol_table(declarations[item.name](item))
 
 
+# checks to see if contextual statements were placed correctly
 def check_context(ast, loop, func, local_scope):
     for item in ast.content:
         if isinstance(item, ASTNode):
@@ -71,4 +77,4 @@ def check_context(ast, loop, func, local_scope):
 # the main semantic checker function
 def check(ast):
     construct_symbol_table(ast)
-    check_context(ast, False, False)
+    check_context(ast, False, False, 0)

@@ -3,10 +3,11 @@ import src.semantics.infer as infer
 from src.parser.ASTtools import Token
 from src.errormodule import throw
 from src.semantics.parameters import parse_parameters
+from src.semantics.identifiers import check_identifier
 
 
 # main variable parsing method
-def var_parse(variable):
+def var_parse(variable, s):
     # a list of modifiers (ie. private, final)
     properties = []
     # creates a temporary holder
@@ -17,13 +18,13 @@ def var_parse(variable):
             properties += infer.unparse(item)
         # runs the parse on the declaration itself (sans modifiers)
         elif item.name == "variable_decl_stmt":
-            var = variable_declaration_parse(item)
+            var = variable_declaration_parse(item, s)
             var.modifiers = properties
     return var
 
 
 # main declaration parsing function
-def variable_declaration_parse(var_decl):
+def variable_declaration_parse(var_decl, scope):
     # another temporary holder
     var = semantics.TypedVariable()
     # will be used to decide whether or not type needs to be inferred, checked or none
@@ -51,10 +52,10 @@ def variable_declaration_parse(var_decl):
                 has_init = True
                 # if there is no extension, infer
                 if not has_extension:
-                    var.data_type = infer.from_assignment(item)
+                    var.data_type = infer.from_assignment(item, scope)
                 else:
                     # if there is an extension, check it v the item it is being assigned too
-                    dt = infer.from_assignment(item)
+                    dt = infer.from_assignment(item, scope)
                     # catches initialization type mismatch
                     # if dt == var.data_type:
                     #    throw("semantic_error", "Declared type and assigned type are not equal", item)
@@ -65,7 +66,7 @@ def variable_declaration_parse(var_decl):
 
 
 # parses functions
-def func_parse(func):
+def func_parse(func, scope):
     # holder
     func_var = semantics.Function()
     # parsing loop
@@ -92,7 +93,7 @@ def func_parse(func):
             if isinstance(item.content[0], Token):
                 func_var.return_type = None
             elif item.content[0].name == "id":
-                # TODO check identifier
+                check_identifier(item, False)
                 func_var.return_type = infer.compile_identifier(item.content[0])
             else:
                 func_var.return_type = infer.from_type(item.content[0].content)
@@ -121,7 +122,6 @@ def macro_parse(macro):
         # generate identifier
         elif item.name == "id":
             identifier = infer.compile_identifier(item)
-            print(identifier)
             macro_var.name = identifier[0]
             macro_var.group = identifier[1]
             if identifier[2]:
@@ -140,7 +140,7 @@ def macro_parse(macro):
 # parsed structs, interfaces, and types
 def struct_parse(struct):
     # holder
-    struct_var = semantics.Variable()
+    struct_var = semantics.Structure()
     # decides what type it is
     if struct.content[0].type == "STRUCT":
         struct_var.data_structure = semantics.DataStructure.STRUCT
@@ -157,7 +157,18 @@ def struct_parse(struct):
     struct_var.name = identifier[0]
     struct_var.group = identifier[1]
     struct_var.is_instance = identifier[2]
+    # TODO check structure's content and add to symbol table
+    struct_var.members = parse_members(struct.content[id_pos + 1], struct.content[0].type)
     return struct_var
+
+
+def parse_members(s_members, s_type):
+    if s_type == "STRUCT":
+        pass
+    elif s_type == "INTERFACE":
+        pass
+    else:
+        return infer.remove_periods([x.type for x in infer.unparse(s_members)])
 
 
 # module parser

@@ -62,6 +62,6 @@ def throw(type, error, params):
             println(pos, len(params.value))
         else:
             pos = get_position(params.content[0].ndx)
-            print(ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):" % (error, get_tree_string(params), pos[0] + 1, pos[1]))
-            println(pos, len(get_tree_string(params)))
+            print(ConsoleColors.RED + "[Semantic Error] - %s (ln:%d, pos:%d):" % (error, pos[0] + 1, pos[1]))
+            print(code.split("\n")[pos[0]])
     exit(0)
