@@ -6,6 +6,14 @@ from util import *
 code = ""
 
 
+class SycSyntaxError(Exception):
+    pass
+
+
+class SycSemanticError(Exception):
+    pass
+
+
 def get_position(ndx):
     new_lines = list(re.finditer("\n", code))
     line = 0
@@ -22,46 +30,51 @@ def get_position(ndx):
     return [line, ndx]
 
 
-def println(pos, len_carrots):
-    print(code.split("\n")[pos[0]])
-    print(" " * pos[1], end="")
-    print("^" * len_carrots)
+def getln(pos, len_carrots):
+    return code.split("\n")[pos[0]] + "\n " * pos[1] + ("^" * len_carrots)
 
 
-def get_tree_string(tree):
-    string = ""
-    for item in tree.content:
+def unparse(ast):
+    unwind_list = []
+    for item in ast.content:
         if isinstance(item, Token):
-            string += item.value + " "
+            unwind_list.append(item)
         else:
-            string += get_tree_string(item)
-    return string
+            unwind_list += unparse(item)
+    return unwind_list
 
 
 def throw(type, error, params):
-    print("")
+    code_error = Exception()
     if type == "syntax_error":
         if params[0].type == "$":
             token = params[0]
             pos = get_position(token.ndx)
-            print(ConsoleColors.RED + "[Syntax Error] - Invalid End of Program, (ln:%d, pos:%d):" % (pos[0] + 1, pos[1]))
-            println(pos, len(token.value))
+            error_message = ConsoleColors.RED + "[Syntax Error] - Invalid End of Program, (ln:%d, pos:%d):\n" % (pos[0] + 1, pos[1])
+            error_message += getln(pos, len(token.value))
             if not isinstance(params[1], list):
-                print("\nExpected: '%s'" % params[1])
+                error_message += "\n\nExpected: '%s'" % params[1]
+            code_error = SycSyntaxError(error_message)
         else:
             token = params[0]
             pos = get_position(token.ndx)
-            print(ConsoleColors.RED + "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):" % (error, token.value, pos[0] + 1, pos[1]))
-            println(pos, len(token.value))
+            error_message = ConsoleColors.RED + "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):" % (error, token.value, pos[0] + 1, pos[1])
+            error_message += getln(pos, len(token.value))
             if not isinstance(params[1], list):
-                print("\nExpected: '%s'" % params[1])
+                error_message += "\n\nExpected: '%s'" % params[1]
+            code_error = SycSyntaxError(error_message)
     elif type == "semantic_error":
         if isinstance(params, Token):
             pos = get_position(params.ndx)
-            print(ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):" % (error, params.value, pos[0] + 1, pos[1]))
-            println(pos, len(params.value))
+            error_message = ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):\n" % (error, params.value, pos[0] + 1, pos[1])
+            error_message += getln(pos, len(params.value))
+            code_error = SycSemanticError(error_message)
         else:
-            pos = get_position(params.content[0].ndx)
-            print(ConsoleColors.RED + "[Semantic Error] - %s (ln:%d, pos:%d):" % (error, pos[0] + 1, pos[1]))
-            print(code.split("\n")[pos[0]])
-    exit(0)
+            params = unparse(params)
+            pos = get_position(params[0].ndx)
+            end_pos = get_position(params[-1].ndx)
+            error_message = ConsoleColors.RED + "[Semantic Error] - %s (ln:%d, pos:%d):\n" % (error, pos[0] + 1, pos[1])
+            error_message += code.split("\n")[pos[0]][pos[1]:end_pos[1] + 1]
+            code_error = SycSemanticError(error_message)
+    raise code_error
+
