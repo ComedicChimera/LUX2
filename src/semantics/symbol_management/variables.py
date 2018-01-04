@@ -1,9 +1,11 @@
+import src.semantics.inferencing.infer as infer
 import src.semantics.semantics as semantics
-import src.semantics.infer as infer
-from src.parser.ASTtools import Token
 from src.errormodule import throw
-from src.semantics.parameters import parse_parameters
-from src.semantics.identifiers import check_identifier
+from src.parser.ASTtools import Token
+from src.semantics.symbol_management.parameters import parse_parameters
+from src.semantics.symbol_management.identifiers import check_identifier
+
+s_table = []
 
 
 # main variable parsing method
@@ -93,7 +95,7 @@ def func_parse(func, scope):
             if isinstance(item.content[0], Token):
                 func_var.return_type = None
             elif item.content[0].name == "id":
-                check_identifier(item, False)
+                check_identifier(item, False, s_table)
                 func_var.return_type = infer.compile_identifier(item.content[0])
             else:
                 func_var.return_type = infer.from_type(item.content[0].content)
@@ -199,7 +201,7 @@ def parse_interface_members(m):
                 if isinstance(item.content[0], Token):
                     func.return_type = None
                 elif item.content[0].name == "id":
-                    check_identifier(item, False)
+                    check_identifier(item, False, s_table)
                     func.return_type = infer.compile_identifier(item.content[0])
                 else:
                     func.return_type = infer.from_type(item.content[0].content)
@@ -252,6 +254,17 @@ def module_parse(mod):
                     inherits.remove(token)
             mod_var.inherit = inherits
     return mod_var
+
+
+# parses module constructors
+def module_constructor_parse(constructor):
+    c_var = semantics.Function()
+    c_var.is_constructor = True
+    for item in constructor.content:
+        if not isinstance(item, Token):
+            if item.name == "func_params_decl":
+                c_var.parameters = parse_parameters(item)
+    return c_var
 
 
 

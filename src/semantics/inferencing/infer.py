@@ -1,7 +1,6 @@
+import src.semantics.inferencing.operators as op
 from src.parser.ASTtools import Token
 from src.semantics.semantics import DataType, DataTypes, ListType, DictType
-import src.semantics.operators as op
-
 
 str_to_enum = {
     "INT_TYPE": DataTypes.INT,

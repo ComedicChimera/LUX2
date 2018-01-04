@@ -1,10 +1,4 @@
 {
-  "syclone": [
-    "package_declaration ; main"
-  ],
-  "package_declaration": [
-    "PACKAGE IDENTIFIER : IDENTIFIER"
-  ],
   "main": [
     "block_stmt main",
     "stmt ; main",
@@ -44,7 +38,7 @@
     "module_constructor main"
   ],
   "module_constructor": [
-    "CONSTRUCTOR ( ) constructional_block"
+    "CONSTRUCTOR ( func_params_decl ) constructional_block"
   ],
   "constructor_block": [
     "CONSTRUCTOR modifiers IDENTIFIER dot_id ( func_params_decl ) inherit constructional_block"

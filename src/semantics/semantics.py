@@ -68,6 +68,8 @@ class Function(Variable):
         self.data_structure = DataStructure.FUNCTION
         self.is_async = False
         self.is_constructor = False
+        self.group_inherits = []
+        self.code = []
 
 
 class ModuleTypes(Enum):
@@ -82,4 +84,11 @@ class Module(Variable):
         self.data_structure = DataStructure.MODULE
         self.mod_type = ModuleTypes.ACTIVE
         self.inherit = []
+        self.constructor = []
+        self.members = []
 
+
+class SemanticConstruct:
+    def __init__(self, symbol_table, ast):
+        self.symbol_table = symbol_table
+        self.ast = ast

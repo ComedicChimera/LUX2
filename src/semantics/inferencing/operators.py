@@ -1,4 +1,4 @@
-from src.semantics.identifiers import check_identifier
+from src.semantics.symbol_management.identifiers import check_identifier
 
 
 class Operator:
@@ -32,9 +32,9 @@ def check_operator(expr):
 
 def math_operator(m, scope):
     if m.content[0].name == "bool":
-        return check_identifier(m.content[0], False)
+        return check_identifier(m.content[0], False, [])
     elif m.content[0].name == "atom":
-        return check_identifier(m.content[0], False)
+        return check_identifier(m.content[0], False, [])
     elif len(m.content) > 1:
         print(m.name)
         print(m.content)

@@ -1,6 +1,6 @@
-from src.parser.ASTtools import ASTNode
-from src.semantics.infer import from_type
 from src.errormodule import throw
+from src.parser.ASTtools import ASTNode
+from src.semantics.inferencing.infer import from_type
 
 
 class Parameter:
@@ -16,7 +16,6 @@ class Parameter:
 
 
 def check_optional(p):
-    is_opt = False
     for item in p:
         is_opt = item.optional
         if is_opt and not item.optional:
