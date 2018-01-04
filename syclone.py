@@ -118,8 +118,6 @@ class Console:
     def compile(self, code, generate_file):
         print(ConsoleColors.BOLD + "Starting Compiler..." + ConsoleColors.WHITE)
         print("\n", end="")
-        # run preprocessor
-        print(ConsoleColors.BLUE + "Running Preprocessor...\n")
         p_code = code
         self.analyze(p_code, generate_file)
 

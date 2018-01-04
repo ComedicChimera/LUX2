@@ -1,7 +1,14 @@
 {
+  "syclone": [
+    "package_declaration ; main"
+  ],
+  "package_declaration": [
+    "PACKAGE IDENTIFIER : IDENTIFIER"
+  ],
   "main": [
     "block_stmt main",
     "stmt ; main",
+    "header_stmt main",
     "&"
   ],
   "block": [
@@ -22,7 +29,8 @@
     "for_block",
     "switch_stmt",
     "with_block",
-    "except_block"
+    "except_block",
+    "restricted_block"
   ],
   "module_block": [
     "MODULE modifiers module_type id inherit { module_main }"
@@ -212,7 +220,11 @@
     "{ main }",
     ";"
   ],
+  "restricted_block": [
+    "RESTRICTED { main }"
+  ],
   "stmt": [
+    "goto_stmt",
     "variable_declaration",
     "throw_stmt",
     "del_stmt",
@@ -221,7 +233,14 @@
     "return_stmt",
     "generator_stmt",
     "assignment",
+    "import_stmt",
     "&"
+  ],
+  "header_stmt": [
+    "# IDENTIFIER :"
+  ],
+  "goto_stmt": [
+    "GOTO IDENTIFIER"
   ],
   "break_stmt": [
     "BREAK"
@@ -275,6 +294,9 @@
     "assignment_ops",
     "=",
     ", full_assignment ,"
+  ],
+  "import_stmt": [
+    "[ IMPORT ( expr ) ]"
   ],
   "expr": [
     "lambda",
@@ -417,7 +439,11 @@
   ],
   "atom": [
     "await new base trailer",
-    "( expression )"
+    "( expression )",
+    "import_call"
+  ],
+  "import_call": [
+    "IMPORT ( expr )"
   ],
   "new": [
     "NEW",

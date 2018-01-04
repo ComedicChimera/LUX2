@@ -37,6 +37,7 @@ def add_to_symbol_table(var):
     current_level.append(var)
 
 
+# TODO add special handling for module blocks
 # builds the symbol table
 def construct_symbol_table(ast):
     global scope

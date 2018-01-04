@@ -1,0 +1,15 @@
+package test4 : exe;
+
+[import("hello")];
+
+&curl = import("lib-curl");
+
+#region:
+print("Hi");
+
+if(curl):
+    goto region;
+
+restricted {
+    print("This will never be reached, but it cool tho");
+}

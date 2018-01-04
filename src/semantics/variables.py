@@ -157,18 +157,66 @@ def struct_parse(struct):
     struct_var.name = identifier[0]
     struct_var.group = identifier[1]
     struct_var.is_instance = identifier[2]
-    # TODO check structure's content and add to symbol table
     struct_var.members = parse_members(struct.content[id_pos + 1], struct.content[0].type)
     return struct_var
 
 
 def parse_members(s_members, s_type):
     if s_type == "STRUCT":
-        pass
+        return parse_struct_members(s_members)
     elif s_type == "INTERFACE":
-        pass
+        return parse_interface_members(s_members)
     else:
         return infer.remove_periods([x.type for x in infer.unparse(s_members)])
+
+
+def parse_struct_members(m):
+    var = semantics.TypedVariable()
+    members = []
+    for item in m.content:
+        if not isinstance(item, Token):
+            if item.name == "extension":
+                var.data_type = infer.from_type(item.content[1])
+            elif item.name == "n_var":
+                members.append(var)
+                members += parse_struct_members(item)
+                return members
+        else:
+            if item.type == "IDENTIFIER":
+                var.name = item.value
+    members.append(var)
+    return members
+
+
+def parse_interface_members(m):
+    func = semantics.Function()
+    members = []
+    for item in m.content:
+        if not isinstance(item, Token):
+            if item.name == "modifiers":
+                func.modifiers = infer.unparse(item)
+            elif item.name == "rt_type":
+                if isinstance(item.content[0], Token):
+                    func.return_type = None
+                elif item.content[0].name == "id":
+                    check_identifier(item, False)
+                    func.return_type = infer.compile_identifier(item.content[0])
+                else:
+                    func.return_type = infer.from_type(item.content[0].content)
+            elif item.name == "id":
+                identifier = infer.compile_identifier(item)
+                func.name = identifier[0]
+                func.group = identifier[1]
+                if identifier[2]:
+                    throw("semantic_error", "Invalid Identifier", item.content[0])
+            elif item.name == "func_params_decl":
+                func = parse_parameters(item)
+            elif item.name == "interface_main":
+                members.append(func)
+                members += parse_interface_members(item)
+                return members
+    members.append(func)
+    return members
 
 
 # module parser
