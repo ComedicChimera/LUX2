@@ -1,6 +1,7 @@
 import src.semantics.symbol_management.variables as variables
 from src.parser.ASTtools import ASTNode
 from src.semantics.semantics import SemanticConstruct
+from src.semantics.import_func import import_package
 
 declarations = {
     "variable_declaration": variables.var_parse,
@@ -55,6 +56,9 @@ def construct_symbol_table(ast, scope=0):
                             if len(sub_tree.content) > 1:
                                 mod.members = sub_tree.content[1]
                 symbol_table.append(mod)
+            elif item.name == "import_stmt":
+                # TODO get package name
+                symbol_table.append(import_package("", True, ""))
             else:
                 construct_symbol_table(item, scope)
     return symbol_table

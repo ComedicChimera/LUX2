@@ -74,7 +74,7 @@ class Console:
         if len(cmd_obj.parameters) > 0:
             raise(CustomException("Function RUN does not except parameters."))
         if self.fileType == "source":
-            self.compile(" " + self.currentFile, False)
+            self.compile(" " + self.currentFile, "")
         else:
             raise NotImplementedError
 
@@ -115,20 +115,20 @@ class Console:
             self.commands[item.name](item)
 
     # main compile function
-    def compile(self, code, generate_file):
+    def compile(self, code, output_dir):
         print(ConsoleColors.BOLD + "Starting Compiler..." + ConsoleColors.WHITE)
         print("\n", end="")
         p_code = code
-        self.analyze(p_code, generate_file)
+        self.analyze(p_code, output_dir)
 
     # gets semantically valid AST and catches compile time errors
     @staticmethod
-    def analyze(code, generate_file):
+    def analyze(code, output_dir=""):
+        os.mkdir(output_dir + "_build")
+        os.mkdir(output_dir + "_build/bin")
         # gets the tokens from the Lexer
         lx = lexer.Lexer()
         tokens = lx.lex(code)
-        # for token in tokens:
-        #    print(token.to_str())
         print("Lex Successful: Found %d tokens\n" % len(tokens))
         # runs tokens through parser
         parser = syc_parser.Parser(tokens)
