@@ -98,10 +98,10 @@ def func_parse(func, scope):
                 check_identifier(item, False, s_table)
                 func_var.return_type = infer.compile_identifier(item.content[0])
             else:
-                func_var.return_type = infer.from_type(item.content[0].content)
+                func_var.return_type = infer.from_type(item.content[0])
         # parse the function params
         elif item.name == "func_params_decl":
-            func_var = parse_parameters(item)
+            func_var.parameters = parse_parameters(item)
     return func_var
 
 
@@ -159,7 +159,7 @@ def struct_parse(struct):
     struct_var.name = identifier[0]
     struct_var.group = identifier[1]
     struct_var.is_instance = identifier[2]
-    struct_var.members = parse_members(struct.content[id_pos + 1], struct.content[0].type)
+    struct_var.members = parse_members(struct.content[-2], struct.content[0].type)
     return struct_var
 
 

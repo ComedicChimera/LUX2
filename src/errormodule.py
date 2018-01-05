@@ -33,7 +33,7 @@ def get_position(ndx):
 
 
 def getln(pos, len_carrots):
-    return code.split("\n")[pos[0]] + "\n " * pos[1] + ("^" * len_carrots)
+    return code.split("\n")[pos[0]] + "\n" + " " * pos[1] + ("^" * len_carrots)
 
 
 def unparse(ast):
@@ -60,7 +60,7 @@ def throw(type, error, params):
         else:
             token = params[0]
             pos = get_position(token.ndx)
-            error_message = ConsoleColors.RED + "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):" % (error, token.value, pos[0] + 1, pos[1])
+            error_message = ConsoleColors.RED + "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):\n" % (error, token.value, pos[0] + 1, pos[1])
             error_message += getln(pos, len(token.value))
             if not isinstance(params[1], list):
                 error_message += "\n\nExpected: '%s'" % params[1]

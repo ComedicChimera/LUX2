@@ -63,7 +63,7 @@ def from_simple(simple, c_type):
 def from_type(data_type):
     rt_type = DataType()
     if data_type.content[0].name == "deref_op":
-        rt_type.pointer = [x.type for x in unparse(data_type[0])]
+        rt_type.pointer = [x.type for x in unparse(data_type.content[0])]
         return from_simple(data_type.content[1], rt_type)
     elif data_type.content[0].name == "simple_types":
         return from_simple(data_type.content[0], rt_type)

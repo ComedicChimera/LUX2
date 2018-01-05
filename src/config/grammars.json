@@ -290,7 +290,7 @@
     ", full_assignment ,"
   ],
   "import_stmt": [
-    "[ IMPORT ( expr ) ]"
+    "[ IMPORT ( STRING_LITERAL ) ]"
   ],
   "expr": [
     "lambda",
@@ -437,7 +437,7 @@
     "import_call"
   ],
   "import_call": [
-    "IMPORT ( expr )"
+    "IMPORT ( STRING_LITERAL )"
   ],
   "new": [
     "NEW",

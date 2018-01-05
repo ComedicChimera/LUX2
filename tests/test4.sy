@@ -1,8 +1,4 @@
-package test4 : exe;
-
-[import("hello")];
-
-&curl = import("lib-curl");
+[import("tests/test2.sy")];
 
 #region:
 print("Hi");

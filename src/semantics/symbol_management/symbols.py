@@ -1,7 +1,12 @@
 import src.semantics.symbol_management.variables as variables
 from src.parser.ASTtools import ASTNode
 from src.semantics.semantics import SemanticConstruct
-from src.semantics.import_func import import_package
+import src.errormodule as er
+# package management
+from lib.spm import load_package
+import pickle
+from src.parser.syc_parser import Parser
+from src.parser.lexer import Lexer
 
 declarations = {
     "variable_declaration": variables.var_parse,
@@ -15,6 +20,39 @@ declarations = {
 }
 
 
+class Package:
+    def __init__(self):
+        self.alias = ""
+        self.dir = ""
+        self.is_global = False
+
+
+def import_package(name, is_global):
+    code = load_package(name)
+    er_file = er.file
+    er_code = er.code
+    lx = Lexer()
+    tokens = lx.lex(code)
+    p = Parser(tokens)
+    ast = p.parse()
+    s_table = construct_symbol_table(ast)
+    construct = SemanticConstruct(s_table, ast)
+    er.code = er_code
+    er.file = er_file
+    if "/" in name:
+        alias = name.split(".")[0].split("/")[-1]
+    else:
+        alias = name
+    with open("_build/bin/%s_ssc.pickle" % alias, "bw+") as file:
+        pickle.dump(construct, file)
+        file.close()
+    pkg = Package()
+    pkg.alias = alias
+    pkg.dir = "_build/bin/%s_scc.pickle" % alias
+    pkg.is_global = is_global
+    return pkg
+
+
 # builds the symbol table
 def construct_symbol_table(ast, scope=0):
     symbol_table = []
@@ -24,12 +62,14 @@ def construct_symbol_table(ast, scope=0):
                 symbol_table.append(construct_symbol_table(item, scope + 1))
             elif item.name in declarations:
                 variables.s_table = symbol_table
-                if item.name in ["func_block", "variable_declaration", "async_block"]:
-                    if item.name in ["func_block", "async_block"]:
+                if item.name in ["func_block", "variable_declaration", "async_block", "constructor_block"]:
+                    if item.name in ["func_block", "async_block", "constructor_block"]:
                         func = variables.func_parse(item, scope)
+
                         for sub_tree in item.content:
-                            if sub_tree.name == "functional_block":
-                                func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
+                            if isinstance(sub_tree, ASTNode):
+                                if sub_tree.name == "functional_block":
+                                    func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
                         symbol_table.append(func)
                     else:
                         symbol_table.append(declarations[item.name](item, scope))
@@ -57,8 +97,8 @@ def construct_symbol_table(ast, scope=0):
                                 mod.members = sub_tree.content[1]
                 symbol_table.append(mod)
             elif item.name == "import_stmt":
-                # TODO get package name
-                symbol_table.append(import_package("", True, ""))
+                name = item.content[3].value
+                symbol_table.append(import_package(name[1:len(name) - 1], True))
             else:
                 construct_symbol_table(item, scope)
     return symbol_table

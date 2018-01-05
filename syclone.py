@@ -124,8 +124,9 @@ class Console:
     # gets semantically valid AST and catches compile time errors
     @staticmethod
     def analyze(code, output_dir=""):
-        os.mkdir(output_dir + "_build")
-        os.mkdir(output_dir + "_build/bin")
+        if not os.path.exists("_build"):
+            os.mkdir(output_dir + "_build")
+            os.mkdir(output_dir + "_build/bin")
         # gets the tokens from the Lexer
         lx = lexer.Lexer()
         tokens = lx.lex(code)
