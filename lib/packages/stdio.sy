@@ -1,35 +1,23 @@
-#package stdio : pkg;
-
-#define iostream extern __DOS32__;
-#define istream extern __DOSIN__;
-#define istream : iostream;
-#undef istream;
-#define extern dout >> iostream __main__;
-#define extern din << iostream __istream__;
-
-constructor buffer() {
-  $this.content;
-  $this.charset;
-}
-
-func local buffer.write(this) {
-  if(this.charset = "utf8") {
-    $charlist : int[] = lambda(this.content[y] => int(y));
-    for($item in charlist) {
-      yield return item;
-    }
+func str read($count : int) {
+  $string : str;
+  do(count) {
+    string += _SSLM002();
   }
-  else {
-    throw False;
+  return string;
+}
+
+func str readLine($delimiter = '\n') {
+  $line : str;
+  $character = '';
+  while(character != delimiter) {
+    character = char(read(1));
+    line += character;
   }
+  return line;
 }
 
-macro stdout.out($b : buffer) {
-  iostream::dout << b.write();
-}
-
-macro stdout.in($b : buffer) {
-  $content : str;
-  iostream::din >> content;
-  return yield (value : str) += lambda(buffer.write(content)[y] => char(y));
+func void write($string : str) {
+  for($elem in string) {
+    _SSLM001(elem);
+  }
 }

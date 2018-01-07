@@ -7,6 +7,7 @@ from lib.spm import load_package
 import pickle
 from src.parser.syc_parser import Parser
 from src.parser.lexer import Lexer
+import src.semantics.semantics as semantics
 
 declarations = {
     "variable_declaration": variables.var_parse,
@@ -72,7 +73,18 @@ def construct_symbol_table(ast, scope=0):
                                     func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
                         symbol_table.append(func)
                     else:
-                        symbol_table.append(declarations[item.name](item, scope))
+                        var = declarations[item.name](item, scope)
+                        if var.data_type == semantics.DataTypes.PACKAGE:
+                            current = ""
+                            for elem in item.content:
+                                if isinstance(elem, ASTNode):
+                                    if elem.name == 'initializer':
+                                        current = elem.content[1]
+                            while current.name != "import_call":
+                                current = current.content[0]
+                            name = current.content[2].value
+                            var.data_type = import_package(name, False)
+                        symbol_table.append(var)
                 else:
                     if item.name == "macro_block":
                         macro = variables.macro_parse(item)

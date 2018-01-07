@@ -105,7 +105,9 @@
   ],
   "access_modifiers": [
     "PRIVATE",
-    "PROTECTED"
+    "PROTECTED",
+    "UNIQUE",
+    "VIRTUAL"
   ],
   "macro_params_decl": [
     "DOLLAR IDENTIFIER extension n_var",
