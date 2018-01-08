@@ -95,7 +95,7 @@ def func_parse(func, scope):
             if isinstance(item.content[0], Token):
                 func_var.return_type = None
             elif item.content[0].name == "id":
-                check_identifier(item, False, s_table)
+                check_identifier(item.content[0], False, s_table, scope)
                 func_var.return_type = infer.compile_identifier(item.content[0])
             else:
                 func_var.return_type = infer.from_type(item.content[0])
@@ -140,7 +140,7 @@ def macro_parse(macro):
 
 
 # parsed structs, interfaces, and types
-def struct_parse(struct):
+def struct_parse(struct, scope=0):
     # holder
     struct_var = semantics.Structure()
     # decides what type it is
@@ -159,15 +159,15 @@ def struct_parse(struct):
     struct_var.name = identifier[0]
     struct_var.group = identifier[1]
     struct_var.is_instance = identifier[2]
-    struct_var.members = parse_members(struct.content[-2], struct.content[0].type)
+    struct_var.members = parse_members(struct.content[-2], struct.content[0].type, scope)
     return struct_var
 
 
-def parse_members(s_members, s_type):
+def parse_members(s_members, s_type, scope=0):
     if s_type == "STRUCT":
         return parse_struct_members(s_members)
     elif s_type == "INTERFACE":
-        return parse_interface_members(s_members)
+        return parse_interface_members(s_members, scope)
     else:
         return infer.remove_periods([x.type for x in infer.unparse(s_members)])
 
@@ -190,7 +190,7 @@ def parse_struct_members(m):
     return members
 
 
-def parse_interface_members(m):
+def parse_interface_members(m, scope):
     func = semantics.Function()
     members = []
     for item in m.content:
@@ -201,7 +201,7 @@ def parse_interface_members(m):
                 if isinstance(item.content[0], Token):
                     func.return_type = None
                 elif item.content[0].name == "id":
-                    check_identifier(item, False, s_table)
+                    check_identifier(item.content[0], False, s_table, scope)
                     func.return_type = infer.compile_identifier(item.content[0])
                 else:
                     func.return_type = infer.from_type(item.content[0].content)

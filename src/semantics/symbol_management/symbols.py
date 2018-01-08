@@ -63,15 +63,16 @@ def construct_symbol_table(ast, scope=0):
                 symbol_table.append(construct_symbol_table(item, scope + 1))
             elif item.name in declarations:
                 variables.s_table = symbol_table
-                if item.name in ["func_block", "variable_declaration", "async_block", "constructor_block"]:
+                if item.name in ["func_block", "variable_declaration", "async_block", "constructor_block", "interface_block"]:
                     if item.name in ["func_block", "async_block", "constructor_block"]:
                         func = variables.func_parse(item, scope)
-
                         for sub_tree in item.content:
                             if isinstance(sub_tree, ASTNode):
                                 if sub_tree.name == "functional_block":
                                     func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
                         symbol_table.append(func)
+                    elif item.name == "interface_block":
+                        symbol_table.append(variables.struct_parse(item, scope))
                     else:
                         var = declarations[item.name](item, scope)
                         if var.data_type == semantics.DataTypes.PACKAGE:

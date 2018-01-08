@@ -435,7 +435,7 @@
   ],
   "atom": [
     "await new base trailer",
-    "( expression )",
+    "( expr )",
     "import_call"
   ],
   "import_call": [
@@ -483,7 +483,15 @@
     "&"
   ],
   "inline_params": [
-    "DOLLAR IDENTIFIER << expr inline_params",
+    "DOLLAR IDENTIFIER extension inline_params_extension n_inline_params",
+    "&"
+  ],
+  "inline_params_extension": [
+    "<< expr",
+    "&"
+  ],
+  "n_inline_params": [
+    ", DOLLAR IDENTIFIER extension inline_params_extension n_inline_params",
     "&"
   ],
   "string": [
