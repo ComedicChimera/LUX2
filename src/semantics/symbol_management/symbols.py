@@ -75,16 +75,6 @@ def construct_symbol_table(ast, scope=0):
                         symbol_table.append(variables.struct_parse(item, scope))
                     else:
                         var = declarations[item.name](item, scope)
-                        if var.data_type == semantics.DataTypes.PACKAGE:
-                            current = ""
-                            for elem in item.content:
-                                if isinstance(elem, ASTNode):
-                                    if elem.name == 'initializer':
-                                        current = elem.content[1]
-                            while current.name != "import_call":
-                                current = current.content[0]
-                            name = current.content[2].value
-                            var.data_type = import_package(name, False)
                         symbol_table.append(var)
                 else:
                     if item.name == "macro_block":

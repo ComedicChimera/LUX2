@@ -292,7 +292,11 @@
     ", full_assignment ,"
   ],
   "import_stmt": [
-    "[ IMPORT ( STRING_LITERAL ) ]"
+    "INCLUDE id as_ext"
+  ],
+  "as_ext": [
+    "AS IDENTIFIER",
+    "&"
   ],
   "expr": [
     "lambda",
@@ -435,11 +439,7 @@
   ],
   "atom": [
     "await new base trailer",
-    "( expr )",
-    "import_call"
-  ],
-  "import_call": [
-    "IMPORT ( STRING_LITERAL )"
+    "( expr )"
   ],
   "new": [
     "NEW",
