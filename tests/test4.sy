@@ -1,10 +1,7 @@
-[import("tests/test2.sy")];
+include "tests/test4";
 
 #region:
 print("Hi");
-
-if(curl):
-    goto region;
 
 restricted {
     print("This will never be reached, but it cool tho");

@@ -3,11 +3,10 @@ from src.parser.ASTtools import ASTNode
 from src.semantics.semantics import SemanticConstruct
 import src.errormodule as er
 # package management
-from lib.spm import load_package
+from lib.spm import load_package, parse_declaration
 import pickle
 from src.parser.syc_parser import Parser
 from src.parser.lexer import Lexer
-import src.semantics.semantics as semantics
 
 declarations = {
     "variable_declaration": variables.var_parse,
@@ -25,7 +24,6 @@ class Package:
     def __init__(self):
         self.alias = ""
         self.dir = ""
-        self.is_global = False
 
 
 def import_package(name, is_global):
@@ -100,8 +98,12 @@ def construct_symbol_table(ast, scope=0):
                                 mod.members = sub_tree.content[1]
                 symbol_table.append(mod)
             elif item.name == "include_stmt":
-                name = item.content[3].value
-                symbol_table.append(import_package(name[1:len(name) - 1], True))
+                if item.content[1].content[0].type == "IDENTIFIER":
+                    name = item.content[1].content[0].value
+                else:
+                    name = item.content[1].content[0].value
+                    name = name[1:len(name) - 1] + ".sy"
+                symbol_table.append(import_package(name, True))
             else:
                 construct_symbol_table(item, scope)
     return symbol_table

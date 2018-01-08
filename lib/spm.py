@@ -2,6 +2,7 @@ import json
 import util
 
 
+# open a package
 def load_package(name):
     index = json.loads(open(util.source_dir + "/lib/package_index.json").read())
     if name in index.keys():

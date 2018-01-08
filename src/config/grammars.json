@@ -295,8 +295,8 @@
     "INCLUDE include_ext"
   ],
   "include_ext": [
-    "id",
-    "string"
+    "IDENTIFIER",
+    "STRING"
   ],
   "expr": [
     "lambda",
