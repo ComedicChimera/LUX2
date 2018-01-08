@@ -99,7 +99,7 @@ def construct_symbol_table(ast, scope=0):
                             if len(sub_tree.content) > 1:
                                 mod.members = sub_tree.content[1]
                 symbol_table.append(mod)
-            elif item.name == "import_stmt":
+            elif item.name == "include_stmt":
                 name = item.content[3].value
                 symbol_table.append(import_package(name[1:len(name) - 1], True))
             else:

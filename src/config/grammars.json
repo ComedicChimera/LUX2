@@ -291,12 +291,12 @@
     "=",
     ", full_assignment ,"
   ],
-  "import_stmt": [
-    "INCLUDE id as_ext"
+  "include_stmt": [
+    "INCLUDE include_ext"
   ],
-  "as_ext": [
-    "AS IDENTIFIER",
-    "&"
+  "include_ext": [
+    "id",
+    "string"
   ],
   "expr": [
     "lambda",
