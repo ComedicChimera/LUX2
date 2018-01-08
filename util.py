@@ -1,3 +1,6 @@
+import os
+
+
 class CustomException(Exception):
     pass
 
@@ -12,10 +15,6 @@ class ConsoleColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+source_dir = os.path.dirname(os.path.realpath(__file__))
 
-def set_source_dir(path):
-    global source_dir
-    source_dir = path
-
-source_dir = "C:/Users/forlo/Desktop/Coding/SyClone"
 version = "0.0.1"
