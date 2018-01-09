@@ -23,7 +23,6 @@ class Console:
             "u": self.update,
             "v": self.get_version,
             "bug": self.debug,
-            "set_path": self.set_path
         }
 
         self.currentFile = ""
@@ -61,13 +60,6 @@ class Console:
         with open(path) as fileObject:
             for item in fileObject:
                 self.currentFile += item
-
-    @staticmethod
-    def set_path(cmd_obj):
-        if len(cmd_obj.parameters) != 1:
-            raise(CustomException("Function SET_PATH excepts only one parameter."))
-        set_source_dir(cmd_obj.parameters[0])
-        print("Source dir changed to '%s'." % cmd_obj.parameters[0])
 
     # runs a file
     def run(self, cmd_obj):
@@ -116,21 +108,21 @@ class Console:
 
     # main compile function
     def compile(self, code, output_dir):
-        print(ConsoleColors.BOLD + "Starting Compiler..." + ConsoleColors.WHITE)
-        print("\n", end="")
+        print("Initializing SyClone Compiler [%s] (SycStandard)\n" % version)
         p_code = code
-        self.analyze(p_code, output_dir)
+        sc = self.analyze(p_code, output_dir)
 
     # gets semantically valid AST and catches compile time errors
     @staticmethod
     def analyze(code, output_dir=""):
+        print("Compiling [          ] (\\)", end="\r")
         if not os.path.exists("_build"):
             os.mkdir(output_dir + "_build")
             os.mkdir(output_dir + "_build/bin")
         # gets the tokens from the Lexer
         lx = lexer.Lexer()
         tokens = lx.lex(code)
-        print("Lex Successful: Found %d tokens\n" % len(tokens))
+        print("Compiling [#         ] (|)", end="\r")
         # runs tokens through parser
         parser = syc_parser.Parser(tokens)
         tree = object()
@@ -139,12 +131,12 @@ class Console:
         except RecursionError:
             print(ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
             exit(1)
+        print("Compiling [##        ] (/)", end="\r")
         # simplify ast
         ast = AST(tree)
-        ast_string = ast.to_str()
-        print("Parse Successful:\n\tTree Size: %dB\n" % sys.getsizeof(ast_string))
-        semantic_ast = check(ast)
-        return semantic_ast
+        semantic_obj = check(ast)
+        print("Compiling [####      ] (-)", end="\r")
+        return semantic_obj
 
 
 cn = Console()

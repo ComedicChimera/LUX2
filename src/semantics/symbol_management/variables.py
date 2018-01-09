@@ -1,3 +1,4 @@
+import src.semantics.symbol_management.types as types
 import src.semantics.inferencing.infer as infer
 import src.semantics.semantics as semantics
 from src.errormodule import throw
@@ -17,7 +18,7 @@ def var_parse(variable, s):
     for item in variable.content:
         # gets the modifiers as list
         if item.name == "modifiers":
-            properties += infer.unparse(item)
+            properties += types.unparse(item)
         # runs the parse on the declaration itself (sans modifiers)
         elif item.name == "variable_decl_stmt":
             var = variable_declaration_parse(item, s)
@@ -41,13 +42,13 @@ def variable_declaration_parse(var_decl, scope):
         else:
             # generates the identifier properties
             if item.name == "id":
-                iden = infer.compile_identifier(item)
+                iden = types.compile_identifier(item)
                 var.name = iden[0]
                 var.group = iden[1]
                 var.is_instance = iden[2]
             # gets data type from extension
             elif item.name == "extension":
-                var.data_type = infer.from_type(item.content[1])
+                var.data_type = types.from_type(item.content[1])
                 has_extension = True
             # infers data type from the initializer/checks extension v initializer
             elif item.name == "initializer":
@@ -82,10 +83,10 @@ def func_parse(func, scope):
             continue
         # generate modifiers
         if item.name == "modifiers":
-            func_var.modifiers = infer.unparse(item)
+            func_var.modifiers = types.unparse(item)
         # generate identifier
         elif item.name == "id":
-            identifier = infer.compile_identifier(item)
+            identifier = types.compile_identifier(item)
             func_var.name = identifier[0]
             func_var.group = identifier[1]
             if identifier[2]:
@@ -96,9 +97,9 @@ def func_parse(func, scope):
                 func_var.return_type = None
             elif item.content[0].name == "id":
                 check_identifier(item.content[0], False, s_table, scope)
-                func_var.return_type = infer.compile_identifier(item.content[0])
+                func_var.return_type = types.compile_identifier(item.content[0])
             else:
-                func_var.return_type = infer.from_type(item.content[0])
+                func_var.return_type = types.from_type(item.content[0])
         # parse the function params
         elif item.name == "func_params_decl":
             func_var.parameters = parse_parameters(item)
@@ -120,10 +121,10 @@ def macro_parse(macro):
             continue
         # generate modifiers
         if item.name == "modifiers":
-            macro_var.modifiers = infer.unparse(item)
+            macro_var.modifiers = types.unparse(item)
         # generate identifier
         elif item.name == "id":
-            identifier = infer.compile_identifier(item)
+            identifier = types.compile_identifier(item)
             macro_var.name = identifier[0]
             macro_var.group = identifier[1]
             if identifier[2]:
@@ -153,9 +154,9 @@ def struct_parse(struct, scope=0):
     # gets its identifiers and modifiers
     id_pos = 1
     if struct.content[1].name == "modifiers":
-        struct_var.modifiers = infer.unparse(struct.content[1])
+        struct_var.modifiers = types.unparse(struct.content[1])
         id_pos = 2
-    identifier = infer.compile_identifier(struct.content[id_pos])
+    identifier = types.compile_identifier(struct.content[id_pos])
     struct_var.name = identifier[0]
     struct_var.group = identifier[1]
     struct_var.is_instance = identifier[2]
@@ -169,7 +170,7 @@ def parse_members(s_members, s_type, scope=0):
     elif s_type == "INTERFACE":
         return parse_interface_members(s_members, scope)
     else:
-        return infer.remove_periods([x.type for x in infer.unparse(s_members)])
+        return types.remove_periods([x.type for x in types.unparse(s_members)])
 
 
 def parse_struct_members(m):
@@ -178,7 +179,7 @@ def parse_struct_members(m):
     for item in m.content:
         if not isinstance(item, Token):
             if item.name == "extension":
-                var.data_type = infer.from_type(item.content[1])
+                var.data_type = types.from_type(item.content[1])
             elif item.name == "n_var":
                 members.append(var)
                 members += parse_struct_members(item)
@@ -196,17 +197,17 @@ def parse_interface_members(m, scope):
     for item in m.content:
         if not isinstance(item, Token):
             if item.name == "modifiers":
-                func.modifiers = infer.unparse(item)
+                func.modifiers = types.unparse(item)
             elif item.name == "rt_type":
                 if isinstance(item.content[0], Token):
                     func.return_type = None
                 elif item.content[0].name == "id":
                     check_identifier(item.content[0], False, s_table, scope)
-                    func.return_type = infer.compile_identifier(item.content[0])
+                    func.return_type = types.compile_identifier(item.content[0])
                 else:
-                    func.return_type = infer.from_type(item.content[0].content)
+                    func.return_type = types.from_type(item.content[0].content)
             elif item.name == "id":
-                identifier = infer.compile_identifier(item)
+                identifier = types.compile_identifier(item)
                 func.name = identifier[0]
                 func.group = identifier[1]
                 if identifier[2]:
@@ -215,7 +216,7 @@ def parse_interface_members(m, scope):
                 func = parse_parameters(item)
             elif item.name == "interface_main":
                 members.append(func)
-                members += parse_interface_members(item)
+                members += parse_interface_members(item, scope)
                 return members
     members.append(func)
     return members
@@ -231,7 +232,7 @@ def module_parse(mod):
     for item in mod.content[1:]:
         # get modifiers
         if item.name == "modifiers":
-            mod_var.modifiers = infer.unparse(item)
+            mod_var.modifiers = types.unparse(item)
         # set the type
         elif item.name == "module_type":
             mod_types = {
@@ -242,13 +243,13 @@ def module_parse(mod):
             mod_var.mod_type = mod_types[item.content[0].name]
         # compile the identifier
         elif item.name == "id":
-            identifier = infer.compile_identifier(item)
+            identifier = types.compile_identifier(item)
             mod_var.name = identifier[0]
             mod_var.group = identifier[1]
             mod_var.is_instance = identifier[2]
         # handle inherits
         elif item.name == "inherit":
-            inherits = infer.unparse(item)
+            inherits = types.unparse(item)
             for token in inherits:
                 if token.type == ":":
                     inherits.remove(token)

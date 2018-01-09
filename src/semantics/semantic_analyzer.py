@@ -1,4 +1,4 @@
-from src.semantics.symbol_management.symbols import construct_symbol_table
+from src.semantics.symbol_management.symbol_table import construct_symbol_table
 from src.semantics.symbol_management.identifiers import check_identifier
 from src.parser.ASTtools import ASTNode
 from src.errormodule import throw

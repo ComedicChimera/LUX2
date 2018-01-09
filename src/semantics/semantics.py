@@ -18,7 +18,6 @@ class DataTypes(Enum):
     BOOL = 2
     STRING = 3
     CHAR = 5
-    PACKAGE = 6
 
 
 class DataType:

@@ -8,11 +8,8 @@ file = "MAIN"
 code = ""
 
 
-class SycSyntaxError(Exception):
-    pass
-
-
-class SycSemanticError(Exception):
+# error types
+class SycCompileError(Exception):
     pass
 
 
@@ -56,7 +53,7 @@ def throw(type, error, params):
             error_message += getln(pos, len(token.value))
             if not isinstance(params[1], list):
                 error_message += "\n\nExpected: '%s'" % params[1]
-            code_error = SycSyntaxError(error_message)
+            code_error = SycCompileError(error_message)
         else:
             token = params[0]
             pos = get_position(token.ndx)
@@ -64,19 +61,21 @@ def throw(type, error, params):
             error_message += getln(pos, len(token.value))
             if not isinstance(params[1], list):
                 error_message += "\n\nExpected: '%s'" % params[1]
-            code_error = SycSyntaxError(error_message)
-    elif type == "semantic_error":
+            code_error = SycCompileError(error_message)
+    elif type == "semantic_error" or type == "package_error":
+        name_dict = {"semantic_error": "Semantic Error", "package_error": "Package Error"}
+        name = name_dict[type]
         if isinstance(params, Token):
             pos = get_position(params.ndx)
-            error_message = ConsoleColors.RED + "[Semantic Error] - %s, '%s' (ln:%d, pos:%d):\n" % (error, params.value, pos[0] + 1, pos[1])
+            error_message = ConsoleColors.RED + "[%s] - %s, '%s' (ln:%d, pos:%d):\n" % (name, error, params.value, pos[0] + 1, pos[1])
             error_message += getln(pos, len(params.value))
-            code_error = SycSemanticError(error_message)
+            code_error = SycCompileError(error_message)
         else:
             params = unparse(params)
             pos = get_position(params[0].ndx)
             end_pos = get_position(params[-1].ndx)
-            error_message = ConsoleColors.RED + "[Semantic Error] - %s (ln:%d, pos:%d):\n" % (error, pos[0] + 1, pos[1])
-            error_message += code.split("\n")[pos[0]][pos[1]:end_pos[1] + 1]
-            code_error = SycSemanticError(error_message)
+            error_message = ConsoleColors.RED + "[%s] - %s (ln:%d, pos:%d):\n" % (name, error, pos[0] + 1, pos[1])
+            error_message += code.split("\n")[pos[0]][pos[1] - 1:end_pos[1] + len(params[1].value)]
+            code_error = SycCompileError(error_message)
     raise code_error
 

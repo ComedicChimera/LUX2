@@ -229,7 +229,7 @@
     "return_stmt",
     "generator_stmt",
     "assignment",
-    "import_stmt",
+    "include_stmt",
     "&"
   ],
   "header_stmt": [
@@ -296,12 +296,11 @@
   ],
   "include_ext": [
     "IDENTIFIER",
-    "STRING"
+    "STRING_LITERAL"
   ],
   "expr": [
     "lambda",
     "comprehension",
-    "generator_expr",
     "inline_generator",
     "with_expr",
     "equation"
