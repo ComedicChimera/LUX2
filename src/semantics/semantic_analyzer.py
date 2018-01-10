@@ -10,10 +10,11 @@ table = []
 def check_context(ast, loop, func, local_scope):
     for item in ast.content:
         if isinstance(item, ASTNode):
-            if item.name in ["for_block", "do_block"]:
-                check_context(item, True, False, local_scope)
+            if item.name in ["for_block", "do_block", "switch_block"]:
+                check_context(item, True, func, local_scope)
+            # broken
             elif item.name == "func_block" or item.name == "async_block":
-                func = check_identifier(item, False, table)
+                func = check_identifier(item, False, table, local_scope)
                 if func.return_type:
                     check_context(item, loop, True, local_scope)
                 else:
@@ -27,7 +28,7 @@ def check_context(ast, loop, func, local_scope):
             elif item.name == "block":
                 check_context(item, loop, func, local_scope + 1)
             else:
-                check_context(item, False, False, local_scope)
+                check_context(item, loop, func, local_scope)
 
 
 # the main semantic checker function

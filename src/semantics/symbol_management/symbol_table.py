@@ -81,8 +81,9 @@ def construct_symbol_table(ast, scope=0):
                     if item.name == "macro_block":
                         macro = variables.macro_parse(item)
                         for sub_tree in item.content:
-                            if sub_tree.name == "functional_block":
-                                macro.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
+                            if isinstance(sub_tree, ASTNode):
+                                if sub_tree.name == "functional_block":
+                                    macro.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
                         symbol_table.append(macro)
                     else:
                         symbol_table.append(declarations[item.name](item))

@@ -24,6 +24,9 @@ class Lexer:
         for token in self.tokenTypes:
             matches = re.finditer(re.compile(self.tokenTypes[token]), code)
             for match in matches:
+                # checks to make sure all char literals are valid
+                if token == "CHAR_LITERAL":
+                    self.check_char(match.group(0)[1:len(match.group(0)) - 1], match.start())
                 if match.group(0) != "" and match.start() not in phrases.keys():
                     phrases[match.start()] = Token(token, match.group(0), match.start())
                     code = re.sub(self.tokenTypes[token], " " * len(match.group(0)), code, 1)
@@ -31,6 +34,7 @@ class Lexer:
         numbers = [x for x in phrases]
         numbers.sort()
         phrase_list = [phrases[x] for x in numbers]
+        self.check_unmatched(code)
         return phrase_list
 
     @staticmethod
@@ -47,3 +51,19 @@ class Lexer:
         for item in single_line_comments:
             code = code.replace(item, "\n" + (" " * (len(item) - 2)) + "\n", 1)
         return code
+
+    @staticmethod
+    def check_char(char, ndx):
+        slash_chars = ["\\n", "\\t", "\\r", "\\\\"]
+        if len(char) > 1:
+            if char not in slash_chars:
+                er.throw("lex_error", "Invalid char literal", [char, ndx])
+
+    @staticmethod
+    def check_unmatched(code_str):
+        unmatched = re.finditer(r"[^\s]", code_str)
+        for item in unmatched:
+            er.throw("lex_error", "Invalid identifier name", [item.group(0), item.start()])
+
+
+

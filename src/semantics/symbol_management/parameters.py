@@ -1,6 +1,6 @@
 from src.errormodule import throw
 from src.parser.ASTtools import ASTNode
-from src.semantics.inferencing.infer import from_type
+from src.semantics.symbol_management.types import from_type
 
 
 class Parameter:

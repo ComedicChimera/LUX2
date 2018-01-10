@@ -1,7 +1,7 @@
 func str read($count : int) {
   $string : str;
   do(count) {
-    string += _SSLM002();
+    string += __STDIN__();
   }
   return string;
 }
@@ -16,8 +16,8 @@ func str readLine($delimiter = '\n') {
   return line;
 }
 
-func void write($string : str) {
+macro write($string : str) {
   for($elem in string) {
-    _SSLM001(elem);
+    __STDOUT__(elem);
   }
 }

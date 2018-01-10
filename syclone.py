@@ -75,7 +75,7 @@ class Console:
     def get_input(self):
         command = ""
         while command != "exit":
-            # try:
+            try:
                 print(ConsoleColors.MAGENTA + "SYC_VCP@x64 " + ConsoleColors.GREEN + os.getcwd() + ConsoleColors.YELLOW + " ~\n" + ConsoleColors.WHITE + "$ ", end="")
                 command = input("")
                 # if is a syc command, the syc parser will handle it
@@ -88,9 +88,9 @@ class Console:
                 elif command != "exit":
                     output = subprocess.check_output(command, shell=True)
                     print(str(output).replace("b'", "").replace("\\n", "\n").replace("\\r", "\r")[:len(output) - 1])
-            # except Exception as e:
-                # print(bcolors.RED + str(e))
-                print("\n")
+            except Exception as e:
+                print("\n\n" + str(e))
+            print("\n")
 
     # splits the command into its parts and executes it
     def evaluate_command(self, command):
@@ -115,14 +115,14 @@ class Console:
     # gets semantically valid AST and catches compile time errors
     @staticmethod
     def analyze(code, output_dir=""):
-        print("Compiling [          ] (\\)", end="\r")
+        print("Compiling [          ] (\\)", end="")
         if not os.path.exists("_build"):
             os.mkdir(output_dir + "_build")
             os.mkdir(output_dir + "_build/bin")
         # gets the tokens from the Lexer
         lx = lexer.Lexer()
         tokens = lx.lex(code)
-        print("Compiling [#         ] (|)", end="\r")
+        print("\rCompiling [#         ] (|)", end="")
         # runs tokens through parser
         parser = syc_parser.Parser(tokens)
         tree = object()
@@ -131,11 +131,11 @@ class Console:
         except RecursionError:
             print(ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
             exit(1)
-        print("Compiling [##        ] (/)", end="\r")
+        print("\rCompiling [##        ] (/)", end="")
         # simplify ast
         ast = AST(tree)
         semantic_obj = check(ast)
-        print("Compiling [####      ] (-)", end="\r")
+        print("\rCompiling [####      ] (-)", end="")
         return semantic_obj
 
 

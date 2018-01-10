@@ -1,0 +1,11 @@
+include stdio;
+
+macro print($item) =>
+  stdio.write("{}".format(item));
+
+macro println($item) => print(item + '\n');
+
+func str input($prompt : str) {
+  println(prompt);
+  return stdio.readLine();
+}

@@ -170,7 +170,7 @@ def parse_members(s_members, s_type, scope=0):
     elif s_type == "INTERFACE":
         return parse_interface_members(s_members, scope)
     else:
-        return types.remove_periods([x.type for x in types.unparse(s_members)])
+        return types.remove_periods(s_members)
 
 
 def parse_struct_members(m):
@@ -230,8 +230,11 @@ def module_parse(mod):
     mod_var.data_structure = semantics.DataStructure.MODULE
     # slice so that the module keyword is not included
     for item in mod.content[1:]:
+        # check for tokens
+        if isinstance(item, Token):
+            continue
         # get modifiers
-        if item.name == "modifiers":
+        elif item.name == "modifiers":
             mod_var.modifiers = types.unparse(item)
         # set the type
         elif item.name == "module_type":
@@ -240,7 +243,7 @@ def module_parse(mod):
                 "AWAIT": semantics.ModuleTypes.AWAIT,
                 "PASSIVE": semantics.ModuleTypes.PASSIVE
             }
-            mod_var.mod_type = mod_types[item.content[0].name]
+            mod_var.mod_type = mod_types[item.content[0].type]
         # compile the identifier
         elif item.name == "id":
             identifier = types.compile_identifier(item)
