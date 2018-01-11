@@ -1,6 +1,15 @@
 from src.parser.ASTtools import ASTNode
 
 
+class AtomParser:
+    @staticmethod
+    def lambda_atom(atom):
+        for item in atom.content:
+            if isinstance(item, ASTNode):
+                if item.name == "trailer":
+                    pass
+
+
 class ExpressionParser:
     @staticmethod
     def parse_with(with_expr, scope):
