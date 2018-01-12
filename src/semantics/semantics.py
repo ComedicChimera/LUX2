@@ -88,6 +88,14 @@ class Module(Variable):
         self.members = []
 
 
+class Lambda(Variable):
+    def __init__(self, iterator, s_e):
+        Variable.__init__(self)
+        self.iterator = iterator
+        self.sub_expr = s_e
+        self.condition = None
+
+
 class SemanticConstruct:
     def __init__(self, symbol_table, ast):
         self.symbol_table = symbol_table
