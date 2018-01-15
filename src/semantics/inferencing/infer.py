@@ -5,11 +5,24 @@ import src.semantics.semantics as semantics
 
 class AtomParser:
     @staticmethod
-    def lambda_atom(atom):
+    def lambda_atom(atom, sc):
         if not AtomParser.check_lambda_trailer(atom):
             er.throw("semantic_error", "Unable to perform lambda operation without proper iterator.", atom)
-        # TODO calculate return value of lambda
-        return [AtomParser.get_lambda_iterator(atom)]
+        rt_val = AtomParser.parse_atom(AtomParser.get_lambda_return(atom), sc)
+        lb_atom = semantics.Lambda(AtomParser.get_lambda_iterator(atom), rt_val)
+        lb_atom.return_val = rt_val
+        return lb_atom
+
+    @staticmethod
+    def get_lambda_return(at):
+        for item in at.content:
+            if isinstance(item, ASTNode):
+                if item.name == "trailer":
+                    if not AtomParser.get_lambda_return(item):
+                        at.content.pop(-1)
+                        return at
+        else:
+            return False
 
     @staticmethod
     def check_lambda_trailer(atom):
@@ -46,6 +59,10 @@ class AtomParser:
                         er.throw("semantic_error", "Invalid lambda iterator", current)
                     return current.content[0].value
 
+    @staticmethod
+    def parse_atom(at, scope):
+        return at
+
 
 class ExpressionParser:
     @staticmethod
@@ -55,13 +72,12 @@ class ExpressionParser:
     @staticmethod
     def parse_lambda(expr, scope):
         lb_expr = expr.content[2]
-        iterator = AtomParser.lambda_atom(lb_expr.content[0])
-        lb = semantics.Lambda(iterator, lb_expr.content[2])
+        lb = AtomParser.lambda_atom(lb_expr.content[0], scope)
         for item in lb_expr.content:
             if isinstance(item, ASTNode):
                 if item.name == "lambda_if":
                     lb.condition = item
-        return lb
+        return lb.return_val
 
 
 expressions = {

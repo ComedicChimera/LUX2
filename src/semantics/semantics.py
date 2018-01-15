@@ -94,6 +94,7 @@ class Lambda(Variable):
         self.iterator = iterator
         self.sub_expr = s_e
         self.condition = None
+        self.return_val = None
 
 
 class SemanticConstruct:
