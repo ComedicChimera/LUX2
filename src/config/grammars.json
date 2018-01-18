@@ -191,7 +191,7 @@
     "&"
   ],
   "switch_stmt": [
-    "SWITCH ( expression ) { switch_block }"
+    "SWITCH ( arithmetic ) { switch_block }"
   ],
   "switch_block": [
     "block_stmt switch_block",
@@ -391,14 +391,14 @@
     "shift"
   ],
   "shift": [
-    "expression n_shift"
+    "arithmetic n_shift"
   ],
   "n_shift": [
-    "<< expression n_shift",
-    ">> expression n_shift",
+    "<< arithmetic n_shift",
+    ">> arithmetic n_shift",
     "&"
   ],
-  "expression": [
+  "arithmetic": [
     "term add_sub_op",
     "bool"
   ],

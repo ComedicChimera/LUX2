@@ -79,10 +79,25 @@ class ExpressionParser:
                     lb.condition = item
         return lb.return_val
 
+    @staticmethod
+    def parse_comp(expr, scope):
+        rt_type = ""
+        for item in expr.content:
+            if isinstance(item, ASTNode):
+                if item.name == "atom":
+                    rt_type = AtomParser.parse_atom(item, scope)
+        return rt_type
+
+    @staticmethod
+    def parse_equation(expr, scope):
+        pass
+
 
 expressions = {
     "with_expr": ExpressionParser.parse_with,
-    "lambda": ExpressionParser.parse_lambda
+    "lambda": ExpressionParser.parse_lambda,
+    "comprehension": ExpressionParser.parse_comp,
+    "equation": ExpressionParser.parse_equation
 }
 
 
