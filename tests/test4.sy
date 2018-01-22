@@ -1,4 +1,4 @@
-include "tests/test2";
+include "test2";
 
 #region:
 print("Hi");

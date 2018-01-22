@@ -1,6 +1,5 @@
-import os
 import subprocess
-import sys
+import src.errormodule as er
 
 import src.parser.syc_parser as syc_parser
 from src.parser.ASTtools import AST
@@ -57,9 +56,12 @@ class Console:
             self.fileType = "source"
         else:
             raise CustomException("Invalid file type.")
+        er.file = path
+        er.main_file = path
         with open(path) as fileObject:
             for item in fileObject:
                 self.currentFile += item
+        os.chdir(os.path.dirname(er.main_file))
 
     # runs a file
     def run(self, cmd_obj):
@@ -75,21 +77,18 @@ class Console:
     def get_input(self):
         command = ""
         while command != "exit":
-            try:
-                print(ConsoleColors.MAGENTA + "SYC_VCP@x64 " + ConsoleColors.GREEN + os.getcwd() + ConsoleColors.YELLOW + " ~\n" + ConsoleColors.WHITE + "$ ", end="")
-                command = input("")
-                # if is a syc command, the syc parser will handle it
-                if command.startswith("syc "):
-                    self.evaluate_command(command)
-                # test if command is cd and revise current dir to compensate
-                elif command[:2] == "cd":
-                    os.chdir(command[3:])
-                # else it will echo to console and print response
-                elif command != "exit":
-                    output = subprocess.check_output(command, shell=True)
-                    print(str(output).replace("b'", "").replace("\\n", "\n").replace("\\r", "\r")[:len(output) - 1])
-            except Exception as e:
-                print("\n\n" + str(e))
+            print(ConsoleColors.MAGENTA + "SYC_VCP@x64 " + ConsoleColors.GREEN + os.getcwd() + ConsoleColors.YELLOW + " ~\n" + ConsoleColors.WHITE + "$ ", end="")
+            command = input("")
+            # if is a syc command, the syc parser will handle it
+            if command.startswith("syc "):
+                self.evaluate_command(command)
+            # test if command is cd and revise current dir to compensate
+            elif command[:2] == "cd":
+                os.chdir(command[3:])
+            # else it will echo to console and print response
+            elif command != "exit":
+                output = subprocess.check_output(command, shell=True)
+                print(str(output).replace("b'", "").replace("\\n", "\n").replace("\\r", "\r")[:len(output) - 1])
             print("\n")
 
     # splits the command into its parts and executes it

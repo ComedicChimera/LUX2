@@ -5,6 +5,8 @@ from util import *
 
 file = "MAIN"
 
+main_file = ""
+
 code = ""
 
 
@@ -47,14 +49,15 @@ def unparse(ast):
 
 def throw(type, error, params):
     code_error = Exception()
+    error_message = ConsoleColors.RED + "Compile Error occurred in file '%s':\n" % file
     if type == "lex_error":
         pos = get_position(params[1])
-        code_error = SycCompileError(ConsoleColors.RED + "[Lexical Error] - %s, '%s' (ln:%d, pos:%d)\n" % (error, params[0], pos[0] + 1, pos[1]))
+        code_error = SycCompileError(error_message + "[Lexical Error] - %s, '%s' (ln:%d, pos:%d)\n" % (error, params[0], pos[0] + 1, pos[1]))
     elif type == "syntax_error":
         if params[0].type == "$":
             token = params[0]
             pos = get_position(token.ndx)
-            error_message = ConsoleColors.RED + "[Syntax Error] - Invalid End of Program, (ln:%d, pos:%d):\n" % (pos[0] + 1, pos[1])
+            error_message += "[Syntax Error] - Invalid End of Program, (ln:%d, pos:%d):\n" % (pos[0] + 1, pos[1])
             error_message += getln(pos, len(token.value))
             if not isinstance(params[1], list):
                 error_message += "\n\nExpected: '%s'" % params[1]
@@ -62,7 +65,7 @@ def throw(type, error, params):
         else:
             token = params[0]
             pos = get_position(token.ndx)
-            error_message = ConsoleColors.RED + "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):\n" % (error, token.value, pos[0] + 1, pos[1])
+            error_message += "[Syntax Error] - %s: '%s' (ln:%d, pos:%d):\n" % (error, token.value, pos[0] + 1, pos[1])
             error_message += getln(pos, len(token.value))
             if not isinstance(params[1], list):
                 error_message += "\n\nExpected: '%s'" % params[1]
@@ -72,14 +75,16 @@ def throw(type, error, params):
         name = name_dict[type]
         if isinstance(params, Token):
             pos = get_position(params.ndx)
-            error_message = ConsoleColors.RED + "[%s] - %s, '%s' (ln:%d, pos:%d):\n" % (name, error, params.value, pos[0] + 1, pos[1])
+            error_message += "[%s] - %s, '%s' (ln:%d, pos:%d):\n" % (name, error, params.value, pos[0] + 1, pos[1])
             error_message += getln(pos, len(params.value))
             code_error = SycCompileError(error_message)
+        elif isinstance(params, str):
+            code_error = SycCompileError("[%s] - %s" % (name, error))
         else:
             params = unparse(params)
             pos = get_position(params[0].ndx)
             end_pos = get_position(params[-1].ndx)
-            error_message = ConsoleColors.RED + "[%s] - %s (ln:%d, pos:%d):\n" % (name, error, pos[0] + 1, pos[1])
+            error_message += "[%s] - %s (ln:%d, pos:%d):\n" % (name, error, pos[0] + 1, pos[1])
             error_message += code.split("\n")[pos[0]][pos[1] - 1:end_pos[1] + len(params[-1].value)]
             code_error = SycCompileError(error_message)
     raise code_error

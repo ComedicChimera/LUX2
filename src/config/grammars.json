@@ -38,18 +38,14 @@
     "module_constructor main"
   ],
   "module_constructor": [
-    "CONSTRUCTOR ( func_params_decl ) constructional_block"
+    "CONSTRUCTOR ( func_params_decl ) functional_block"
   ],
   "constructor_block": [
-    "CONSTRUCTOR modifiers IDENTIFIER dot_id ( func_params_decl ) inherit constructional_block"
+    "CONSTRUCTOR modifiers IDENTIFIER dot_id ( func_params_decl ) inherit functional_block"
   ],
   "inherit": [
     ": id inherit",
     "&"
-  ],
-  "constructional_block": [
-    "functional_block",
-    ";"
   ],
   "async_block": [
     "ASYNC modifiers rt_type id ( func_params_decl ) functional_block"
@@ -90,7 +86,8 @@
   ],
   "functional_block": [
     "{ main }",
-    "=> stmt ;"
+    "=> stmt ;",
+    ";"
   ],
   "modifiers": [
     "VOLATILE modifiers",
@@ -101,13 +98,13 @@
   ],
   "scope_modifiers": [
     "LOCAL",
-    "GLOBAL"
+    "GLOBAL",
+    "INTERNAL"
   ],
   "access_modifiers": [
     "PRIVATE",
-    "PROTECTED",
-    "UNIQUE",
-    "VIRTUAL"
+    "DERIVE",
+    "ABSTRACT"
   ],
   "macro_params_decl": [
     "DOLLAR IDENTIFIER extension n_var",
@@ -292,7 +289,12 @@
     ", full_assignment ,"
   ],
   "include_stmt": [
-    "INCLUDE include_ext"
+    "inc_prefix INCLUDE include_ext"
+  ],
+  "inc_prefix": [
+    "GLOBAL",
+    "USE",
+    "&"
   ],
   "include_ext": [
     "IDENTIFIER",

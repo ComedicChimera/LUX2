@@ -5,8 +5,7 @@ import src.errormodule as er
 # package management
 from lib.spm import load_package
 import pickle
-from src.parser.syc_parser import Parser
-from src.parser.lexer import Lexer
+import os
 
 declarations = {
     "variable_declaration": variables.var_parse,
@@ -27,16 +26,9 @@ class Package:
 
 
 def import_package(name, is_global):
-    code = load_package(name)
+    """er_code = er.code
     er_file = er.file
-    er_code = er.code
-    lx = Lexer()
-    test_code = lx.clear_comments(code)
-    if test_code == er_code:
-        raise Exception("Unable to recursively import package")
-    tokens = lx.lex(code)
-    p = Parser(tokens)
-    ast = p.parse()
+    ast = load_package(name)
     s_table = construct_symbol_table(ast)
     construct = SemanticConstruct(s_table, ast)
     er.code = er_code
@@ -45,14 +37,18 @@ def import_package(name, is_global):
         alias = name.split(".")[0].split("/")[-1]
     else:
         alias = name
+    os.chdir(os.path.dirname(er.main_file))
     with open("_build/bin/%s_ssc.pickle" % alias, "bw+") as file:
         pickle.dump(construct, file)
         file.close()
+    if os.getcwd() != os.path.dirname(er.file):
+        os.chdir(os.path.dirname(er.file))
     pkg = Package()
     pkg.alias = alias
     pkg.dir = "_build/bin/%s_scc.pickle" % alias
     pkg.is_global = is_global
-    return pkg
+    return pkg"""
+    return name
 
 
 # builds the symbol table
@@ -107,10 +103,10 @@ def construct_symbol_table(ast, scope=0):
                 else:
                     name = item.content[1].content[0].value
                     name = name[1:len(name) - 1] + ".sy"
-                try:
+                # try:
                     symbol_table.append(import_package(name, True))
-                except Exception as e:
-                    er.throw("package_error", e, item)
+                # except Exception as e:
+                    # er.throw("package_error", e, item)
             else:
                 construct_symbol_table(item, scope)
     return symbol_table
