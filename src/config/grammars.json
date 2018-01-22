@@ -103,7 +103,7 @@
   ],
   "access_modifiers": [
     "PRIVATE",
-    "DERIVE",
+    "PROTECTED",
     "ABSTRACT"
   ],
   "macro_params_decl": [
