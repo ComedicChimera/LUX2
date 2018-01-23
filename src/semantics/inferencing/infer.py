@@ -1,6 +1,7 @@
 from src.parser.ASTtools import ASTNode
 import src.errormodule as er
 import src.semantics.semantics as semantics
+import src.semantics.symbol_management.types as types
 
 
 class AtomParser:
@@ -90,14 +91,48 @@ class ExpressionParser:
 
     @staticmethod
     def parse_equation(expr, scope):
+        current_expr = expr
+        while True:
+            if len(current_expr.content) < 2:
+                current_expr = current_expr.content[0]
+            elif current_expr.name == "arithmetic":
+                return ExpressionParser.parse_ari(current_expr, scope)
+            else:
+                return semantics.DataTypes.BOOL
+
+    @staticmethod
+    def parse_ari(expr, scope):
         pass
+
+    @staticmethod
+    def parse_inline_generator(expr, scope):
+        base_type = ""
+        collection = semantics.ListType()
+        for item in expr.content:
+            if isinstance(item, ASTNode):
+                if item.name == "extension":
+                    base_type = types.from_type(item.content[1])
+                elif item.name == "inline_gen_effect":
+                    for elem in item.content:
+                        if isinstance(elem, ASTNode):
+                            if elem.name == "assignment_ops":
+                                if base_type == "":
+                                    collection.data_type = from_expr(item.content[1], scope)
+                                else:
+                                    collection.data_type = base_type
+                                break
+                            else:
+                                # obtained during type checking/identifier checker
+                                collection = "DETERMINE"
+        return collection
 
 
 expressions = {
     "with_expr": ExpressionParser.parse_with,
     "lambda": ExpressionParser.parse_lambda,
     "comprehension": ExpressionParser.parse_comp,
-    "equation": ExpressionParser.parse_equation
+    "equation": ExpressionParser.parse_equation,
+    "inline_generator": ExpressionParser.parse_inline_generator
 }
 
 
