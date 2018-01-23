@@ -1,5 +1,4 @@
-from src.semantics.symbol_management.symbol_table import construct_symbol_table
-from src.semantics.symbol_management.identifiers import check_identifier
+from src.semantics.symbols.symbol_table import construct_symbol_table
 from src.parser.ASTtools import ASTNode
 from src.errormodule import throw
 
@@ -12,15 +11,8 @@ def check_context(ast, loop, func, local_scope):
         if isinstance(item, ASTNode):
             if item.name in ["for_block", "do_block", "switch_block"]:
                 check_context(item, True, func, local_scope)
-            # broken
-            elif item.name == "func_block" or item.name == "async_block":
-                func = check_identifier(item, False, table, local_scope)
-                if func.return_type:
-                    check_context(item, loop, True, local_scope)
-                else:
-                    check_context(item, loop, False, local_scope)
-            elif item.name == "macro_block":
-                check_context(item, loop, False, local_scope)
+            elif item.name == "functional_block":
+                check_context(item, loop, True, local_scope)
             elif item.name == "return_stmt" and not func:
                 throw("semantic_error", "Unable to return from region", item)
             elif item.name in ["break_stmt", "continue_stmt"] and not loop:

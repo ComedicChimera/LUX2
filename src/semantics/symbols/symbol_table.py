@@ -1,4 +1,4 @@
-import src.semantics.symbol_management.variables as variables
+import src.semantics.symbols.variables as variables
 from src.parser.ASTtools import ASTNode
 from src.semantics.semantics import SemanticConstruct
 import src.errormodule as er

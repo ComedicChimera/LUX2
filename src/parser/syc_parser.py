@@ -5,9 +5,6 @@ import src.errormodule as er
 import src.parser.gramtools as gramtools
 
 
-# update parsing algorithm
-
-
 class Parser:
     def __init__(self, input_buffer):
         self.input_buffer = input_buffer

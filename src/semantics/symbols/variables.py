@@ -1,10 +1,9 @@
-import src.semantics.symbol_management.types as types
-import src.semantics.inferencing.infer as infer
 import src.semantics.semantics as semantics
+import src.semantics.symbols.infer as infer
+import src.semantics.symbols.types as types
 from src.errormodule import throw
 from src.parser.ASTtools import Token
-from src.semantics.symbol_management.parameters import parse_parameters
-from src.semantics.symbol_management.identifiers import check_identifier
+from src.semantics.symbols.parameters import parse_parameters
 
 s_table = []
 
@@ -96,7 +95,6 @@ def func_parse(func, scope):
             if isinstance(item.content[0], Token):
                 func_var.return_type = None
             elif item.content[0].name == "id":
-                check_identifier(item.content[0], False, s_table, scope)
                 func_var.return_type = types.compile_identifier(item.content[0])
             else:
                 func_var.return_type = types.from_type(item.content[0])
@@ -202,7 +200,6 @@ def parse_interface_members(m, scope):
                 if isinstance(item.content[0], Token):
                     func.return_type = None
                 elif item.content[0].name == "id":
-                    check_identifier(item.content[0], False, s_table, scope)
                     func.return_type = types.compile_identifier(item.content[0])
                 else:
                     func.return_type = types.from_type(item.content[0].content)
