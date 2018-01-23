@@ -62,7 +62,8 @@ class AtomParser:
 
     @staticmethod
     def parse_atom(at, scope):
-        return at
+        if len(at.content) > 1:
+            return "DETERMINE"
 
 
 class ExpressionParser:
@@ -102,6 +103,13 @@ class ExpressionParser:
 
     @staticmethod
     def parse_ari(expr, scope):
+        if len(expr.content) > 1:
+            ExpressionParser.get_dominant_type(expr)
+        else:
+            ExpressionParser.parse_ari(expr.content[0], scope)
+
+    @staticmethod
+    def get_dominant_type(e):
         pass
 
     @staticmethod

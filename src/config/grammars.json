@@ -401,8 +401,7 @@
     "&"
   ],
   "arithmetic": [
-    "term add_sub_op",
-    "bool"
+    "term add_sub_op"
   ],
   "add_sub_op": [
     "+ term add_sub_op",
@@ -473,7 +472,8 @@
     "list",
     "dict",
     "type_cast",
-    "NULL"
+    "NULL",
+    "bool"
   ],
   "inline_function": [
     "FUNC ( inline_params ) functional_block",
