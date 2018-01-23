@@ -63,7 +63,23 @@ class AtomParser:
     @staticmethod
     def parse_atom(at, scope):
         if len(at.content) > 1:
-            return "DETERMINE"
+            if isinstance(at.content[0], ASTNode):
+                return "DETERMINE"
+            else:
+                return from_expr(at.content[1], scope)
+        else:
+            base_elem = at.content[0].content[0]
+            if isinstance(base_elem, ASTNode):
+                # TODO parse null, bool, inline function, dict and list
+                if base_elem.name == "string":
+                    if base_elem.content[0].type == "CHAR_LITERAL":
+                        return semantics.DataTypes.CHAR
+                    return semantics.DataTypes.STRING
+                elif base_elem.name == "number":
+                    if base_elem.content[0].type == "INTEGER_LITERAL":
+                        return semantics.DataTypes.INT
+                    return semantics.DataTypes.FLOAT
+
 
 
 class ExpressionParser:

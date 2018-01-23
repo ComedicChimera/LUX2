@@ -473,7 +473,7 @@
     "dict",
     "type_cast",
     "NULL",
-    "bool"
+    "BOOL_LITERAL"
   ],
   "inline_function": [
     "FUNC ( inline_params ) functional_block",
@@ -502,13 +502,6 @@
   "number": [
     "INTEGER_LITERAL",
     "FLOAT_LITERAL"
-  ],
-  "bool": [
-    "BOOL_LITERAL bool_trailer"
-  ],
-  "bool_trailer": [
-    " . base trailer",
-    "&"
   ],
   "list": [
     "[ list_builder ]"
