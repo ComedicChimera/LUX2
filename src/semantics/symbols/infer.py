@@ -70,7 +70,7 @@ class AtomParser:
         else:
             base_elem = at.content[0].content[0]
             if isinstance(base_elem, ASTNode):
-                # TODO parse null, bool, inline function, dict and list
+                # TODO parse inline function, dict and list
                 if base_elem.name == "string":
                     if base_elem.content[0].type == "CHAR_LITERAL":
                         return semantics.DataTypes.CHAR
@@ -79,7 +79,20 @@ class AtomParser:
                     if base_elem.content[0].type == "INTEGER_LITERAL":
                         return semantics.DataTypes.INT
                     return semantics.DataTypes.FLOAT
-
+                elif base_elem.name == "type_cast":
+                    if not isinstance(ASTNode, base_elem.content[0]):
+                        type_name = base_elem.content[0].type
+                        type_matches = {
+                            "CHAR_TYPE": semantics.DataTypes.CHAR,
+                            "STRING_TYPE": semantics.DataTypes.STRING,
+                            "BOOL_TYPE": semantics.DataTypes.BOOL,
+                            "INT_TYPE": semantics.DataTypes.INT,
+                            "FLOAT_TYPE": semantics.DataTypes.FLOAT
+                        }
+                        return type_matches[type_name]
+            else:
+                if base_elem.type == "NULL":
+                    return None
 
 
 class ExpressionParser:
