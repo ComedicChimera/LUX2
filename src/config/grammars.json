@@ -268,7 +268,7 @@
     "&"
   ],
   "assignment": [
-    "id_types trailer assignment_expr"
+    "await new id_types trailer assignment_expr"
   ],
   "id_types": [
     "IDENTIFIER",
@@ -477,8 +477,7 @@
     "BOOL_LITERAL"
   ],
   "inline_function": [
-    "FUNC ( inline_params ) functional_block",
-    "ASYNC ( inline_params ) functional_block"
+    "FUNC ( inline_params ) functional_block"
   ],
   "await": [
     "AWAIT",
