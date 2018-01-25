@@ -90,9 +90,14 @@ class AtomParser:
                             "FLOAT_TYPE": semantics.DataTypes.FLOAT
                         }
                         return type_matches[type_name]
+                elif base_elem.name == "list":
+                    first_elem = base_elem.content[1]
+
             else:
                 if base_elem.type == "NULL":
                     return None
+                else:
+                    return "DETERMINE"
 
 
 class ExpressionParser:

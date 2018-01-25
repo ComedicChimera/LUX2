@@ -227,6 +227,7 @@
     "generator_stmt",
     "assignment",
     "include_stmt",
+    "invoke_call",
     "&"
   ],
   "header_stmt": [
@@ -271,10 +272,7 @@
   ],
   "id_types": [
     "IDENTIFIER",
-    "THIS",
-    "pure_types",
-    "DICT",
-    "LIST"
+    "THIS"
   ],
   "assignment_expr": [
     "core_id expr",
