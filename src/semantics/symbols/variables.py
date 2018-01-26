@@ -91,8 +91,8 @@ def func_parse(func, scope):
             if identifier[2]:
                 throw("semantic_error", "Invalid Identifier", item.content[0])
         # generate return type
-    elif item.name == "extension":
-        types.from_type(item.content[1])
+    elif item.name == "rt_type":
+        types.from_type(item);
         # parse the function params
         elif item.name == "func_params_decl":
             func_var.parameters = parse_parameters(item)

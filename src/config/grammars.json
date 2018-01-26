@@ -47,10 +47,14 @@
     "&"
   ],
   "async_block": [
-    "ASYNC modifiers id ( func_params_decl ) extension functional_block"
+    "ASYNC modifiers id ( func_params_decl ) rt_type functional_block"
   ],
   "func_block": [
-    "FUNC modifiers id ( func_params_decl ) extension functional_block"
+    "FUNC modifiers id ( func_params_decl ) rt_type functional_block"
+  ],
+  "rt_type": [
+    "types",
+    "&"
   ],
   "func_params_decl": [
     "func_param_prefix IDENTIFIER extension params_extension n_func_params",
