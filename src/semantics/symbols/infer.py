@@ -68,36 +68,50 @@ class AtomParser:
             else:
                 return from_expr(at.content[1], scope)
         else:
-            base_elem = at.content[0].content[0]
-            if isinstance(base_elem, ASTNode):
-                # TODO parse inline function, dict and list
-                if base_elem.name == "string":
-                    if base_elem.content[0].type == "CHAR_LITERAL":
-                        return semantics.DataTypes.CHAR
-                    return semantics.DataTypes.STRING
-                elif base_elem.name == "number":
-                    if base_elem.content[0].type == "INTEGER_LITERAL":
-                        return semantics.DataTypes.INT
-                    return semantics.DataTypes.FLOAT
-                elif base_elem.name == "type_cast":
-                    if not isinstance(ASTNode, base_elem.content[0]):
-                        type_name = base_elem.content[0].type
-                        type_matches = {
-                            "CHAR_TYPE": semantics.DataTypes.CHAR,
-                            "STRING_TYPE": semantics.DataTypes.STRING,
-                            "BOOL_TYPE": semantics.DataTypes.BOOL,
-                            "INT_TYPE": semantics.DataTypes.INT,
-                            "FLOAT_TYPE": semantics.DataTypes.FLOAT
-                        }
-                        return type_matches[type_name]
-                elif base_elem.name == "list":
-                    first_elem = base_elem.content[1]
-
-            else:
-                if base_elem.type == "NULL":
-                    return None
+            def parse_base(base_elem):
+                if isinstance(base_elem, ASTNode):
+                    if base_elem.name == "string":
+                        if base_elem.content[0].type == "CHAR_LITERAL":
+                            return semantics.DataTypes.CHAR
+                        return semantics.DataTypes.STRING
+                    elif base_elem.name == "number":
+                        if base_elem.content[0].type == "INTEGER_LITERAL":
+                            return semantics.DataTypes.INT
+                        return semantics.DataTypes.FLOAT
+                    elif base_elem.name == "type_cast":
+                        if not isinstance(ASTNode, base_elem.content[0]):
+                            type_name = base_elem.content[0].type
+                            type_matches = {
+                                "CHAR_TYPE": semantics.DataTypes.CHAR,
+                                "STRING_TYPE": semantics.DataTypes.STRING,
+                                "BOOL_TYPE": semantics.DataTypes.BOOL,
+                                "INT_TYPE": semantics.DataTypes.INT,
+                                "FLOAT_TYPE": semantics.DataTypes.FLOAT,
+                                "BYTE_TYPE": semantics.DataTypes.BYTE
+                            }
+                            return type_matches[type_name]
+                    elif base_elem.name == "list":
+                        first_elem = base_elem.content[1].content[0]
+                        lst = semantics.ListType()
+                        lst.element_type = from_expr(first_elem, scope)
+                        return lst
+                    elif base_elem.name == "dict":
+                        key = base_elem.content[1].content[0]
+                        value = base_elem.content[1].content[2]
+                        dct = semantics.DictType()
+                        dct.key_type = parse_base(key)
+                        dct.value_type = from_expr(value, scope)
+                        return dct
+                    else:
+                        return "DETERMINE"
                 else:
-                    return "DETERMINE"
+                    if base_elem.type == "NULL":
+                        return None
+                    else:
+                        return "DETERMINE"
+
+            base = at.content[0].content[0]
+            return parse_base(base)
 
 
 class ExpressionParser:

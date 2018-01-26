@@ -474,7 +474,14 @@
     "dict",
     "type_cast",
     "NULL",
-    "BOOL_LITERAL"
+    "BOOL_LITERAL",
+    "HEX_LITERAL",
+    "atom_types"
+  ],
+  "atom_types": [
+    "pure_types",
+    "LIST_TYPE list_modifier",
+    "DICT_TYPE dict_modifier"
   ],
   "inline_function": [
     "FUNC ( inline_params ) functional_block"
@@ -484,15 +491,11 @@
     "&"
   ],
   "inline_params": [
-    "DOLLAR IDENTIFIER extension inline_params_extension n_inline_params",
-    "&"
-  ],
-  "inline_params_extension": [
-    "<< expr",
+    "DOLLAR IDENTIFIER extension n_inline_params",
     "&"
   ],
   "n_inline_params": [
-    ", DOLLAR IDENTIFIER extension inline_params_extension n_inline_params",
+    ", DOLLAR IDENTIFIER extension n_inline_params",
     "&"
   ],
   "string": [
@@ -573,6 +576,7 @@
     "BOOL_TYPE",
     "INT_TYPE",
     "FLOAT_TYPE",
-    "STRING_TYPE"
+    "STRING_TYPE",
+    "BYTE_TYPE"
   ]
 }
