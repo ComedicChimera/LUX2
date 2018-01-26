@@ -91,52 +91,12 @@ def func_parse(func, scope):
             if identifier[2]:
                 throw("semantic_error", "Invalid Identifier", item.content[0])
         # generate return type
-        elif item.name == "rt_type":
-            if isinstance(item.content[0], Token):
-                func_var.return_type = None
-            elif item.content[0].name == "id":
-                func_var.return_type = types.compile_identifier(item.content[0])
-            else:
-                func_var.return_type = types.from_type(item.content[0])
+    elif item.name == "extension":
+        types.from_type(item.content[1])
         # parse the function params
         elif item.name == "func_params_decl":
             func_var.parameters = parse_parameters(item)
     return func_var
-
-
-# parses macros
-def macro_parse(macro):
-    # holder
-    macro_var = semantics.Function()
-    # set the data structure
-    macro_var.data_structure = semantics.DataStructure.MACRO
-    # set the *pseudo* return type
-    macro_var.return_type = None
-    # parsing loop
-    for item in macro.content[1:]:
-        # avoid tokens
-        if isinstance(item, Token):
-            continue
-        # generate modifiers
-        if item.name == "modifiers":
-            macro_var.modifiers = types.unparse(item)
-        # generate identifier
-        elif item.name == "id":
-            identifier = types.compile_identifier(item)
-            macro_var.name = identifier[0]
-            macro_var.group = identifier[1]
-            if identifier[2]:
-                throw("semantic_error", "Invalid Identifier", item.content[0])
-        # parse the parameters
-        elif item.name == "macro_params_decl":
-            macro_var.parameters = parse_parameters(item)
-            if macro_var.parameters[0].instance_marker and len(macro_var.group) == 0:
-                throw("semantic_error", "Macro cannot be instance macro", macro)
-            elif macro_var.parameters[0].instance_marker:
-                macro_var.parameters.pop(0)
-                macro_var.is_instance = True
-    return macro_var
-
 
 # parsed structs, interfaces, and types
 def struct_parse(struct, scope=0):
@@ -266,6 +226,3 @@ def module_constructor_parse(constructor):
             if item.name == "func_params_decl":
                 c_var.parameters = parse_parameters(item)
     return c_var
-
-
-

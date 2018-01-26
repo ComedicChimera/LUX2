@@ -9,7 +9,6 @@ class DataStructure(Enum):
     CONSTANT = 4
     MODULE = 5
     FUNCTION = 6
-    MACRO = 7
 
 
 class DataTypes(Enum):
@@ -64,7 +63,7 @@ class Structure(Variable):
 class Function(Variable):
     def __init__(self):
         Variable.__init__(self)
-        self.return_type = DataType()
+        self.return_type = None
         self.parameters = []
         self.data_structure = DataStructure.FUNCTION
         self.is_async = False

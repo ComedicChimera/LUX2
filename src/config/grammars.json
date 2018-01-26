@@ -14,7 +14,6 @@
     "constructor_block",
     "async_block",
     "func_block",
-    "macro_block",
     "type_block",
     "interface_block",
     "struct_block",
@@ -48,15 +47,10 @@
     "&"
   ],
   "async_block": [
-    "ASYNC modifiers rt_type id ( func_params_decl ) functional_block"
+    "ASYNC modifiers id ( func_params_decl ) extension functional_block"
   ],
   "func_block": [
-    "FUNC modifiers rt_type id ( func_params_decl ) functional_block"
-  ],
-  "rt_type": [
-    "types",
-    "id",
-    "VOID"
+    "FUNC modifiers id ( func_params_decl ) extension functional_block"
   ],
   "func_params_decl": [
     "func_param_prefix IDENTIFIER extension params_extension n_func_params",
@@ -80,9 +74,6 @@
   "n_func_param": [
     "func_param_prefix IDENTIFIER extension params_extension",
     "* * func_param_prefix IDENTIFIER extension"
-  ],
-  "macro_block": [
-    "MACRO modifiers id ( macro_params_decl ) functional_block"
   ],
   "functional_block": [
     "{ main }",
