@@ -75,7 +75,7 @@ def generate_func_parameter(p):
             elif item.name == "params_extension":
                 parameter.default = item
         else:
-            if item.type == "**":
+            if item.type == "*":
                 parameter.indefinite = True
             elif item.type == "THIS":
                 parameter.instance_marker = True
