@@ -61,7 +61,7 @@
   "func_params_decl": [
     "func_param_prefix IDENTIFIER extension params_extension n_func_params",
     "THIS n_func_params",
-    "** func_param_prefix IDENTIFIER extension",
+    "* * func_param_prefix IDENTIFIER extension",
     "&"
   ],
   "params_extension": [
@@ -79,7 +79,7 @@
   ],
   "n_func_param": [
     "func_param_prefix IDENTIFIER extension params_extension",
-    "** func_param_prefix IDENTIFIER extension"
+    "* * func_param_prefix IDENTIFIER extension"
   ],
   "macro_block": [
     "MACRO modifiers id ( macro_params_decl ) functional_block"
