@@ -2,8 +2,6 @@ from src.semantics.symbols.symbol_table import construct_symbol_table
 from src.parser.ASTtools import ASTNode
 from src.errormodule import throw
 
-table = []
-
 
 # checks to see if contextual statements were placed correctly
 def check_context(ast, loop, func, local_scope):
@@ -25,6 +23,5 @@ def check_context(ast, loop, func, local_scope):
 
 # the main semantic checker function
 def check(ast):
-    global table
     table = construct_symbol_table(ast)
     check_context(ast, False, False, 0)

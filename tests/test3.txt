@@ -1,5 +1,4 @@
 do (4) {
-    print("Hi");
+    $x = 3;
+    print(x);
 }
-
-break;

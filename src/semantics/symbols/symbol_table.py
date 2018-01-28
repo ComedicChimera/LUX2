@@ -103,5 +103,5 @@ def construct_symbol_table(ast):
                             else:
                                 is_global = True
             else:
-                construct_symbol_table(item)
+                symbol_table += construct_symbol_table(item)
     return symbol_table
