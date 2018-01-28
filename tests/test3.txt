@@ -1,11 +1,5 @@
-private $x : dict[float, str];
-print(x);
-$x : dict[float, str];
-
-$y : str = "Hi";
-
-struct z {
-    $x : int
+do (4) {
+    print("Hi");
 }
 
-macro group.myMacro(this, $m : int) => print(12);
+break;

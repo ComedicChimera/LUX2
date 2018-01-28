@@ -1,8 +1,5 @@
 include "test2";
 
-#region:
-print("Hi");
-
 restricted {
     print("This will never be reached, but it cool tho");
 }

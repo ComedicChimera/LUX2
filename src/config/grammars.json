@@ -53,7 +53,7 @@
     "FUNC modifiers id ( func_params_decl ) rt_type functional_block"
   ],
   "rt_type": [
-    "types",
+    "<- types",
     "&"
   ],
   "func_params_decl": [
@@ -222,7 +222,6 @@
     "generator_stmt",
     "assignment",
     "include_stmt",
-    "node_stmt",
     "&"
   ],
   "header_stmt": [
@@ -263,7 +262,7 @@
     "&"
   ],
   "assignment": [
-    "await new id_types trailer assignment_expr"
+    "new await id_types trailer assignment_expr"
   ],
   "id_types": [
     "IDENTIFIER",
@@ -292,9 +291,6 @@
   "include_ext": [
     "IDENTIFIER",
     "STRING_LITERAL"
-  ],
-  "node_stmt": [
-    "NODE inline_function"
   ],
   "expr": [
     "lambda",
@@ -434,7 +430,7 @@
     "&"
   ],
   "atom": [
-    "await new base trailer",
+    "new await base trailer",
     "( expr )"
   ],
   "new": [

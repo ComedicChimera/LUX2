@@ -187,5 +187,3 @@ class Parser:
         p_table = self.generate_table(g)
         # returns result of parsing function
         return self.run_parser(p_table, g)
-
-

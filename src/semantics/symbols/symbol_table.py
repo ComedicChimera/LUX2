@@ -13,7 +13,6 @@ declarations = {
     "interface_block": variables.struct_parse,
     "type_block": variables.struct_parse,
     "func_block": variables.func_parse,
-    "macro_block": variables.macro_parse,
     "async_block": variables.func_parse,
     "constructor_block": variables.func_parse
 }
@@ -22,15 +21,18 @@ declarations = {
 class Package:
     def __init__(self):
         self.alias = ""
-        self.dir = ""
+        self.dep_dir = ""
+        self.source_dir = ""
+        self.used = False
+        self.is_global = False
 
 
-def import_package(name, is_global):
-    """er_code = er.code
-    er_file = er.file
+def import_package(name, is_global, used):
+    er_code, er_file = er.file, er.code
     ast = load_package(name)
-    s_table = construct_symbol_table(ast)
-    construct = SemanticConstruct(s_table, ast)
+    os.chdir(os.path.dirname(os.path.abspath(er_file)))
+    construct = SemanticConstruct(construct_symbol_table(ast), ast)
+    pkg_dir = er.file
     er.code = er_code
     er.file = er_file
     if "/" in name:
@@ -38,51 +40,37 @@ def import_package(name, is_global):
     else:
         alias = name
     os.chdir(os.path.dirname(er.main_file))
-    with open("_build/bin/%s_ssc.pickle" % alias, "bw+") as file:
+    with open("_build/%s_ssc.pickle" % alias, "bw+") as file:
         pickle.dump(construct, file)
         file.close()
-    if os.getcwd() != os.path.dirname(er.file):
-        os.chdir(os.path.dirname(er.file))
+    os.chdir(os.path.dirname(os.path.abspath(er.file)))
     pkg = Package()
     pkg.alias = alias
-    pkg.dir = "_build/bin/%s_scc.pickle" % alias
+    pkg.dep_dir = "_build/%s_scc.pickle" % alias
     pkg.is_global = is_global
-    return pkg"""
-    return name
+    pkg.source_dir = pkg_dir
+    pkg.used = used
+    return pkg
 
 
 # builds the symbol table
-def construct_symbol_table(ast, scope=0):
+def construct_symbol_table(ast):
     symbol_table = []
     for item in ast.content:
         if isinstance(item, ASTNode):
             if item.name == "block":
-                symbol_table.append(construct_symbol_table(item, scope + 1))
+                symbol_table.append(construct_symbol_table(item))
             elif item.name in declarations:
-                variables.s_table = symbol_table
-                if item.name in ["func_block", "variable_declaration", "async_block", "constructor_block", "interface_block"]:
-                    if item.name in ["func_block", "async_block", "constructor_block"]:
-                        func = variables.func_parse(item, scope)
-                        for sub_tree in item.content:
-                            if isinstance(sub_tree, ASTNode):
-                                if sub_tree.name == "functional_block":
+                if item.name in ["func_block", "async_block", "constructor_block"]:
+                    func = variables.func_parse(item)
+                    for sub_tree in item.content:
+                        if isinstance(sub_tree, ASTNode):
+                            if sub_tree.name == "functional_block":
+                                if sub_tree.content[0].type != ";":
                                     func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
-                        symbol_table.append(func)
-                    elif item.name == "interface_block":
-                        symbol_table.append(variables.struct_parse(item, scope))
-                    else:
-                        var = declarations[item.name](item, scope)
-                        symbol_table.append(var)
+                    symbol_table.append(func)
                 else:
-                    if item.name == "macro_block":
-                        macro = variables.macro_parse(item)
-                        for sub_tree in item.content:
-                            if isinstance(sub_tree, ASTNode):
-                                if sub_tree.name == "functional_block":
-                                    macro.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
-                        symbol_table.append(macro)
-                    else:
-                        symbol_table.append(declarations[item.name](item))
+                    symbol_table.append(declarations[item.name](item))
             elif item.name == "module_block":
                 mod = variables.module_parse(item)
                 for sub_tree in item.content:
@@ -98,15 +86,22 @@ def construct_symbol_table(ast, scope=0):
                                 mod.members = sub_tree.content[1]
                 symbol_table.append(mod)
             elif item.name == "include_stmt":
-                if item.content[1].content[0].type == "IDENTIFIER":
-                    name = item.content[1].content[0].value
-                else:
-                    name = item.content[1].content[0].value
-                    name = name[1:len(name) - 1] + ".sy"
-                # try:
-                    symbol_table.append(import_package(name, True))
-                # except Exception as e:
-                    # er.throw("package_error", e, item)
+                used = False
+                is_global = False
+                for elem in item.content:
+                    if isinstance(elem, ASTNode):
+                        if elem.name == "include_ext":
+                            name = elem.content[0]
+                            if name.type == "IDENTIFIER":
+                                symbol_table.append(import_package(name.value, is_global, used))
+                            else:
+                                name_str = name.value
+                                symbol_table.append(import_package(name_str[1:len(name_str) - 1] + ".sy", is_global, used))
+                        else:
+                            if elem.content[0].type == "USE":
+                                used = True
+                            else:
+                                is_global = True
             else:
-                construct_symbol_table(item, scope)
+                construct_symbol_table(item)
     return symbol_table

@@ -1,15 +1,12 @@
 import src.semantics.semantics as semantics
-import src.semantics.symbols.infer as infer
 import src.semantics.symbols.types as types
 from src.errormodule import throw
 from src.parser.ASTtools import Token
 from src.semantics.symbols.parameters import parse_parameters
 
-s_table = []
-
 
 # main variable parsing method
-def var_parse(variable, s):
+def var_parse(variable):
     # a list of modifiers (ie. private, final)
     properties = []
     # creates a temporary holder
@@ -20,13 +17,13 @@ def var_parse(variable, s):
             properties += types.unparse(item)
         # runs the parse on the declaration itself (sans modifiers)
         elif item.name == "variable_decl_stmt":
-            var = variable_declaration_parse(item, s)
+            var = variable_declaration_parse(item)
             var.modifiers = properties
     return var
 
 
 # main declaration parsing function
-def variable_declaration_parse(var_decl, scope):
+def variable_declaration_parse(var_decl):
     # another temporary holder
     var = semantics.TypedVariable()
     # will be used to decide whether or not type needs to be inferred, checked or none
@@ -49,18 +46,12 @@ def variable_declaration_parse(var_decl, scope):
             elif item.name == "extension":
                 var.data_type = types.from_type(item.content[1])
                 has_extension = True
-            # infers data type from the initializer/checks extension v initializer
+            # infers data type from the initializer
             elif item.name == "initializer":
+                var.initializer = item.content[1]
                 has_init = True
-                # if there is no extension, infer
-                if not has_extension:
-                    var.data_type = infer.from_assignment(item, scope)
-                else:
-                    # if there is an extension, check it v the item it is being assigned too
-                    dt = infer.from_assignment(item, scope)
-                    # catches initialization type mismatch
-                    # if dt == var.data_type:
-                    #    throw("semantic_error", "Declared type and assigned type are not equal", item)
+                if has_extension:
+                    var.data_type = "INFER"
     # catches invalid null declarations
     if not has_init and not has_extension:
         throw("semantic_error", "Unable to discern type from declaration", var_decl)
@@ -68,7 +59,7 @@ def variable_declaration_parse(var_decl, scope):
 
 
 # parses functions
-def func_parse(func, scope):
+def func_parse(func):
     # holder
     func_var = semantics.Function()
     # parsing loop
@@ -91,15 +82,16 @@ def func_parse(func, scope):
             if identifier[2]:
                 throw("semantic_error", "Invalid Identifier", item.content[0])
         # generate return type
-    elif item.name == "rt_type":
-        types.from_type(item);
-        # parse the function params
-        elif item.name == "func_params_decl":
-            func_var.parameters = parse_parameters(item)
+        elif item.name == "rt_type":
+            types.from_type(item.content[1])
+            # parse the function params
+            if item.name == "func_params_decl":
+                func_var.parameters = parse_parameters(item)
     return func_var
 
+
 # parsed structs, interfaces, and types
-def struct_parse(struct, scope=0):
+def struct_parse(struct):
     # holder
     struct_var = semantics.Structure()
     # decides what type it is
@@ -118,15 +110,15 @@ def struct_parse(struct, scope=0):
     struct_var.name = identifier[0]
     struct_var.group = identifier[1]
     struct_var.is_instance = identifier[2]
-    struct_var.members = parse_members(struct.content[-2], struct.content[0].type, scope)
+    struct_var.members = parse_members(struct.content[-2], struct.content[0].type)
     return struct_var
 
 
-def parse_members(s_members, s_type, scope=0):
+def parse_members(s_members, s_type):
     if s_type == "STRUCT":
         return parse_struct_members(s_members)
     elif s_type == "INTERFACE":
-        return parse_interface_members(s_members, scope)
+        return parse_interface_members(s_members)
     else:
         return types.remove_periods(s_members)
 
@@ -149,7 +141,7 @@ def parse_struct_members(m):
     return members
 
 
-def parse_interface_members(m, scope):
+def parse_interface_members(m):
     func = semantics.Function()
     members = []
     for item in m.content:
@@ -173,7 +165,7 @@ def parse_interface_members(m, scope):
                 func = parse_parameters(item)
             elif item.name == "interface_main":
                 members.append(func)
-                members += parse_interface_members(item, scope)
+                members += parse_interface_members(item)
                 return members
     members.append(func)
     return members

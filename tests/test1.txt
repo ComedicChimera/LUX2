@@ -5,6 +5,7 @@ $x = x.myVar()[1];
 
 /* test2
  test 3*/
+
 $x : list[char] = [ 'a', 'b', 'c' ];
 x, b = 2 * 5, x + [ "lol" ];
 if (x > 3):
@@ -30,7 +31,7 @@ struct Point {
 }
 
 interface IFunctions {
-    func void test();
+    func test();
 }
 
 type Color {
@@ -46,11 +47,7 @@ else {
     print("Lol");
 }
 
-macro dab() {
-    print("I dabbed...");
-}
-
-func private int test($p1 : str, $p2 = 34, ** $p3 : str) {
+func private test($p1 : str, $p2 = 34, ** $p3 : str) <- int {
     dab();
 }
 
@@ -59,5 +56,5 @@ constructor myObject() : IFunctions;
 module private active myModule : Point {
     constructor();
 
-    async void run() => print("lol");
+    async run() => print("lol");
 }

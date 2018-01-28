@@ -1,3 +1,5 @@
+include "error_test";
+
 struct LinkedListNode {
     $item : int,
     $pointer : *int
@@ -11,7 +13,7 @@ constructor LinkedList($lst) : Iterable {
     }
 }
 
-func int __next__(this) {
+func __next__(this) <- int {
     $elem = this.lst[0];
     do (elem.pointer != *null) {
         yield return elem.item;

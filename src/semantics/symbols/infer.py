@@ -3,6 +3,8 @@ import src.errormodule as er
 import src.semantics.semantics as semantics
 import src.semantics.symbols.types as types
 
+# broken
+
 
 class AtomParser:
     @staticmethod

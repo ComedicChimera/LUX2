@@ -1,5 +1,6 @@
 import subprocess
 import src.errormodule as er
+import re
 
 import src.parser.syc_parser as syc_parser
 from src.parser.ASTtools import AST
@@ -57,7 +58,7 @@ class Console:
         else:
             raise CustomException("Invalid file type.")
         er.file = path
-        er.main_file = path
+        er.main_file = os.path.abspath(path)
         with open(path) as fileObject:
             for item in fileObject:
                 self.currentFile += item
@@ -115,6 +116,7 @@ class Console:
     @staticmethod
     def analyze(code, output_dir=""):
         print("Compiling [          ] (\\)", end="")
+        os.chdir(os.path.dirname(er.main_file))
         if not os.path.exists("_build"):
             os.mkdir(output_dir + "_build")
             os.mkdir(output_dir + "_build/bin")
