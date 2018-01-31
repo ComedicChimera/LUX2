@@ -33,7 +33,7 @@ def variable_declaration_parse(var_decl):
     for item in var_decl.content:
         # checks for constants
         if isinstance(item, Token):
-            if item.type == "AMP":
+            if item.type == "@":
                 var.data_structure = semantics.DataStructure.CONSTANT
         else:
             # generates the identifier properties

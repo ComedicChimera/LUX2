@@ -250,7 +250,7 @@
   ],
   "variable_decl_stmt": [
     "DOLLAR id extension initializer",
-    "AMP id extension initializer"
+    "@ id extension initializer"
   ],
   "initializer": [
     "( expr ) modify_assignment",
@@ -423,7 +423,7 @@
   "prefix": [
     "-",
     "* deref_op",
-    "@"
+    "AMP"
   ],
   "deref_op": [
     "*",
