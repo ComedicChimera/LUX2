@@ -101,11 +101,6 @@
     "PROTECTED",
     "ABSTRACT"
   ],
-  "macro_params_decl": [
-    "DOLLAR IDENTIFIER extension n_var",
-    "THIS n_var",
-    "&"
-  ],
   "type_block": [
     "TYPE modifiers id { type_main }"
   ],

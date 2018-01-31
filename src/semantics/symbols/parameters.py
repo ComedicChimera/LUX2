@@ -66,9 +66,9 @@ def generate_func_parameter(p):
     for item in p:
         if isinstance(item, ASTNode):
             if item.name == "func_param_prefix":
-                if item.content[0].type == "@":
+                if item.content[0].type == "AMP":
                     parameter.reference = True
-                elif item.content[0].type == "AMP":
+                elif item.content[0].type == "@":
                     parameter.const = True
             elif item.name == "extension":
                 parameter.data_type = from_type(item.content[1])
