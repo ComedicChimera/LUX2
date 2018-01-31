@@ -3,6 +3,7 @@ from src.parser.ASTtools import ASTNode
 from src.semantics.symbols.types import from_type
 
 
+# main parameter class
 class Parameter:
     def __init__(self):
         self.name = ""
@@ -15,6 +16,7 @@ class Parameter:
         self.const = False
 
 
+# checks if optional param is valid
 def check_optional(p):
     for item in p:
         is_opt = item.optional
@@ -22,9 +24,13 @@ def check_optional(p):
             throw("semantic_error", "Optional parameters declared before regular parameters", "")
 
 
+# main parameter parse function
 def parse_parameters(params):
+    # final params
     n_params = []
+    # working param
     param = []
+    # is function
     is_func = False
     for item in params.content:
         if isinstance(item, ASTNode):

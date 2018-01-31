@@ -2,3 +2,6 @@ do (4) {
     $x = 3;
     print(x);
 }
+
+@testConst : int = 2;
+
