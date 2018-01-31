@@ -2,6 +2,7 @@ class TableManager:
     def __init__(self, table):
         self.table = table
         self.scope = 0
+        self.level = table
         self.current = None
 
     def update(self, elem):
