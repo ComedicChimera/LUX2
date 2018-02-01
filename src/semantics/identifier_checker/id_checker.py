@@ -30,6 +30,10 @@ class TableManager:
 tb = None
 
 
+def check_expr(expr):
+    pass
+
+
 def check(ast):
     for item in ast.content:
         if isinstance(item, ASTNode):
@@ -38,8 +42,8 @@ def check(ast):
                 tb.update()
             # var
             elif item.name == "variable_declaration":
-                # check expr
                 tb.update()
+                check_expr(tb.level[tb.pos].initializer)
             # function
             elif item.name in ["func_block", "constructor_block"]:
                 # special check function
