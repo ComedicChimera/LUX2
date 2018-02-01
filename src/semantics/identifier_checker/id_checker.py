@@ -1,4 +1,5 @@
 from src.parser.ASTtools import ASTNode
+from src.errormodule import throw
 
 
 class TableManager:
@@ -54,6 +55,19 @@ def check(ast):
                 tb.ascend()
             else:
                 check(ast)
+
+
+def catch_repeats(table):
+    used_names = []
+    for item in table:
+        if isinstance(item, list):
+            catch_repeats(item)
+        else:
+            identifier = [item.name, item.group, item.is_instance]
+            if identifier in used_names:
+                # get id pos
+                throw("semantic_error", "Variable declared multiple times.", identifier[0])
+            used_names.append(identifier)
 
 
 def check_id(table, ast):
