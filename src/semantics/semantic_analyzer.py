@@ -1,7 +1,7 @@
 from src.semantics.symbols.symbol_table import construct_symbol_table
 from src.parser.ASTtools import ASTNode
 from src.errormodule import throw
-from src.semantics.identifier_checker.id_checker import check_id
+from src.semantics.checker.semantic_checker import check_ast
 
 
 # checks to see if contextual statements were placed correctly
@@ -26,4 +26,4 @@ def check_context(ast, loop, func, local_scope):
 def check(ast):
     table = construct_symbol_table(ast)
     check_context(ast, False, False, 0)
-    check_id(table, ast)
+    check_ast(ast, table)
