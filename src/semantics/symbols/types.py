@@ -1,6 +1,7 @@
 from src.parser.ASTtools import Token
 from src.semantics.semantics import DataType, DataTypes, ListType, DictType
 
+# converts strings to enumerated types
 str_to_enum = {
     "INT_TYPE": DataTypes.INT,
     "STRING_TYPE": DataTypes.STRING,
@@ -11,6 +12,7 @@ str_to_enum = {
 }
 
 
+# converts an ast to a list of its elements
 def unparse(ast):
     unwind_list = []
     for item in ast.content:
@@ -21,6 +23,7 @@ def unparse(ast):
     return unwind_list
 
 
+# removes periods from a group declaration (returns a list of named elements)
 def remove_periods(group):
     group = [group.content[0]] + unparse(group.content[1])
     n_group = []
@@ -33,6 +36,7 @@ def remove_periods(group):
     return [x.value for x in n_group]
 
 
+# creates an identifier list for a given set of elements
 def compile_identifier(id):
     if len(id.content) < 2:
         if id.content[0].type == "THIS":
@@ -44,6 +48,7 @@ def compile_identifier(id):
         return [unparse(id)[-1].value, remove_periods(id), False]
 
 
+# generates from a simple data type
 def from_simple(simple, c_type):
     if isinstance(simple.content[0], Token):
         if simple.content[0].type == "LIST_TYPE":
@@ -60,8 +65,10 @@ def from_simple(simple, c_type):
     return c_type
 
 
+# generates from a type declaration (types in grammar)
 def from_type(data_type):
     rt_type = DataType()
+    # handles dereference operators
     if data_type.content[0].name == "deref_op":
         rt_type.pointer = [x.type for x in unparse(data_type.content[0])]
         return from_simple(data_type.content[1], rt_type)

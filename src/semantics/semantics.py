@@ -1,6 +1,7 @@
 from enum import Enum
 
 
+# all data structures
 class DataStructure(Enum):
     STRUCT = 0
     INTERFACE = 1
@@ -39,6 +40,7 @@ class DictType(DataType):
         self.value_type = DataType()
 
 
+# main semantic class for ALL variables
 class Variable:
     def __init__(self):
         self.name = ""
@@ -48,6 +50,7 @@ class Variable:
         self.is_instance = False
 
 
+# main semantic class for standard variables and constants
 class TypedVariable(Variable):
     def __init__(self):
         Variable.__init__(self)
@@ -55,12 +58,15 @@ class TypedVariable(Variable):
         self.initializer = None
 
 
+# main semantic class for all data structures ie. type and interface
 class Structure(Variable):
     def __init__(self):
         Variable.__init__(self)
+        # sub members
         self.members = []
 
 
+# main function semantic class
 class Function(Variable):
     def __init__(self):
         Variable.__init__(self)
@@ -79,6 +85,7 @@ class ModuleTypes(Enum):
     AWAIT = 2
 
 
+# main module semantic class
 class Module(Variable):
     def __init__(self):
         Variable.__init__(self)
@@ -89,15 +96,7 @@ class Module(Variable):
         self.members = []
 
 
-class Lambda(Variable):
-    def __init__(self, iterator, s_e):
-        Variable.__init__(self)
-        self.iterator = iterator
-        self.sub_expr = s_e
-        self.condition = None
-        self.return_val = None
-
-
+# main return/semantic storage object
 class SemanticConstruct:
     def __init__(self, symbol_table, ast):
         self.symbol_table = symbol_table

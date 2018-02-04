@@ -1,13 +1,12 @@
 import subprocess
 import src.errormodule as er
-import re
 
 import src.parser.syc_parser as syc_parser
 from src.parser.ASTtools import AST
 
 import cmd
 import src.parser.lexer as lexer
-from src.semantics.semantic_analyzer import check
+from src.semantics.semantic_analyzer import check_ast
 from util import *
 
 
@@ -135,7 +134,7 @@ class Console:
         print("\rCompiling [##        ] (/)", end="")
         # simplify ast
         ast = AST(tree)
-        semantic_obj = check(ast)
+        semantic_obj = check_ast(ast)
         print("\rCompiling [####      ] (-)", end="")
         return semantic_obj
 

@@ -17,11 +17,17 @@ class Parameter:
 
 
 # checks if optional param is valid
+# no check for indefinite as it is handled by grammar
 def check_optional(p):
+    # stores whether an optional parameter has occurred
+    is_opt = False
+    # iterate through generated parameters
     for item in p:
-        is_opt = item.optional
+        # if previous item was optional and current is not, throw error (optional parameters declared before reg params
         if is_opt and not item.optional:
+            # TODO get erroneous element
             throw("semantic_error", "Optional parameters declared before regular parameters", "")
+        is_opt = item.optional
 
 
 # main parameter parse function
@@ -30,43 +36,25 @@ def parse_parameters(params):
     n_params = []
     # working param
     param = []
-    # is function
-    is_func = False
+    # iterate through parameters
     for item in params.content:
         if isinstance(item, ASTNode):
-            if item.name == "n_var":
-                n_params.append(generate_macro_parameter(param))
-                n_params += parse_parameters(item)
-                break
-            elif item.name == "n_func_params":
-                is_func = True
-                n_params.append(generate_func_parameter(param))
-                n_params.append(generate_func_parameter(item.content[1].content))
-                n_params += parse_parameters(item.content[2])
-                break
+            # generate next two parameters
+            n_params.append(generate_func_parameter(param))
+            n_params.append(generate_func_parameter(item.content[1].content))
+            # continue recursively
+            n_params += parse_parameters(item.content[2])
+            break
         param.append(item)
     else:
-        if is_func:
-            n_params.append(generate_func_parameter(param))
-        else:
-            n_params.append(generate_macro_parameter(param))
+        # catch single parameter function
+        n_params.append(generate_func_parameter(param))
+    # check optional parameters
     check_optional(n_params)
     return n_params
 
 
-def generate_macro_parameter(p):
-    parameter = Parameter()
-    for item in p:
-        if isinstance(item, ASTNode):
-            if item.name == "extension":
-                parameter.data_type = from_type(item.content[1])
-        elif item.type == "IDENTIFIER":
-            parameter.name = item.value
-        elif item.type == "THIS":
-            parameter.instance_marker = True
-    return parameter
-
-
+# generates a functional parameters based on list
 def generate_func_parameter(p):
     parameter = Parameter()
     for item in p:
