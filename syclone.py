@@ -61,7 +61,6 @@ class Console:
         with open(path) as fileObject:
             for item in fileObject:
                 self.currentFile += item
-        os.chdir(os.path.dirname(er.main_file))
 
     # runs a file
     def run(self, cmd_obj):
@@ -108,8 +107,10 @@ class Console:
     # main compile function
     def compile(self, code, output_dir):
         print("Initializing SyClone Compiler [%s] (SycStandard)\n" % version)
+        safe_dir = os.getcwd()
         p_code = code
         sc = self.analyze(p_code, output_dir)
+        os.chdir(safe_dir)
 
     # gets semantically valid AST and catches compile time errors
     @staticmethod

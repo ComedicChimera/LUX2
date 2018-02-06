@@ -2,7 +2,7 @@
   "main": [
     "block_stmt main",
     "stmt ; main",
-    "header_stmt main",
+    "label main",
     "&"
   ],
   "block": [
@@ -219,7 +219,7 @@
     "include_stmt",
     "&"
   ],
-  "header_stmt": [
+  "label": [
     "# IDENTIFIER :"
   ],
   "goto_stmt": [
@@ -288,24 +288,8 @@
     "STRING_LITERAL"
   ],
   "expr": [
-    "lambda",
-    "comprehension",
     "inline_generator",
-    "with_expr",
     "equation"
-  ],
-  "lambda": [
-    "LAMBDA ( lambda_expr )"
-  ],
-  "lambda_expr": [
-    "atom => expr lambda_if"
-  ],
-  "lambda_if": [
-    "IF equation",
-    "&"
-  ],
-  "comprehension": [
-    "[ atom ^ ( IDENTIFIER => expr ) ]"
   ],
   "inline_generator": [
     "YIELD ( VALUE extension ) inline_gen_effect"
@@ -333,15 +317,17 @@
     "DICT ( expr )",
     "VALUE ( expr )"
   ],
-  "with_expr": [
-    "WITH ( expr )"
-  ],
   "equation": [
     "or n_equation"
   ],
   "n_equation": [
     "comparison_op or n_equation",
+    "?? or n_equation",
+    "ternary_operator n_equation",
     "&"
+  ],
+  "ternary_operator": [
+    "? or : or"
   ],
   "comparison_op": [
     "==",
@@ -426,7 +412,19 @@
   ],
   "atom": [
     "new await base trailer",
-    "( expr )"
+    "( expr )",
+    "lambda",
+    "| equation |"
+  ],
+  "lambda": [
+    "LAMBDA ( lambda_expr )"
+  ],
+  "lambda_expr": [
+    "atom => expr lambda_if"
+  ],
+  "lambda_if": [
+    "IF equation",
+    "&"
   ],
   "new": [
     "NEW",
@@ -461,8 +459,13 @@
     "type_cast",
     "NULL",
     "BOOL_LITERAL",
-    "HEX_LITERAL",
+    "byte_literal",
+    "COMPLEX_LITERAL",
     "atom_types"
+  ],
+  "byte_literal": [
+    "HEX_LITERAL",
+    "BINARY_LITERAL"
   ],
   "atom_types": [
     "pure_types",
@@ -563,6 +566,7 @@
     "INT_TYPE",
     "FLOAT_TYPE",
     "STRING_TYPE",
-    "BYTE_TYPE"
+    "BYTE_TYPE",
+    "COMPLEX_TYPE"
   ]
 }

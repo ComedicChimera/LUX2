@@ -1,4 +1,6 @@
 from src.semantics.semantics import DataStructure
+from src.semantics.symbols.symbol_table import Package
+import pickle
 
 
 # table manager - controls table for analysis
@@ -18,12 +20,29 @@ class TableManager:
             if level == self.table:
                 top = True
             for var in level:
+                if isinstance(var, Package):
+                    if var.used:
+                        pass
+                    elif var.alias == elem.name:
+                        return self.unpack(var).find(elem)
                 if self.compare(var, elem):
                     return var
             else:
                 if top:
                     return False
                 layers.pop()
+
+    def unpack(self, pkg):
+        table = pickle.load(pkg.dep_dir).symbol_table
+
+        class OpenedPackage:
+            def __init__(self):
+                self.table = table
+
+            def find(self, elem):
+                pass
+
+        return OpenedPackage()
 
     # compares identifier w/ member from table
     @staticmethod
@@ -46,4 +65,8 @@ class TableManager:
 
     def ascend(self):
         self.pos = self.prevPos[-1]
+
+
+def has_modifier(name, var):
+    pass
 

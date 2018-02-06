@@ -8,7 +8,8 @@ str_to_enum = {
     "CHAR_TYPE": DataTypes.CHAR,
     "BOOL_TYPE": DataTypes.BOOL,
     "FLOAT_TYPE": DataTypes.FLOAT,
-    "BYTE_TYPE": DataTypes.BYTE
+    "BYTE_TYPE": DataTypes.BYTE,
+    "COMPLEX_TYPE": DataTypes.COMPLEX
 }
 
 

@@ -17,8 +17,9 @@ class DataTypes(Enum):
     FLOAT = 1
     BOOL = 2
     STRING = 3
-    CHAR = 5
-    BYTE = 6
+    CHAR = 4
+    BYTE = 5
+    COMPLEX = 6
 
 
 class DataType:

@@ -1,6 +1,6 @@
 print(content: "Hello, world!");
 $x = x.myVar()[1];
-&b = 2 + 3;
+@b = 2 + 3;
 // test
 
 /* test2

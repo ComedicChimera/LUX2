@@ -3,5 +3,15 @@ do (4) {
     print(x);
 }
 
-@testConst : int = 2;
+@testConst : int = -2;
+
+$lst : list[byte] = [ 0b101, 0xFE21A, 0b1001101 ];
+
+@myComplex : complex = 12i;
+
+@nullCoalesce = myComplex ?? 3i;
+
+print(true ? 3 + 2 : 4i * myComplex);
+
+$absVal = | testConst |;
 
