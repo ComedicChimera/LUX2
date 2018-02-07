@@ -20,7 +20,7 @@
     "if_block",
     "do_block",
     "for_block",
-    "switch_stmt",
+    "select_stmt",
     "with_block",
     "except_block",
     "restricted_block"
@@ -177,17 +177,17 @@
     "assignment",
     "&"
   ],
-  "switch_stmt": [
-    "SWITCH ( arithmetic ) { switch_block }"
+  "select_stmt": [
+    "SWITCH ( arithmetic ) { select_block }"
   ],
-  "switch_block": [
+  "select_block": [
     "block_stmt switch_block",
     "stmt ; switch_block",
-    "case switch_block",
+    "when switch_block",
     "default switch_block",
     "&"
   ],
-  "case": [
+  "when": [
     "CASE expr block"
   ],
   "default": [

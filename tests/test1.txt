@@ -18,10 +18,10 @@ else {
 for($item in array) {
     print(item);
 }
-switch(x) {
+select(x) {
     case 3:
         break;
-    def:
+    default:
         break;
 }
 
