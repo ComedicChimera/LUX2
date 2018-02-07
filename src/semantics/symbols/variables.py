@@ -47,10 +47,10 @@ def variable_declaration_parse(var_decl):
                 var.data_type = types.from_type(item.content[1])
                 has_extension = True
             # infers data type from the initializer
-            elif item.name == "initializer":
+            elif item.name == "initializer" or item.name == "const_initializer":
                 var.initializer = item.content[1]
                 has_init = True
-                if has_extension:
+                if not has_extension:
                     var.data_type = "INFER"
     # catches invalid null declarations
     if not has_init and not has_extension:

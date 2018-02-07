@@ -245,12 +245,14 @@
   ],
   "variable_decl_stmt": [
     "DOLLAR id extension initializer",
-    "@ id extension initializer"
+    "@ id extension const_initializer"
   ],
   "initializer": [
-    "( expr ) modify_assignment",
     "= expr",
     "&"
+  ],
+  "const_initializer": [
+    "= expr"
   ],
   "modify_assignment": [
     "assignment_ops expr",
