@@ -37,7 +37,5 @@ def open_package(name):
 # adds data to a dependency file that will be use later when the compiler is acquiring packages
 def make_dependency(name, path):
     os.chdir(os.path.dirname(er.main_file))
-    if name in imports.keys():
-        er.throw("package_error", "Unable to import package multiple times.", name)
-    else:
+    if name not in imports.keys():
         imports[name] = path

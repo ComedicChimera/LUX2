@@ -78,16 +78,19 @@ def construct_symbol_table(ast):
                 symbol_table.append(construct_symbol_table(item))
             # parse declarations
             elif item.name in declarations:
-                if item.name in ["func_block", "async_block", "constructor_block"]:
-                    func = variables.func_parse(item)
-                    for sub_tree in item.content:
-                        if isinstance(sub_tree, ASTNode):
-                            if sub_tree.name == "functional_block":
-                                if sub_tree.content[0].type != ";":
-                                    func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
-                    symbol_table.append(func)
-                else:
-                    symbol_table.append(declarations[item.name](item))
+                try:
+                    if item.name in ["func_block", "async_block", "constructor_block"]:
+                        func = variables.func_parse(item)
+                        for sub_tree in item.content:
+                            if isinstance(sub_tree, ASTNode):
+                                if sub_tree.name == "functional_block":
+                                    if sub_tree.content[0].type != ";":
+                                        func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
+                        symbol_table.append(func)
+                    else:
+                        symbol_table.append(declarations[item.name](item))
+                except Exception as e:
+                    er.throw("semantic_error", e, item)
             # special parsing rules for module blocks
             elif item.name == "module_block":
                 mod = variables.module_parse(item)

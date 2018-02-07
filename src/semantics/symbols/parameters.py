@@ -1,4 +1,3 @@
-from src.errormodule import throw
 from src.parser.ASTtools import ASTNode
 from src.semantics.symbols.types import from_type
 
@@ -25,8 +24,7 @@ def check_optional(p):
     for item in p:
         # if previous item was optional and current is not, throw error (optional parameters declared before reg params
         if is_opt and not item.optional:
-            # TODO get erroneous element
-            throw("semantic_error", "Optional parameters declared before regular parameters", "")
+            raise Exception("Optional parameters precede required parameters.")
         is_opt = item.optional
 
 

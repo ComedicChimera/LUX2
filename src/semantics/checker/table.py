@@ -1,6 +1,7 @@
 from src.semantics.semantics import DataStructure
 from src.semantics.symbols.symbol_table import Package
 import pickle
+from src.parser.ASTtools import ASTNode
 
 
 # table manager - controls table for analysis
@@ -32,23 +33,44 @@ class TableManager:
                     return False
                 layers.pop()
 
-    def unpack(self, pkg):
+    @staticmethod
+    def unpack(pkg):
         table = pickle.load(pkg.dep_dir).symbol_table
 
         class OpenedPackage:
             def __init__(self):
-                self.table = table
+                self.visible = []
+                self.available_packages = []
+                for item in table:
+                    if isinstance(item, ASTNode):
+                        if has_modifier(item, "GLOBAL"):
+                            self.visible.append(item)
+                    elif isinstance(item, Package):
+                        if item.is_global:
+                            self.available_packages.append(item)
+                self.is_global = pkg.is_global
+                self.used = pkg.used
 
             def find(self, elem):
-                pass
+                if not self.used:
+                    elem.group = elem.group[1:]
+                for pkg in self.available_packages:
+                    res = TableManager.unpack(pkg).find(elem)
+                    if res:
+                        return res
+                for item in self.visible:
+                    if TableManager.compare(item, elem):
+                        return item
+                    else:
+                        return False
 
         return OpenedPackage()
 
     # compares identifier w/ member from table
     @staticmethod
     def compare(var1, var2):
-        def raw_compare(var1=var1, var2=var2):
-            if var1.name == var2.name and var1.group == var2.group and var1.is_instance == var2.is_instance:
+        def raw_compare(val1=var1, val2=var2):
+            if val1.name == val2.name and val1.group == val2.group and val1.is_instance == val2.is_instance:
                 return True
 
         if raw_compare():
