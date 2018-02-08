@@ -92,3 +92,5 @@ class TableManager:
 def has_modifier(name, var):
     pass
 
+tm = None
+
