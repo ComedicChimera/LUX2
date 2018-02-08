@@ -309,7 +309,6 @@
   ],
   "yield_safe_expr": [
     "lambda",
-    "comprehension",
     "YIELD inline_generator",
     "equation"
   ],

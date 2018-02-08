@@ -88,6 +88,10 @@ class TableManager:
     def ascend(self):
         self.pos = self.prevPos[-1]
 
+    def reset(self):
+        self.pos = 0
+        self.prevPos = []
+
 
 def has_modifier(name, var):
     pass
