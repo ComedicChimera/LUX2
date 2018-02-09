@@ -8,6 +8,18 @@ class TypeStates(Enum):
     SAME = 2
 
 
+def check_similar(val1, val2):
+    pass
+
+def compare_types(expr1, expr2):
+    type1 = parse(expr1)
+    type2 = parse(expr2)
+    if type1 == type2:
+        return TypeStates.SAME
+    elif check_similar(type1, type2):
+    else:
+        return TypeStates.DISTINCT
+
 def parse(expr):
     for item in expr.content:
         if isinstance(item, ASTNode):
