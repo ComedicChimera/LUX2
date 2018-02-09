@@ -92,6 +92,9 @@ class TableManager:
         self.pos = 0
         self.prevPos = []
 
+    def update(self):
+        self.pos += 1
+
 
 def has_modifier(name, var):
     pass

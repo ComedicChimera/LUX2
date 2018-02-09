@@ -20,9 +20,9 @@ for($item in array) {
 }
 select(x) {
     case 3:
-        break;
+        print('3');
     default:
-        break;
+        throw "Invalid input!";
 }
 
 struct Point {

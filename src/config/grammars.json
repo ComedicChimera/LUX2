@@ -178,16 +178,16 @@
     "&"
   ],
   "select_stmt": [
-    "SWITCH ( arithmetic ) { select_block }"
+    "SELECT ( arithmetic ) { select_block }"
   ],
   "select_block": [
-    "block_stmt switch_block",
-    "stmt ; switch_block",
-    "when switch_block",
-    "default switch_block",
+    "block_stmt select_block",
+    "stmt ; select_block",
+    "case select_block",
+    "default select_block",
     "&"
   ],
-  "when": [
+  "case": [
     "CASE expr block"
   ],
   "default": [
@@ -311,12 +311,6 @@
     "lambda",
     "YIELD inline_generator",
     "equation"
-  ],
-  "type_cast": [
-    "pure_types ( expr )",
-    "LIST ( expr )",
-    "DICT ( expr )",
-    "VALUE ( expr )"
   ],
   "equation": [
     "or n_equation"
@@ -462,7 +456,8 @@
     "BOOL_LITERAL",
     "byte_literal",
     "COMPLEX_LITERAL",
-    "atom_types"
+    "atom_types",
+    "VALUE"
   ],
   "byte_literal": [
     "HEX_LITERAL",
