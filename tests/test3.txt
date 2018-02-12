@@ -15,3 +15,17 @@ print(true ? 3 + 2 : 4i * myComplex);
 
 $absVal = | testConst |;
 
+$a2i = 3;
+
+lambda(lst[x] => a2i += int(x) if x % 2 == 0);
+
+{
+    print("Sub scopes working!");
+}
+
+lambda(lst[x] => print("New for loop %s" % x) );
+
+lambda(lst[x] => {
+    x = x >>> 3;
+    print(x);
+});

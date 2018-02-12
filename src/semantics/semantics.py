@@ -12,35 +12,6 @@ class DataStructure(Enum):
     FUNCTION = 6
 
 
-class DataTypes(Enum):
-    INT = 0
-    FLOAT = 1
-    BOOL = 2
-    STRING = 3
-    CHAR = 4
-    BYTE = 5
-    COMPLEX = 6
-
-
-class DataType:
-    def __init__(self):
-        self.data_type = DataTypes(DataTypes.INT)
-        self.pointer = []
-
-
-class ListType(DataType):
-    def __init__(self):
-        DataType.__init__(self)
-        self.element_type = DataType()
-
-
-class DictType(DataType):
-    def __init__(self):
-        DataType.__init__(self)
-        self.key_type = DataType()
-        self.value_type = DataType()
-
-
 # main semantic class for ALL variables
 class Variable:
     def __init__(self):

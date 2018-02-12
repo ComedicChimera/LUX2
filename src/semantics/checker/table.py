@@ -86,7 +86,7 @@ class TableManager:
         self.pos = 0
 
     def ascend(self):
-        self.pos = self.prevPos[-1]
+        self.pos = self.prevPos.pop()
 
     def reset(self):
         self.pos = 0

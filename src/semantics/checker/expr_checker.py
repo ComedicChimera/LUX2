@@ -1,41 +1,75 @@
 from src.parser.ASTtools import ASTNode
-from enum import Enum
+from src.errormodule import throw
 
 
-class TypeStates(Enum):
-    DISTINCT = 0
-    SIMILAR = 1
-    SAME = 2
+def parse_logical(logical):
+    def shift(expr):
+        return expr.content[0] + expr.content[1].content
+
+    if logical.name in ['or', 'and', 'xor']:
+        content = shift(logical)
+        if parse_logical(content[0]) != 'BOOLEAN' or parse_logical(content[2]) != 'BOOLEAN':
+            parse_logical(content[0])
+            return 'BYTES'
+        while content[-1].name in ['n_or', 'n_and', 'n_xor']:
+            n_elem = content[-1].content[1]
+            if parse_logical(n_elem) != 'BOOLEAN':
+                return 'BYTES'
+        return 'BOOLEAN'
+    else:
+        return parse_cond(logical)
 
 
-def check_similar(val1, val2):
+def parse_cond(cond):
     pass
 
 
-def compare_types(expr1, expr2):
-    type1 = parse(expr1)
-    type2 = parse(expr2)
-    if type1 == type2:
-        return TypeStates.SAME
-    elif check_similar(type1, type2):
-        return TypeStates.SIMILAR
+def parse_atom(atom):
+    pass
+
+
+def parse_n_expr(base_type, n_content, expr):
+    if isinstance(n_content[0], ASTNode):
+        if base_type != 'BOOLEAN':
+            throw('semantic_error', 'The primary operand of the ternary conditional operator must be a boolean', expr.content[0])
+        operands = n_content[0].content
+        if parse_logical(operands[1]) != parse_logical(operands[3]):
+            throw('semantic_error', 'Results of ternary conditional operator must of the same type', expr)
+        rt_type = parse_logical(operands[1])
     else:
-        return TypeStates.DISTINCT
+        if base_type != parse_logical(n_content[1]):
+            throw('semantic_error', 'Operands of a null coalescence must be of the same type', expr)
+        rt_type = base_type
+    if isinstance(n_content[-1], ASTNode):
+        if n_content[-1].name == 'n_expr':
+            rt_type = parse_n_expr(rt_type, n_content[-1].content, expr)
+    return rt_type
+
 
 def parse(expr):
-    for item in expr.content:
-        if isinstance(item, ASTNode):
-            if item.name in expressions:
-                return expressions[item.name](item)
-
-
-def parse_eq(expr):
     if len(expr.content) > 1:
-        pass
+        content = [expr.content[0]] + expr.content[1].content
+        if isinstance(content[1], ASTNode):
+            if parse_logical(content[0]) != 'BOOLEAN':
+                throw('semantic_error', 'The primary operand of the ternary conditional operator must be a boolean', content[0])
+            operands = content[1].content
+            if parse_logical(operands[1]) != parse_logical(operands[3]):
+                throw('semantic_error', 'Results of ternary conditional operator must of the same type', expr)
+            rt_type = parse_logical(operands[1])
+        else:
+            if parse_logical(content[0]) != parse_logical(content[2]):
+                throw('semantic_error', 'Operands of a null coalescence must be of the same type', expr)
+            rt_type = parse_logical(content[0])
+        if isinstance(content[-1], ASTNode):
+            if content[-1].name == "n_expr":
+                n_content = content[-1].content
+                rt_type = parse_n_expr(rt_type, n_content, expr)
+        return rt_type
     else:
-        return parse_eq(expr.content[0])
+        parse_logical(expr.content[0])
 
 
-expressions = {
-    'equation': parse_eq
-}
+
+
+
+

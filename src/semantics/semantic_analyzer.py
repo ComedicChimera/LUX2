@@ -10,7 +10,7 @@ def check_context(ast, loop, func):
     for item in ast.content:
         if isinstance(item, ASTNode):
             # update if in loop
-            if item.name in ["for_block", "do_block", "switch_block"]:
+            if item.name in ["for_block", "do_block", "lambda_stmt"]:
                 check_context(item, True, func)
             # update if in function
             elif item.name == "functional_block":

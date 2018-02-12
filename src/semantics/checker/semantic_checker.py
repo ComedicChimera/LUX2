@@ -1,9 +1,9 @@
 import src.semantics.checker.table as table_util
-from src.semantics.checker.expr_checker import parse
 
 
 def check(ast, table):
     table_util.tm = table_util.TableManager(table)
+    table_util.tm.reset()
     infer(table)
 
 
@@ -16,5 +16,5 @@ def infer(table):
         else:
             table_util.tm.update()
             if item.data_type == "INFER":
-                item.data_type = parse(item)
-    table_util.tm.reset()
+                # item.data_type = parse(item)
+                pass

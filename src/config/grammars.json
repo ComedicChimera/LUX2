@@ -3,7 +3,11 @@
     "block_stmt main",
     "stmt ; main",
     "label main",
+    "sub_scope main",
     "&"
+  ],
+  "sub_scope": [
+    "{ main }"
   ],
   "block": [
     "{ main }",
@@ -22,8 +26,7 @@
     "for_block",
     "select_stmt",
     "with_block",
-    "except_block",
-    "restricted_block"
+    "except_block"
   ],
   "module_block": [
     "MODULE modifiers module_type id inherit { module_main }"
@@ -129,7 +132,7 @@
     "&"
   ],
   "if_block": [
-    "IF ( equation ) block if_follow"
+    "IF ( expr ) block if_follow"
   ],
   "if_follow": [
     "elif_block if_follow",
@@ -137,7 +140,7 @@
     "&"
   ],
   "elif_block": [
-    "ELIF ( equation ) block"
+    "ELIF ( expr ) block"
   ],
   "else_block": [
     "ELSE block"
@@ -146,39 +149,18 @@
     "DO do_expr block do_when"
   ],
   "do_expr": [
-    "( equation )",
+    "( expr )",
     "&"
   ],
   "do_when": [
-    "WHEN ( equation ) ;",
+    "WHEN ( expr ) ;",
     "&"
   ],
   "for_block": [
-    "FOR ( DOLLAR IDENTIFIER extension for_expr ) block"
-  ],
-  "for_expr": [
-    "for_each",
-    "for_iter"
-  ],
-  "for_each": [
-    "IN expr"
-  ],
-  "for_iter": [
-    "for_init ; for_condition ; for_operation"
-  ],
-  "for_init": [
-    "initializer"
-  ],
-  "for_condition": [
-    "equation",
-    "&"
-  ],
-  "for_operation": [
-    "assignment",
-    "&"
+    "FOR ( DOLLAR IDENTIFIER extension = expr ; expr ; assignment ) block"
   ],
   "select_stmt": [
-    "SELECT ( arithmetic ) { select_block }"
+    "SELECT ( expr ) { select_block }"
   ],
   "select_block": [
     "block_stmt select_block",
@@ -203,9 +185,6 @@
     "{ main }",
     ";"
   ],
-  "restricted_block": [
-    "RESTRICTED { main }"
-  ],
   "stmt": [
     "goto_stmt",
     "variable_declaration",
@@ -214,9 +193,10 @@
     "break_stmt",
     "continue_stmt",
     "return_stmt",
-    "generator_stmt",
     "assignment",
     "include_stmt",
+    "generator_stmt",
+    "lambda_stmt",
     "&"
   ],
   "label": [
@@ -233,6 +213,9 @@
   ],
   "return_stmt": [
     "RETURN expr"
+  ],
+  "generator_stmt": [
+    "YIELD expr"
   ],
   "throw_stmt": [
     "THROW expr"
@@ -289,51 +272,23 @@
     "IDENTIFIER",
     "STRING_LITERAL"
   ],
+  "lambda_stmt": [
+    "LAMBDA ( atom => lambda_body lambda_if )"
+  ],
+  "lambda_body": [
+    "sub_scope",
+    "stmt"
+  ],
   "expr": [
-    "inline_generator",
-    "equation"
+    "or n_expr"
   ],
-  "inline_generator": [
-    "YIELD ( VALUE extension ) inline_gen_effect"
-  ],
-  "inline_gen_effect": [
-    "assignment_ops inline_generator_expr",
-    ". atom"
-  ],
-  "inline_generator_expr": [
-    "lambda",
-    "atom"
-  ],
-  "generator_stmt": [
-    "YIELD RETURN yield_safe_expr"
-  ],
-  "yield_safe_expr": [
-    "lambda",
-    "YIELD inline_generator",
-    "equation"
-  ],
-  "equation": [
-    "or n_equation"
-  ],
-  "n_equation": [
-    "comparison_op or n_equation",
-    "?? or n_equation",
-    "ternary_operator n_equation",
+  "n_expr": [
+    "?? or n_expr",
+    "ternary_operator n_expr",
     "&"
   ],
   "ternary_operator": [
     "? or : or"
-  ],
-  "comparison_op": [
-    "==",
-    ">=",
-    "<=",
-    "===",
-    "!==",
-    "!=",
-    ">",
-    "<",
-    "IN"
   ],
   "or": [
     "xor n_or"
@@ -350,11 +305,29 @@
     "&"
   ],
   "and": [
-    "not n_and"
+    "comparison n_and"
   ],
   "n_and": [
-    "AND not n_and",
+    "AND comparison n_and",
     "&"
+  ],
+  "comparison": [
+    "not n_comparison"
+  ],
+  "n_comparison": [
+    "comparison_op not n_comparison",
+    "&"
+  ],
+   "comparison_op": [
+    "==",
+    ">=",
+    "<=",
+    "===",
+    "!==",
+    "!=",
+    ">",
+    "<",
+    "IN"
   ],
   "not": [
     "! shift",
@@ -366,6 +339,7 @@
   "n_shift": [
     "<< arithmetic n_shift",
     ">> arithmetic n_shift",
+    ">>> arithmetic n_shift",
     "&"
   ],
   "arithmetic": [
@@ -409,7 +383,7 @@
     "new await base trailer",
     "( expr )",
     "lambda",
-    "| equation |"
+    "| expr |"
   ],
   "lambda": [
     "LAMBDA ( lambda_expr )"
@@ -418,7 +392,7 @@
     "atom => expr lambda_if"
   ],
   "lambda_if": [
-    "IF equation",
+    "IF expr",
     "&"
   ],
   "new": [
@@ -426,7 +400,7 @@
     "&"
   ],
   "trailer": [
-    "[ equation ] trailer",
+    "[ expr ] trailer",
     "( func_params ) trailer",
     ". base trailer",
     "&"
@@ -451,7 +425,6 @@
     "inline_function",
     "list",
     "dict",
-    "type_cast",
     "NULL",
     "BOOL_LITERAL",
     "byte_literal",
