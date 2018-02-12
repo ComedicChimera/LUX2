@@ -54,7 +54,7 @@ class Lexer:
 
     @staticmethod
     def check_char(char, ndx):
-        slash_chars = ["\\n", "\\t", "\\r", "\\\\"]
+        slash_chars = ["\\n", "\\t", "\\r", "\\\\", "\\\'", "\\\""]
         if len(char) > 1:
             if char not in slash_chars:
                 er.throw("lex_error", "Invalid char literal", [char, ndx])

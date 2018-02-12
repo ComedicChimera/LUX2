@@ -26,7 +26,7 @@ class Variable:
 class TypedVariable(Variable):
     def __init__(self):
         Variable.__init__(self)
-        self.data_type = DataType()
+        self.data_type = None
         self.initializer = None
 
 
