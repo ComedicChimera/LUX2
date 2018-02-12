@@ -382,8 +382,7 @@
   "atom": [
     "new await base trailer",
     "( expr )",
-    "lambda",
-    "| expr |"
+    "lambda"
   ],
   "lambda": [
     "LAMBDA ( lambda_expr )"
