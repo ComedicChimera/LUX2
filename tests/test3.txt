@@ -1,33 +1,33 @@
-do (4) {
-    $x = 3;
-    print(x);
-}
-
-@testConst : int = -2;
-
-$lst : list[byte] = [ 0b101, 0xFE21A, 0b1001101 ];
-
-@myComplex : complex = 12i;
-
-@nullCoalesce = myComplex ?? 3i;
-
-print(true ? 3 + 2 : 4i * myComplex);
-
-$absVal = | testConst |;
-
 $a2i = 3;
 
-lambda(lst[x] => a2i += int(x) if x % 2 == 0);
+func Main() <- int {
+    do (4) {
+        $x = 3;
+        print(x);
+    }
 
-{
-    print("Sub scopes working!");
+    @testConst : int = -2;
+
+    $lst : list[byte] = [ 0b101, 0xFE21A, 0b1001101 ];
+
+    @myComplex : complex = 12i;
+
+    @nullCoalesce = myComplex ?? 3i;
+
+    print(true ? 3 + 2 : 4i * myComplex);
+
+    lambda(lst[x] => a2i += int(x) if x % 2 == 0);
+
+    {
+        print("Sub scopes working!");
+    }
+
+    lambda(lst[x] => print("New for loop %s" % x) );
+
+    lambda(lst[x] => {
+        x = x >>> 3;
+        print(x);
+    });
+
+    print('\'');
 }
-
-lambda(lst[x] => print("New for loop %s" % x) );
-
-lambda(lst[x] => {
-    x = x >>> 3;
-    print(x);
-});
-
-print('\'');

@@ -1,6 +1,11 @@
 {
+  "syclone": [
+    "block_declaration syclone",
+    "variable_declaration ; syclone",
+    "&"
+  ],
   "main": [
-    "block_stmt main",
+    "blocks main",
     "stmt ; main",
     "label main",
     "sub_scope main",
@@ -13,14 +18,20 @@
     "{ main }",
     ": stmt ;"
   ],
-  "block_stmt": [
+  "blocks": [
+    "block_declaration",
+    "block_stmt"
+  ],
+  "block_declaration": [
     "module_block",
     "constructor_block",
     "async_block",
     "func_block",
     "type_block",
     "interface_block",
-    "struct_block",
+    "struct_block"
+  ],
+  "block_stmt": [
     "if_block",
     "do_block",
     "for_block",
@@ -535,6 +546,7 @@
     "FLOAT_TYPE",
     "STRING_TYPE",
     "BYTE_TYPE",
-    "COMPLEX_TYPE"
+    "COMPLEX_TYPE",
+    "LONG_TYPE"
   ]
 }
