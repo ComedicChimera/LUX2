@@ -21,7 +21,28 @@ def parse_logical(logical):
 
 
 def parse_cond(cond):
-    pass
+    content = cond.content[0] + cond.content[1].content
+
+    def check(optype1, optype2, op):
+        if op in ['==', '!=', '===', '!==']:
+            return 'BOOLEAN'
+        elif op in ['>=', '<=', '>', '<']:
+            int_type = ['INT', 'LONG', 'COMPLEX', 'FLOAT']
+            if optype1 in int_type and optype2 in int_type:
+                return 'BOOLEAN'
+            throw('semantic_error', 'Operands of the inequality operators must be numeric', cond)
+        elif op == 'IN':
+            if optype2.startswith('LIST') and optype2.startswith('DICT'):
+                if optype1 == optype2.split('_')[1:].join('_'):
+                    return 'BOOLEAN'
+                throw('semantic_error', 'Collection does not contain type of left hand operand', cond)
+            throw('semantic_error', 'Operator IN does not apply to non-collections', cond)
+
+    def parse_not(nt):
+        pass
+
+    t1, t2 = parse_not(content[2]), parse_not(content[0])
+    rt_type = check(t1, t2, content[1].content[0].type)
 
 
 def parse_atom(atom):
