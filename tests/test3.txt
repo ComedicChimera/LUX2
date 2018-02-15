@@ -25,7 +25,7 @@ func Main() <- int {
     }
 
     for lst[x] => {
-        println("New loop: !" % x);
+        println("New loop: %s!" % x);
     }
 
     print('\'');

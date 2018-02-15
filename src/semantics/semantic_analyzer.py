@@ -1,5 +1,5 @@
 from src.semantics.symbols.symbol_table import construct_symbol_table
-from src.parser.ASTtools import ASTNode
+from src.parser.ASTtools import ASTNode, Token
 from src.errormodule import throw
 from src.semantics.checker.semantic_checker import check
 from src.semantics.semantics import SemanticConstruct
@@ -29,10 +29,24 @@ def check_context(ast, loop, func):
 def check_for(ast):
     for item in ast.content:
         if isinstance(item, ASTNode):
-            if item.name == "for_block":
+            if item.name == 'for_block':
                 if len(item.content) > 2:
-                    # check for valid iterator
-                    pass
+                    has_iter = False
+                    has_paren = False
+                    for elem in item.content:
+                        if isinstance(elem, ASTNode):
+                            if elem.name == 'atom':
+                                if isinstance(elem.content[0], Token):
+                                    if elem.content[0].type == "(":
+                                        has_paren = True
+                            elif elem.name == 'for_body':
+                                if isinstance(elem.content[0], Token):
+                                    if elem.content[0].type == "=>":
+                                        has_iter = True
+                    if has_iter and has_paren:
+                        throw('semantic_error', 'Invalid for loop construction', item.content[1])
+                    elif not has_iter and not has_paren:
+                        throw('semantic_error', 'Invalid for loop construction', item.content[1])
             else:
                 check_for(ast)
 
@@ -45,5 +59,7 @@ def check_ast(ast):
     check_context(ast, False, False)
     # run main check function on ast
     check(ast, table)
+    # checks for loops for proper formation
+    check_for(ast)
     # return object containing table and ast
     return SemanticConstruct(table, ast)
