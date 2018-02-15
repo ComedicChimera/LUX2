@@ -74,7 +74,7 @@ def construct_symbol_table(ast):
     for item in ast.content:
         if isinstance(item, ASTNode):
             # descend scope on blocks
-            if item.name == "block":
+            if item.name in ["block", "sub_scope"]:
                 symbol_table.append(construct_symbol_table(item))
             # parse declarations
             elif item.name in declarations:

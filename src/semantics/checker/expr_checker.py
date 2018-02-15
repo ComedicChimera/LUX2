@@ -7,6 +7,9 @@ def parse_logical(logical):
         return expr.content[0] + expr.content[1].content
 
     if logical.name in ['or', 'and', 'xor']:
+        if len(logical.content) == 1:
+            return parse_logical(logical.content[0])
+
         content = shift(logical)
         if parse_logical(content[0]) != 'BOOLEAN' or parse_logical(content[2]) != 'BOOLEAN':
             parse_logical(content[0])
@@ -21,6 +24,17 @@ def parse_logical(logical):
 
 
 def parse_cond(cond):
+    def parse_not(nt):
+        if isinstance(nt.content[0], ASTNode):
+            return parse_ari(nt.content[0])
+        else:
+            if parse_ari(nt.content[1]) != 'BOOLEAN':
+                throw('semantic_error', 'Unable to perform not operation on non boolean type', cond)
+            return 'BOOLEAN'
+
+    if len(cond.content) == 1:
+        parse_not(cond)
+
     content = cond.content[0] + cond.content[1].content
 
     def check(optype1, optype2, op):
@@ -38,11 +52,16 @@ def parse_cond(cond):
                 throw('semantic_error', 'Collection does not contain type of left hand operand', cond)
             throw('semantic_error', 'Operator IN does not apply to non-collections', cond)
 
-    def parse_not(nt):
-        pass
-
     t1, t2 = parse_not(content[2]), parse_not(content[0])
     rt_type = check(t1, t2, content[1].content[0].type)
+    while content[-1].name == 'n_comparison':
+        content = content[-1].content
+        rt_type = check(rt_type, parse_not(content[1]), content[0])
+    return rt_type
+
+
+def parse_ari(ari):
+    pass
 
 
 def parse_atom(atom):

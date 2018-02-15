@@ -1,3 +1,5 @@
+global include "tests/test4.sy";
+
 $a2i = 3;
 
 func Main() <- int {
@@ -22,12 +24,9 @@ func Main() <- int {
         print("Sub scopes working!");
     }
 
-    lambda(lst[x] => print("New for loop %s" % x) );
-
-    lambda(lst[x] => {
-        x = x >>> 3;
-        print(x);
-    });
+    for lst[x] => {
+        println("New loop: !" % x);
+    }
 
     print('\'');
 }

@@ -1,5 +1,3 @@
-include "test2";
-
-restricted {
-    print("This will never be reached, but it cool tho");
+{
+    println("test");
 }

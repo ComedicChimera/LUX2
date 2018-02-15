@@ -2,6 +2,7 @@
   "syclone": [
     "block_declaration syclone",
     "variable_declaration ; syclone",
+    "include_stmt ; syclone",
     "&"
   ],
   "main": [
@@ -34,10 +35,10 @@
   "block_stmt": [
     "if_block",
     "do_block",
-    "for_block",
     "select_stmt",
     "with_block",
-    "except_block"
+    "except_block",
+    "for_block"
   ],
   "module_block": [
     "MODULE modifiers module_type id inherit { module_main }"
@@ -100,15 +101,10 @@
   ],
   "modifiers": [
     "VOLATILE modifiers",
-    "scope_modifiers modifiers",
+    "EXTERN modifiers",
     "access_modifiers modifiers",
     "FINAL modifiers",
     "&"
-  ],
-  "scope_modifiers": [
-    "LOCAL",
-    "GLOBAL",
-    "INTERNAL"
   ],
   "access_modifiers": [
     "PRIVATE",
@@ -157,18 +153,30 @@
     "ELSE block"
   ],
   "do_block": [
-    "DO do_expr block do_when"
+    "DO do_expr block do_for"
   ],
   "do_expr": [
     "( expr )",
     "&"
   ],
-  "do_when": [
-    "WHEN ( expr ) ;",
+  "do_for": [
+    "FOR ( expr ) ;",
     "&"
   ],
   "for_block": [
-    "FOR ( DOLLAR IDENTIFIER extension = expr ; expr ; assignment ) block"
+    "FOR for_expr for_body"
+  ],
+  "for_expr": [
+    "atom",
+    "&"
+  ],
+  "for_body": [
+    "block",
+    "=> iter_body"
+  ],
+  "iter_body": [
+    "sub_scope",
+    "stmt ;"
   ],
   "select_stmt": [
     "SELECT ( expr ) { select_block }"
