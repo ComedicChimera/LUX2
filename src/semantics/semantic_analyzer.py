@@ -26,21 +26,6 @@ def check_context(ast, loop, func):
                 check_context(item, loop, func)
 
 
-def check_do(ast):
-    for item in ast.content:
-        if isinstance(item, ASTNode):
-            if item.name == "do_block":
-                do_accepted = False
-                for elem in item.content:
-                    if isinstance(elem, ASTNode):
-                        if elem.name in ["do_expr", "do_for"]:
-                            do_accepted = not do_accepted
-                if not do_accepted:
-                    throw("semantic_error", "Malformed do block", item)
-            else:
-                check_do(item)
-
-
 def check_for(ast):
     for item in ast.content:
         if isinstance(item, ASTNode):
@@ -58,8 +43,6 @@ def check_ast(ast):
     table = construct_symbol_table(ast)
     # check for basic contextual statements
     check_context(ast, False, False)
-    # check for proper use of the do block
-    check_do(ast)
     # run main check function on ast
     check(ast, table)
     # return object containing table and ast

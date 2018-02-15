@@ -153,15 +153,14 @@
     "ELSE block"
   ],
   "do_block": [
-    "DO do_expr block do_for"
+    "DO do_body"
   ],
-  "do_expr": [
-    "( expr )",
-    "&"
+  "do_body": [
+    "( expr ) block",
+    "block do_for"
   ],
   "do_for": [
-    "FOR ( expr ) ;",
-    "&"
+    "FOR ( expr ) ;"
   ],
   "for_block": [
     "FOR for_expr for_body"
