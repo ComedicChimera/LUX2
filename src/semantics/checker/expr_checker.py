@@ -3,14 +3,11 @@ from src.errormodule import throw
 
 
 def parse_logical(logical):
-    def shift(expr):
-        return expr.content[0] + expr.content[1].content
-
     if logical.name in ['or', 'and', 'xor']:
         if len(logical.content) == 1:
             return parse_logical(logical.content[0])
 
-        content = shift(logical)
+        content = logical.content[0] + logical.content[1].content
         if parse_logical(content[0]) != 'BOOLEAN' or parse_logical(content[2]) != 'BOOLEAN':
             parse_logical(content[0])
             return 'BYTES'
@@ -26,9 +23,9 @@ def parse_logical(logical):
 def parse_cond(cond):
     def parse_not(nt):
         if isinstance(nt.content[0], ASTNode):
-            return parse_ari(nt.content[0])
+            return parse_shift(nt.content[0])
         else:
-            if parse_ari(nt.content[1]) != 'BOOLEAN':
+            if parse_shift(nt.content[1]) != 'BOOLEAN':
                 throw('semantic_error', 'Unable to perform not operation on non boolean type', cond)
             return 'BOOLEAN'
 
@@ -58,6 +55,15 @@ def parse_cond(cond):
         content = content[-1].content
         rt_type = check(rt_type, parse_not(content[1]), content[0])
     return rt_type
+
+
+def parse_shift(shift):
+    if len(shift.content) == 1:
+        return parse_ari(shift.content[0])
+    tree = shift.content
+    while tree[-1].name == "n_shift":
+        n_tree = tree.pop()
+        tree += n_tree.content
 
 
 def parse_ari(ari):
