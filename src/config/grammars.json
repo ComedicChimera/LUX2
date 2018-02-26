@@ -163,15 +163,15 @@
     "FOR ( expr ) ;"
   ],
   "for_block": [
-    "FOR for_expr for_body"
-  ],
-  "for_expr": [
-    "atom",
-    "&"
+    "FOR for_body"
   ],
   "for_body": [
-    "block",
-    "=> iter_body"
+    "for_expr block",
+    "base trailer => iter_body"
+  ],
+  "for_expr": [
+    "( expr )",
+    "&"
   ],
   "iter_body": [
     "sub_scope",
@@ -282,7 +282,6 @@
     "inc_prefix INCLUDE include_ext"
   ],
   "inc_prefix": [
-    "GLOBAL",
     "USE",
     "&"
   ],
@@ -400,7 +399,7 @@
   "atom": [
     "new await base trailer",
     "( expr )",
-    "lambda"
+    "lambda trailer"
   ],
   "lambda": [
     "LAMBDA ( lambda_expr )"
@@ -496,8 +495,22 @@
     "{ dict_builder }"
   ],
   "dict_builder": [
-    "base : expr n_dict",
+    "dict_base : expr n_dict",
     "&"
+  ],
+  "dict_base": [
+    "literals dot_id",
+    "id"
+  ],
+  "literals": [
+    "STRING_LITERAL",
+    "CHAR_LITERAL",
+    "BOOL_LITERAL",
+    "COMPLEX_LITERAL",
+    "FLOAT_LITERAL",
+    "INTEGER_LITERAL",
+    "BINARY_LITERAL",
+    "HEX_LITERAL"
   ],
   "n_dict": [
     ", base : expr n_dict",

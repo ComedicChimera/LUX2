@@ -1,4 +1,4 @@
-global include "tests/test4.sy";
+include "test4";
 
 $a2i = 3;
 

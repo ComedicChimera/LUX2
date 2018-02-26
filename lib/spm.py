@@ -25,17 +25,18 @@ def open_package(name):
     if name in index.keys():
         make_dependency(name, index[name])
         er.file = os.path.abspath(index[name])
-        os.chdir(os.path.dirname(er.file))
+        util.chdir(er.file)
         return open(index[name]).read()
     else:
         make_dependency(name.split(".")[0].split("/")[-1], name)
         er.file = os.path.abspath(name)
-        os.chdir(os.path.dirname(er.file))
+        util.chdir(er.file)
+        print(os.getcwd())
         return open(name).read()
 
 
 # adds data to a dependency file that will be use later when the compiler is acquiring packages
 def make_dependency(name, path):
-    os.chdir(os.path.dirname(er.main_file))
+    util.chdir(er.main_file)
     if name not in imports.keys():
         imports[name] = path

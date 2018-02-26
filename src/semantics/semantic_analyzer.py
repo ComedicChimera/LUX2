@@ -26,31 +26,6 @@ def check_context(ast, loop, func):
                 check_context(item, loop, func)
 
 
-def check_for(ast):
-    for item in ast.content:
-        if isinstance(item, ASTNode):
-            if item.name == 'for_block':
-                if len(item.content) > 2:
-                    has_iter = False
-                    has_paren = False
-                    for elem in item.content:
-                        if isinstance(elem, ASTNode):
-                            if elem.name == 'atom':
-                                if isinstance(elem.content[0], Token):
-                                    if elem.content[0].type == "(":
-                                        has_paren = True
-                            elif elem.name == 'for_body':
-                                if isinstance(elem.content[0], Token):
-                                    if elem.content[0].type == "=>":
-                                        has_iter = True
-                    if has_iter and has_paren:
-                        throw('semantic_error', 'Invalid for loop construction', item.content[1])
-                    elif not has_iter and not has_paren:
-                        throw('semantic_error', 'Invalid for loop construction', item.content[1])
-            else:
-                check_for(ast)
-
-
 # the main semantic checker function
 def check_ast(ast):
     # construct main symbol table
@@ -59,7 +34,5 @@ def check_ast(ast):
     check_context(ast, False, False)
     # run main check function on ast
     check(ast, table)
-    # checks for loops for proper formation
-    check_for(ast)
     # return object containing table and ast
     return SemanticConstruct(table, ast)

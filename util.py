@@ -18,3 +18,11 @@ class ConsoleColors:
 source_dir = os.path.dirname(os.path.realpath(__file__))
 
 version = "0.0.1"
+
+
+def chdir(path):
+    directory = os.path.dirname(os.path.abspath(path)).split('\\')
+    directory.pop()
+    directory = "\\".join(directory)
+    print(directory)
+    os.chdir(directory)

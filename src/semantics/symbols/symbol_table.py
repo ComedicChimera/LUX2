@@ -5,7 +5,7 @@ import src.errormodule as er
 # package management
 from lib.spm import load_package
 import pickle
-import os
+import util
 
 # declaration table for matching
 declarations = {
@@ -28,7 +28,6 @@ class Package:
         # where package was originally located
         self.source_dir = ""
         self.used = False
-        self.is_global = False
 
 
 def import_package(name, is_global, used):
@@ -37,7 +36,7 @@ def import_package(name, is_global, used):
     # generate an ast and load a package
     ast = load_package(name)
     # restore previous working dir
-    os.chdir(os.path.dirname(os.path.abspath(er_file)))
+    util.chdir(er_file)
     # generate semantic construct
     construct = SemanticConstruct(construct_symbol_table(ast), ast)
     # get original source dir
@@ -51,12 +50,12 @@ def import_package(name, is_global, used):
     else:
         alias = name
     # return to main file for dependency dumping
-    os.chdir(os.path.dirname(er.main_file))
+    util.chdir(er.main_file)
     with open("_build/%s_ssc.pickle" % alias, "bw+") as file:
         pickle.dump(construct, file)
         file.close()
     # return to current working dir
-    os.chdir(os.path.dirname(os.path.abspath(er.file)))
+    util.chdir(er.file)
     # generate package
     pkg = Package()
     pkg.alias = alias
@@ -126,9 +125,6 @@ def construct_symbol_table(ast):
                             # if elem is prefixed by use
                             if elem.content[0].type == "USE":
                                 used = True
-                            # if elem is prefixed by global
-                            else:
-                                is_global = True
             else:
                 # add on any new symbols without descending scope
                 symbol_table += construct_symbol_table(item)

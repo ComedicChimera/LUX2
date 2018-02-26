@@ -57,7 +57,7 @@ class Console:
         else:
             raise CustomException("Invalid file type.")
         er.file = path
-        er.main_file = os.path.abspath(path)
+        er.main_file = path
         with open(path) as fileObject:
             for item in fileObject:
                 self.currentFile += item
