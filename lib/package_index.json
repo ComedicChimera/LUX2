@@ -1,3 +1,5 @@
 {
-  "stdio": "packages/stdio/stdio.sy"
+  "stdio": "packages/stdio/stdio.sy",
+  "runtime": "../src/semantics/corelib/runtime/runtime.sy",
+  "os": "packages/os/os.sy"
 }

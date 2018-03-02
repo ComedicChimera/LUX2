@@ -21,17 +21,18 @@ def load_package(name):
 
 # open a package
 def open_package(name):
+    if name == '__application__':
+        return open(er.main_file).read()
     index = json.loads(open(util.source_dir + "/lib/package_index.json").read())
     if name in index.keys():
         make_dependency(name, index[name])
         er.file = os.path.abspath(index[name])
-        util.chdir(er.file)
+        os.chdir(util.source_dir + "/lib")
         return open(index[name]).read()
     else:
         make_dependency(name.split(".")[0].split("/")[-1], name)
         er.file = os.path.abspath(name)
         util.chdir(er.file)
-        print(os.getcwd())
         return open(name).read()
 
 

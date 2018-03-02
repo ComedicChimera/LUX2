@@ -7,6 +7,8 @@ from lib.spm import load_package
 import pickle
 import util
 
+import os
+
 # declaration table for matching
 declarations = {
     "variable_declaration": variables.var_parse,
@@ -28,9 +30,10 @@ class Package:
         # where package was originally located
         self.source_dir = ""
         self.used = False
+        self.extern = False
 
 
-def import_package(name, is_global, used):
+def import_package(name, extern, used):
     # create temporary constants for preservation of current working directory
     er_code, er_file = er.file, er.code
     # generate an ast and load a package
@@ -51,6 +54,7 @@ def import_package(name, is_global, used):
         alias = name
     # return to main file for dependency dumping
     util.chdir(er.main_file)
+    print(os.getcwd())
     with open("_build/%s_ssc.pickle" % alias, "bw+") as file:
         pickle.dump(construct, file)
         file.close()
@@ -60,7 +64,7 @@ def import_package(name, is_global, used):
     pkg = Package()
     pkg.alias = alias
     pkg.dep_dir = "_build/%s_scc.pickle" % alias
-    pkg.is_global = is_global
+    pkg.extern = extern
     pkg.source_dir = pkg_dir
     pkg.used = used
     return pkg
@@ -77,19 +81,20 @@ def construct_symbol_table(ast):
                 symbol_table.append(construct_symbol_table(item))
             # parse declarations
             elif item.name in declarations:
-                try:
+                # try:
                     if item.name in ["func_block", "async_block", "constructor_block"]:
                         func = variables.func_parse(item)
                         for sub_tree in item.content:
                             if isinstance(sub_tree, ASTNode):
                                 if sub_tree.name == "functional_block":
                                     if sub_tree.content[0].type != ";":
-                                        func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
+                                        if len(sub_tree.content) > 2:
+                                            func.code = SemanticConstruct(construct_symbol_table(sub_tree.content[1]), sub_tree.content[1])
                         symbol_table.append(func)
                     else:
                         symbol_table.append(declarations[item.name](item))
-                except Exception as e:
-                    er.throw("semantic_error", e, item)
+                # except Exception as e:
+                # er.throw("semantic_error", e, item)
             # special parsing rules for module blocks
             elif item.name == "module_block":
                 mod = variables.module_parse(item)
@@ -108,7 +113,7 @@ def construct_symbol_table(ast):
             # power package inclusion
             elif item.name == "include_stmt":
                 used = False
-                is_global = False
+                extern = False
                 for elem in item.content:
                     if isinstance(elem, ASTNode):
                         # collect data about package from ast
@@ -116,13 +121,14 @@ def construct_symbol_table(ast):
                             name = elem.content[0]
                             # add import to s-table (id)
                             if name.type == "IDENTIFIER":
-                                symbol_table.append(import_package(name.value, is_global, used))
+                                symbol_table.append(import_package(name.value, extern, used))
                             # import for str
                             else:
                                 name_str = name.value
-                                symbol_table.append(import_package(name_str[1:len(name_str) - 1] + ".sy", is_global, used))
+                                symbol_table.append(import_package(name_str[1:len(name_str) - 1] + ".sy", extern, used))
+                        elif elem.name == 'extern':
+                            extern = True
                         else:
-                            # if elem is prefixed by use
                             if elem.content[0].type == "USE":
                                 used = True
             else:

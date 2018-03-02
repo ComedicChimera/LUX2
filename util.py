@@ -21,6 +21,7 @@ version = "0.0.1"
 
 
 def chdir(path):
+    print(path)
     directory = os.path.dirname(os.path.abspath(path)).split('\\')
     directory.pop()
     directory = "\\".join(directory)

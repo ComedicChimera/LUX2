@@ -1,0 +1,12 @@
+include runtime;
+include __application__;
+include os;
+
+func __main__() <- int {
+	runtime.init();
+	os.init();
+	$exitCode = __application__.Main();
+	os.exit(0);
+	runtime.close();
+	return exitCode;		
+}

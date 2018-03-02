@@ -1,0 +1,7 @@
+func extern init() {
+
+}
+
+func extern exit($exitCode : int) {
+
+}

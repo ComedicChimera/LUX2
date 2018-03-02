@@ -279,7 +279,7 @@
     ", full_assignment ,"
   ],
   "include_stmt": [
-    "inc_prefix INCLUDE include_ext"
+    "inc_prefix INCLUDE include_ext extern"
   ],
   "inc_prefix": [
     "USE",
@@ -288,6 +288,10 @@
   "include_ext": [
     "IDENTIFIER",
     "STRING_LITERAL"
+  ],
+  "extern": [
+    "EXTERN",
+    "&"
   ],
   "lambda_stmt": [
     "LAMBDA ( atom => lambda_body lambda_if )"

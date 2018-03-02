@@ -1,7 +1,7 @@
 from src.semantics.semantics import DataStructure
 from src.semantics.symbols.symbol_table import Package
 import pickle
-from src.parser.ASTtools import ASTNode
+from src.semantics.semantics import Variable, Function
 
 
 # table manager - controls table for analysis
@@ -42,11 +42,13 @@ class TableManager:
                 self.visible = []
                 self.available_packages = []
                 for item in table:
-                    if isinstance(item, ASTNode):
-                        if has_modifier(item, "GLOBAL"):
+                    if isinstance(item, Variable):
+                        if has_modifier(item, "EXTERN"):
+                            self.visible.append(item)
+                        elif item.name == 'Main' and isinstance(item, Function):
                             self.visible.append(item)
                     elif isinstance(item, Package):
-                        if item.is_global:
+                        if item.extern:
                             self.available_packages.append(item)
                 self.is_global = pkg.is_global
                 self.used = pkg.used
@@ -54,10 +56,6 @@ class TableManager:
             def find(self, elem):
                 if not self.used:
                     elem.group = elem.group[1:]
-                for pkg in self.available_packages:
-                    res = TableManager.unpack(pkg).find(elem)
-                    if res:
-                        return res
                 for item in self.visible:
                     if TableManager.compare(item, elem):
                         return item
@@ -96,8 +94,10 @@ class TableManager:
         self.pos += 1
 
 
-def has_modifier(name, var):
-    pass
+def has_modifier(var, mod):
+    if any(x.type == mod for x in var.modifiers):
+        return True
+    return False
 
 tm = None
 

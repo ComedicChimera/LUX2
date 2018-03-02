@@ -24,7 +24,6 @@ class Console:
             "bug": self.debug,
         }
 
-        self.currentFile = ""
         self.fileType = ""
 
     def debug(self):
@@ -58,16 +57,13 @@ class Console:
             raise CustomException("Invalid file type.")
         er.file = path
         er.main_file = path
-        with open(path) as fileObject:
-            for item in fileObject:
-                self.currentFile += item
 
     # runs a file
     def run(self, cmd_obj):
         if len(cmd_obj.parameters) > 0:
             raise(CustomException("Function RUN does not except parameters."))
         if self.fileType == "source":
-            self.compile(" " + self.currentFile, "")
+            self.compile("")
         else:
             raise NotImplementedError
 
@@ -105,10 +101,10 @@ class Console:
             self.commands[item.name](item)
 
     # main compile function
-    def compile(self, code, output_dir):
+    def compile(self, output_dir):
         print("Initializing SyClone Compiler [%s] (SycStandard)\n" % version)
         safe_dir = os.getcwd()
-        p_code = code
+        p_code = open(source_dir + '/src/semantics/corelib/__main__.sy').read()
         sc = self.analyze(p_code, output_dir)
         os.chdir(safe_dir)
 
