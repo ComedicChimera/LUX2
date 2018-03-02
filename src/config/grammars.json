@@ -448,7 +448,6 @@
     "NULL",
     "BOOL_LITERAL",
     "byte_literal",
-    "COMPLEX_LITERAL",
     "atom_types",
     "VALUE"
   ],
@@ -482,7 +481,8 @@
   ],
   "number": [
     "INTEGER_LITERAL",
-    "FLOAT_LITERAL"
+    "FLOAT_LITERAL",
+    "COMPLEX_LITERAL"
   ],
   "list": [
     "[ list_builder ]"

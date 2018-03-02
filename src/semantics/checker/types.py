@@ -137,9 +137,10 @@ class AsyncFunction(DataType):
 
 # struct
 class Structure(DataType):
-    def __init__(self):
+    def __init__(self, name):
         DataType.__init__(self)
         self.properties = [Property.STRUCTURE]
+        self.name = name
 
 
 # type
@@ -182,5 +183,16 @@ class CoreType(DataType):
     def __init__(self, dt):
         DataType.__init__(self)
         self.data_type = dt
+
+
+# this
+class InstancePointer:
+    def __init__(self):
+        self.instance_of = None
+
+
+# value
+class Value:
+    pass
 
 
