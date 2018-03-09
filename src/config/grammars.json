@@ -3,6 +3,7 @@
     "block_declaration syclone",
     "variable_declaration ; syclone",
     "include_stmt ; syclone",
+    "sub_scope syclone",
     "&"
   ],
   "main": [

@@ -1,5 +1,5 @@
 from src.parser.ASTtools import ASTNode
-from src.semantics.symbols.types import from_type
+from src.semantics.symbols.tb_util import from_type
 
 
 # main parameter class

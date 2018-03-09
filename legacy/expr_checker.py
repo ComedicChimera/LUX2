@@ -1,6 +1,6 @@
 from src.parser.ASTtools import ASTNode
 from src.errormodule import throw
-from src.semantics.symbols.types import unparse
+from src.semantics.symbols.tb_util import unparse
 from src.semantics.checker.functions import check_inline
 
 

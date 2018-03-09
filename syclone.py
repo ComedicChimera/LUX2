@@ -7,7 +7,8 @@ from src.parser.ASTtools import AST
 import cmd
 import src.parser.lexer as lexer
 from src.semantics.semantic_analyzer import check_ast
-from util import *
+import util
+import os
 
 
 # the main application
@@ -33,8 +34,8 @@ class Console:
     @staticmethod
     def get_version(cmd_obj):
         if len(cmd_obj.parameters) > 0:
-            raise(CustomException("Function GET_VERSION does not except parameters."))
-        print("SyClone Version: " + version)
+            raise Exception("Function GET_VERSION does not except parameters.")
+        print("SyClone Version: " + util.version)
 
     def install(self, cmd_obj):
         pass
@@ -49,19 +50,19 @@ class Console:
     def in_func(self, cmd_obj):
         params = cmd_obj.parameters
         if len(params) != 1:
-            raise(CustomException("Function IN does not except more that one path."))
+            raise Exception("Function IN does not except more that one path.")
         path = params[0]
         if path.endswith(".sy") or path.endswith(".txt"):
             self.fileType = "source"
         else:
-            raise CustomException("Invalid file type.")
+            raise Exception("Invalid file type.")
         er.file = path
-        er.main_file = path
+        util.main_file = path
 
     # runs a file
     def run(self, cmd_obj):
         if len(cmd_obj.parameters) > 0:
-            raise(CustomException("Function RUN does not except parameters."))
+            raise Exception("Function RUN does not except parameters.")
         if self.fileType == "source":
             self.compile("")
         else:
@@ -72,7 +73,7 @@ class Console:
     def get_input(self):
         command = ""
         while command != "exit":
-            print(ConsoleColors.MAGENTA + "SYC_VCP@x64 " + ConsoleColors.GREEN + os.getcwd() + ConsoleColors.YELLOW + " ~\n" + ConsoleColors.WHITE + "$ ", end="")
+            print(util.ConsoleColors.MAGENTA + "SYC_VCP@x64 " + util.ConsoleColors.GREEN + os.getcwd() + util.ConsoleColors.YELLOW + " ~\n" + util.ConsoleColors.WHITE + "$ ", end="")
             command = input("")
             # if is a syc command, the syc parser will handle it
             if command.startswith("syc "):
@@ -97,14 +98,14 @@ class Console:
             # if it is not a known command, it will raise an exception
             # NOTE: if this evaluates to true, the cmd object parser and the executor may be out of sync (version wise)
             if item.name not in self.commands.keys():
-                raise(CustomException("Unknown Command."))
+                raise Exception("Unknown Command.")
             self.commands[item.name](item)
 
     # main compile function
     def compile(self, output_dir):
-        print("Initializing SyClone Compiler [%s] (SycStandard)\n" % version)
+        print("Initializing SyClone Compiler [%s] (SycStandard)\n" % util.version)
         safe_dir = os.getcwd()
-        p_code = open(source_dir + '/src/semantics/corelib/__main__.sy').read()
+        p_code = open(util.source_dir + '/src/semantics/corelib/__main__.sy').read()
         sc = self.analyze(p_code, output_dir)
         os.chdir(safe_dir)
 
@@ -112,7 +113,9 @@ class Console:
     @staticmethod
     def analyze(code, output_dir=""):
         print("Compiling [          ] (\\)", end="")
-        os.chdir(os.path.dirname(er.main_file))
+        os.chdir(os.path.dirname(util.main_file))
+        util.main_file = util.main_file.split('/')[-1]
+        util.output_dir = output_dir
         if not os.path.exists("_build"):
             os.mkdir(output_dir + "_build")
             os.mkdir(output_dir + "_build/bin")
@@ -126,7 +129,7 @@ class Console:
         try:
             tree = parser.parse()
         except RecursionError:
-            print(ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
+            print(util.ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
             exit(1)
         print("\rCompiling [##        ] (/)", end="")
         # simplify ast

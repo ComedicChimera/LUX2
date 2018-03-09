@@ -5,8 +5,6 @@ from util import *
 
 file = "MAIN"
 
-main_file = ""
-
 code = ""
 
 

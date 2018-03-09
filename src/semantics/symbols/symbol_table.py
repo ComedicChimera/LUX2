@@ -3,11 +3,11 @@ from src.parser.ASTtools import ASTNode
 from src.semantics.semantics import SemanticConstruct
 import src.errormodule as er
 # package management
-from lib.spm import load_package
+import src.semantics.include as pkg
 import pickle
+from random import randint
 import util
 
-import os
 
 # declaration table for matching
 declarations = {
@@ -27,47 +27,39 @@ class Package:
         self.alias = ""
         # where it is stored during compilation
         self.dep_dir = ""
-        # where package was originally located
-        self.source_dir = ""
+        # where package was originally located        self.source_dir = ""
         self.used = False
         self.extern = False
 
 
 def import_package(name, extern, used):
-    # create temporary constants for preservation of current working directory
-    er_code, er_file = er.file, er.code
-    # generate an ast and load a package
-    ast = load_package(name)
-    # restore previous working dir
-    util.chdir(er_file)
-    # generate semantic construct
-    construct = SemanticConstruct(construct_symbol_table(ast), ast)
-    # get original source dir
-    pkg_dir = er.file
-    # restore working directory for error module
-    er.code = er_code
+    def get_rand():
+        rand = ''
+        for _ in range(0, 10):
+            rand += str(randint(0, 10))
+        return rand
+
+    er_file = er.file
+    er_code = er.code
+    inclusion = pkg.include(name)
+    ast = inclusion[0]
+    pkg.load_prefix += inclusion[1]
+    sem_obj = SemanticConstruct(construct_symbol_table(ast), ast)
     er.file = er_file
-    # generate alias
-    if "/" in name:
-        alias = name.split(".")[0].split("/")[-1]
-    else:
-        alias = name
-    # return to main file for dependency dumping
-    util.chdir(er.main_file)
-    print(os.getcwd())
-    with open("_build/%s_ssc.pickle" % alias, "bw+") as file:
-        pickle.dump(construct, file)
+    er.code = er_code
+    pkg.load_prefix = pkg.load_prefix[:len(pkg.load_prefix) - len(inclusion[1])]
+    num = get_rand()
+    if '\\' in name:
+        name = name.split('\\')[-1]
+    with open(util.output_dir + '_build/%s_scc.pickle' % (name + num), 'bw+') as file:
+        pickle.dump(sem_obj, file)
         file.close()
-    # return to current working dir
-    util.chdir(er.file)
-    # generate package
-    pkg = Package()
-    pkg.alias = alias
-    pkg.dep_dir = "_build/%s_scc.pickle" % alias
-    pkg.extern = extern
-    pkg.source_dir = pkg_dir
-    pkg.used = used
-    return pkg
+    package = Package()
+    package.alias = name
+    package.used = used
+    package.extern = extern
+    package.dep_dir = util.output_dir + '_build/%s_scc.pickle' % (name + num)
+    return package
 
 
 # builds the symbol table

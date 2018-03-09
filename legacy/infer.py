@@ -1,7 +1,7 @@
 from src.parser.ASTtools import ASTNode
 import src.errormodule as er
 import src.semantics.semantics as semantics
-import src.semantics.symbols.types as types
+import src.semantics.symbols.tb_util as types
 
 # broken
 

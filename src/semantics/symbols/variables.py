@@ -1,5 +1,5 @@
 import src.semantics.semantics as semantics
-import src.semantics.symbols.types as types
+import src.semantics.symbols.tb_util as types
 from src.errormodule import throw
 from src.parser.ASTtools import Token
 from src.semantics.symbols.parameters import parse_parameters

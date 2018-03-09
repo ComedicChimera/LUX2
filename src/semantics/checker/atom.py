@@ -1,8 +1,8 @@
-from src.parser.ASTtools import ASTNode
-import src.semantics.checker.types as types
 import src.errormodule as er
 import src.semantics.checker.functions as functions
 import src.semantics.checker.identifiers as identifiers
+import src.semantics.types as types
+from src.parser.ASTtools import ASTNode
 
 
 # assumes sub-expressions will not be passed in -> evaluated by upper-level expression parser

@@ -1,4 +1,5 @@
 from src.parser.ASTtools import Token
+import src.semantics.types as types
 
 
 # converts an ast to a list of its elements
@@ -38,27 +39,39 @@ def compile_identifier(id):
 
 
 # generates from a simple data type
-def from_simple(simple, c_type):
+def from_simple(simple, r_depth):
+    simple_types = {
+        'LONG_TYPE': types.Long,
+        'INT_TYPE': types.Integer,
+        'FLOAT_TYPE': types.Float,
+        'COMPLEX_TYPE': types.Complex,
+        'CHAR_TYPE': types.Char,
+        'STRING_TYPE': types.String,
+        'BOOL_TYPE': types.Boolean
+    }
     if isinstance(simple.content[0], Token):
         if simple.content[0].type == "LIST_TYPE":
-            c_type += "LIST[" + from_type(simple.content[1].content[1]) + "]"
+            f_type = types.List(from_type(simple.content[1].content[1]))
+            f_type.reference_depth = r_depth
+            return f_type
         else:
-            c_type += "DICT[" + from_type(simple.content[1].content[1].content[0])
-            c_type += "," + from_type(simple.content[1].content[1].content[2]) + "]"
+            f_type = types.Dictionary(from_type(simple.content[1].content[1].content[0]), from_type(simple.content[1].content[1].content[2]))
+            f_type.reference_depth = r_depth
+            return f_type
     else:
         if simple.content[0].name == "pure_types":
-            c_type += simple.content[0].content[0].type.split('_')[0]
+            f_type = simple_types[simple.content[0].content[0].type]()
+            f_type.reference_depth = r_depth
+            return f_type
         else:
-            c_type += "".join(unparse(simple.content[0]))
-    return c_type
+            return "".join(unparse(simple.content[0]))
 
 
 # generates from a type declaration (types in grammar)
 def from_type(data_type):
-    rt_type = ""
     # handles dereference operators
     if data_type.content[0].name == "deref_op":
-        rt_type = "".join([x.type for x in unparse(data_type.content[0])])
+        rt_type = len(data_type.content[0])
         return from_simple(data_type.content[1], rt_type)
     elif data_type.content[0].name == "simple_types":
-        return from_simple(data_type.content[0], rt_type)
+        return from_simple(data_type.content[0], 0)
