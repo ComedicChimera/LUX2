@@ -1,143 +1,40 @@
-import subprocess
-import src.errormodule as er
-
-import src.parser.syc_parser as syc_parser
-from src.parser.ASTtools import AST
-
-import cmd
-import src.parser.lexer as lexer
-from src.semantics.semantic_analyzer import check_ast
+import sys
+from build import build
 import util
-import os
 
+# dictionary of all possible commands and their respective functions
+# functions take a list of str arguments
+commands = {
+    'get': '',
+    'rm': '',
+    'build': build,
+    'version': lambda _: print(util.VERSION)
+}
 
-# the main application
-class Console:
-    # sets up the default commands dictionary
-    def __init__(self):
-        self.commands = {
-            "i": self.in_func,
-            "o": self.out_func,
-            "r": self.run,
-            "install": self.install,
-            "u": self.update,
-            "v": self.get_version,
-            "bug": self.debug,
-        }
+# current argument set to be passed to functions
+c_args = []
+# the current operating command
+# to prevent command from called at the beginning '' means null command (do not run)
+c_command = ''
 
-        self.fileType = ""
+# for item in starting arguments not including file path
+for item in sys.argv[1:]:
+    # if the item is a command
+    if item in commands:
+        # if not null command
+        if c_command != '':
+            # try to run the function and print exception is failed
+            try:
+                # get the current command function and execute with the current arguments
+                commands[c_command](c_args)
+            except util.SyCloneError as se:
+                print(se)
+        # update it to the new command provided
+        c_command = item
+    # else add it to current working arguments
+    else:
+        c_args.append(item)
 
-    def debug(self):
-        pass
-
-    # returns the current version of SyClone
-    @staticmethod
-    def get_version(cmd_obj):
-        if len(cmd_obj.parameters) > 0:
-            raise Exception("Function GET_VERSION does not except parameters.")
-        print("SyClone Version: " + util.version)
-
-    def install(self, cmd_obj):
-        pass
-
-    def update(self, cmd_obj):
-        pass
-
-    def out_func(self, cmd_obj):
-        pass
-
-    # brings in a file
-    def in_func(self, cmd_obj):
-        params = cmd_obj.parameters
-        if len(params) != 1:
-            raise Exception("Function IN does not except more that one path.")
-        path = params[0]
-        if path.endswith(".sy") or path.endswith(".txt"):
-            self.fileType = "source"
-        else:
-            raise Exception("Invalid file type.")
-        er.file = path
-        util.main_file = path
-
-    # runs a file
-    def run(self, cmd_obj):
-        if len(cmd_obj.parameters) > 0:
-            raise Exception("Function RUN does not except parameters.")
-        if self.fileType == "source":
-            self.compile("")
-        else:
-            raise NotImplementedError
-
-    # TODO revise function to get input directly from native system command line
-    # gets input from user
-    def get_input(self):
-        command = ""
-        while command != "exit":
-            print(util.ConsoleColors.MAGENTA + "SYC_VCP@x64 " + util.ConsoleColors.GREEN + os.getcwd() + util.ConsoleColors.YELLOW + " ~\n" + util.ConsoleColors.WHITE + "$ ", end="")
-            command = input("")
-            # if is a syc command, the syc parser will handle it
-            if command.startswith("syc "):
-                self.evaluate_command(command)
-            # test if command is cd and revise current dir to compensate
-            elif command[:2] == "cd":
-                os.chdir(command[3:])
-            # else it will echo to console and print response
-            elif command != "exit":
-                output = subprocess.check_output(command, shell=True)
-                print(str(output).replace("b'", "").replace("\\n", "\n").replace("\\r", "\r")[:len(output) - 1])
-            print("\n")
-
-    # splits the command into its parts and executes it
-    def evaluate_command(self, command):
-        # removes unnecessary content
-        command = command[4:]
-        # converts cmd into an object
-        cmd_obj = cmd.get_cmd_obj(command)
-        # iterates through and executes each command
-        for item in cmd_obj.commands:
-            # if it is not a known command, it will raise an exception
-            # NOTE: if this evaluates to true, the cmd object parser and the executor may be out of sync (version wise)
-            if item.name not in self.commands.keys():
-                raise Exception("Unknown Command.")
-            self.commands[item.name](item)
-
-    # main compile function
-    def compile(self, output_dir):
-        print("Initializing SyClone Compiler [%s] (SycStandard)\n" % util.version)
-        safe_dir = os.getcwd()
-        p_code = open(util.source_dir + '/src/semantics/corelib/__main__.sy').read()
-        sc = self.analyze(p_code, output_dir)
-        os.chdir(safe_dir)
-
-    # gets semantically valid AST and catches compile time errors
-    @staticmethod
-    def analyze(code, output_dir=""):
-        print("Compiling [          ] (\\)", end="")
-        os.chdir(os.path.dirname(util.main_file))
-        util.main_file = util.main_file.split('/')[-1]
-        util.output_dir = output_dir
-        if not os.path.exists("_build"):
-            os.mkdir(output_dir + "_build")
-            os.mkdir(output_dir + "_build/bin")
-        # gets the tokens from the Lexer
-        lx = lexer.Lexer()
-        tokens = lx.lex(code)
-        print("\rCompiling [#         ] (|)", end="")
-        # runs tokens through parser
-        parser = syc_parser.Parser(tokens)
-        tree = object()
-        try:
-            tree = parser.parse()
-        except RecursionError:
-            print(util.ConsoleColors.RED + "Grammar Error: Left Recursive Grammar Detected.")
-            exit(1)
-        print("\rCompiling [##        ] (/)", end="")
-        # simplify ast
-        ast = AST(tree)
-        semantic_obj = check_ast(ast)
-        print("\rCompiling [####      ] (-)", end="")
-        return semantic_obj
-
-
-cn = Console()
-cn.get_input()
+# ensure all commands are run
+if c_command != '':
+    commands[c_command](c_args)

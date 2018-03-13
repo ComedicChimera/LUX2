@@ -1,0 +1,3 @@
+func Main() <- int {
+    println("Hello, world!");
+}

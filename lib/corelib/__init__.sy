@@ -1,0 +1,14 @@
+include runtime;
+include __application__;
+
+
+func __main__($args : list[str]) <- int {
+    runtime.begin();
+    $exitCode : int;
+    if(value(__application__.Main).parameters.length > 0):
+        exitCode = __application__.Main(args);
+    else:
+        exitCode = __application__.Main();
+    runtime.dealloc(ALL);
+    return exitCode;
+}

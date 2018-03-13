@@ -1,24 +1,49 @@
 import os
+import sys
+
+# used for unparse
+from syc.parser.ASTtools import Token
 
 
-class CustomException(Exception):
+# main SyClone error class thrown by the error module and others parts of the compiler
+class SyCloneError(Exception):
     pass
 
 
-class ConsoleColors:
-    MAGENTA = '\033[35m'
-    BLUE = '\033[34m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[93m'
-    RED = '\033[31m'
-    WHITE = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+# where the compiler source is stored
+# used for opening files such as grammars and tokens
+SOURCE_DIR = os.path.dirname(os.path.realpath(__file__))
 
-source_dir = os.path.dirname(os.path.realpath(__file__))
+# current compiler version
+VERSION = '1.0.0'
 
-version = "0.0.1"
+# the current platform for use when converting to llvm
+PLATFORM = sys.platform
 
-main_file = ''
+# the main file / starting file
+# used for building later
+build_file = ''
 
-output_dir = ''
+
+# used to convert AST node back to list of tokens
+def unparse(ast):
+    unparse_list = []
+    for item in ast.content:
+        if isinstance(item, Token):
+            unparse_list.append(item)
+        else:
+            unparse_list += unparse(item)
+    return unparse_list
+
+
+# main package class
+class Package:
+    def __init__(self, name, extern, used, ast):
+        self.name = name
+        self.is_external = extern
+        self.used = used
+        self.content = ast
+
+    # beautifying method used for testing
+    def to_str(self):
+        return 'Package(%s, [%s])' % (self.name, self.content.to_str())

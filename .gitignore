@@ -1,7 +1,2 @@
-SyCloneCompiler\.idea\misc.xml
-*.iml
-*.pyc
-src/.idea/modules.xml
-src/.idea/workspace.xml
-*.xml
-src/.idea/codeStyleSettings.xml
+.idea
+__pycache__
