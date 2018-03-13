@@ -262,7 +262,7 @@
     "&"
   ],
   "assignment": [
-    "new await id_types trailer assignment_expr"
+    "new await deref_op id_types trailer assignment_expr"
   ],
   "id_types": [
     "IDENTIFIER",
@@ -395,7 +395,7 @@
     "AMP"
   ],
   "deref_op": [
-    "*",
+    "* deref_op",
     "&"
   ],
   "atom": [
