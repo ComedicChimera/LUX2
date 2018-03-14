@@ -569,6 +569,7 @@
     "STRING_TYPE",
     "BYTE_TYPE",
     "COMPLEX_TYPE",
-    "LONG_TYPE"
+    "LONG_TYPE",
+    "OBJECT_TYPE"
   ]
 }
