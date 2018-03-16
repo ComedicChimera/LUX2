@@ -111,7 +111,7 @@ class SymbolTable:
             # neither symbol has groups, name is name, data_type is PACKAGE with no pointers, and members is package IR Object
 
             # if it is external, give symbol external modifier
-            if pkg.external:
+            if pkg.is_external:
                 sym = Symbol(pkg.name, [], types.DataType(types.DataTypes.PACKAGE, []), [Modifiers.EXTERNAL], pkg.content)
             else:
                 sym = Symbol(pkg.name, [], types.DataType(types.DataTypes.PACKAGE, []), [], pkg.content)

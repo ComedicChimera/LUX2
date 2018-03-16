@@ -1,11 +1,23 @@
 from syc.parser.ASTtools import ASTNode, Token
-from syc.icg.generators.expr import generate_expr
-from util import symbol_table as table
+from util import symbol_table
 from syc.icg.action_tree import ActionNode, Identifier
 import syc.icg.types as types
 import errormodule
 from syc.icg.groups import get_method
 
+
+################
+# EXPRESSIONS #
+###############
+
+# generate a action tree from expr
+def generate_expr(expr):
+    return expr
+
+
+#########
+# ATOMS #
+#########
 
 def generate_atom(atom):
     # the only component of the atom grammar that begins with token is ( expr ) trailer
@@ -24,8 +36,12 @@ def generate_atom(atom):
             # if there is extra content, assume trailer and add to lambda root
             if len(atom.content) > 1:
                 lb = add_trailer(lb)
-                # return compiled lambda
-                return lb
+            # return compiled lambda
+            return lb
+
+
+def add_trailer(root):
+    return root
 
 
 #########################
@@ -34,8 +50,9 @@ def generate_atom(atom):
 
 # create a lambda tree from either a lambda expression or lambda statement
 def generate_lambda(lb):
+    print(symbol_table)
     # descend into new scope for lambda
-    table.add_scope()
+    symbol_table.add_scope()
     # arguments for action node
     l_args = []
     # narrow down from LAMBDA ( lambda_expr ) to lambda_expr
@@ -54,9 +71,6 @@ def generate_lambda(lb):
             elif item.name == 'expr':
                 # add compiled expr to args
                 l_args.append(generate_expr(item))
-            elif item.name == 'lambda_body':
-                # TODO add parsing for lambda statements
-                pass
             elif item.name == 'lambda_if':
                 # compile internal expr (IF expr)
                 #                           ^^^^
@@ -68,7 +82,7 @@ def generate_lambda(lb):
                 # compile final result and add to args
                 l_args.append(ActionNode('If', cond_expr, cond_expr.data_type))
     # exit lambda scope
-    table.exit_scope()
+    symbol_table.exit_scope()
     return ActionNode('LambdaExpr', l_args, l_type)
 
 
@@ -148,7 +162,3 @@ def get_iter_name(expr):
             else:
                 # recur if it is right size, but not base
                 return get_iter_name(item)
-
-
-def add_trailer(root):
-    return root

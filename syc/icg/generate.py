@@ -1,8 +1,7 @@
 from syc.icg.table import SymbolTable
 from syc.parser.ASTtools import ASTNode
 import util
-from syc.icg.generators.atom import generate_atom
-from syc.icg.generators.expr import generate_expr
+from syc.icg.expr import generate_atom
 
 
 def generate_tree(ast):
@@ -11,9 +10,7 @@ def generate_tree(ast):
         if isinstance(item, ASTNode):
             # test code for expr compiler
             if item.name == 'atom':
-                generate_atom(item)
-            elif item.name == 'expr':
-                generate_expr(item)
+                print(generate_atom(item))
             else:
                 generate_tree(item)
         elif isinstance(item, util.Package):
@@ -26,5 +23,5 @@ def generate_tree(ast):
             item.content = type('Object', (), dict(symbol_table=util.symbol_table, action_tree=local_tree))
             # reset symbol table
             util.symbol_table = local_table
-            util.symbol_table.add_package(util.Package)
+            util.symbol_table.add_package(item)
     return ast

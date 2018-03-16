@@ -1,3 +1,4 @@
 func Main() <- int {
     println("Hello, world!");
+    $x = lambda(lst[x] => x * 3);
 }

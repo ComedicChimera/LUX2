@@ -39,7 +39,8 @@
     "select_stmt",
     "with_block",
     "except_block",
-    "for_block"
+    "for_block",
+    "lambda_stmt"
   ],
   "module_block": [
     "MODULE modifiers module_type id inherit { module_main }"
@@ -205,6 +206,13 @@
     "{ main }",
     ";"
   ],
+  "lambda_stmt": [
+    "LAMBDA ( atom => lambda_body lambda_if ) ;"
+  ],
+  "lambda_body": [
+    "sub_scope",
+    "stmt"
+  ],
   "stmt": [
     "goto_stmt",
     "variable_declaration",
@@ -216,7 +224,6 @@
     "assignment",
     "include_stmt",
     "generator_stmt",
-    "lambda_stmt",
     "&"
   ],
   "label": [
@@ -291,13 +298,6 @@
     "EXTERN",
     "&"
   ],
-  "lambda_stmt": [
-    "LAMBDA ( atom => lambda_body lambda_if )"
-  ],
-  "lambda_body": [
-    "sub_scope",
-    "stmt"
-  ],
   "expr": [
     "or n_expr"
   ],
@@ -345,8 +345,7 @@
     "!==",
     "!=",
     ">",
-    "<",
-    "IN"
+    "<"
   ],
   "not": [
     "! shift",

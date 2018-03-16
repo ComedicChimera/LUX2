@@ -2,11 +2,18 @@ import os
 
 import syc.parser.syc_parser as parser
 from syc.parser.ASTtools import ASTNode
+import syc.icg.generate as generate
 
 import errormodule
 import syc.parser.lexer as lexer
 import util
 from lib.package_manager import get
+
+
+# dictionary to hold used imports
+imports = {
+
+}
 
 # possible command modifiers
 MODIFIERS = ['--sandbox']
@@ -29,7 +36,10 @@ def build(args):
     # loads all constants into memory
     with open(util.SOURCE_DIR + '/lib/corelib/__init__.sy') as file:
         ast = get_ast(file.read())
-    # TODO convert ast to action tree
+    global imports
+    # reset imports (free memory)
+    imports = {}
+    action_tree = generate.generate_tree(ast)
     # TODO optimize action tree
     # TODO convert action tree to llvm code
 
@@ -87,12 +97,19 @@ def load_package(include_stmt):
     # package cannot be used and external
     if used and extern:
         errormodule.throw('package_error', 'Package cannot be both external and anonymous.', include_stmt)
-    # if get fails due to file path not being found
-    try:
-        code, path = get(name)
-    except FileNotFoundError:
-        errormodule.throw('package_error', 'Unable to locate package by name \'%s\'.' % name, include_stmt)
-        return
+    # prevent redundant imports
+    if name in imports:
+        code, path = imports[name]
+    # if import not redundant, fetch new import
+    else:
+        # if get fails due to file path not being found
+        try:
+            code, path = get(name)
+        except FileNotFoundError:
+            errormodule.throw('package_error', 'Unable to locate package by name \'%s\'.' % name, include_stmt)
+            return
+        # add to dictionary so it is not imported multiple times
+        imports[name] = code, path
     # if working directory needs to be updated
     if path:
         # store cwd

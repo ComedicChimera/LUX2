@@ -27,4 +27,3 @@ def getln(pos, len_carrots):
 
 def throw(type, error, params):
     print(type, error, params)
-    exit(1)
