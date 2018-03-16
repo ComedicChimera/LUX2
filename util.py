@@ -47,3 +47,7 @@ class Package:
     # beautifying method used for testing
     def to_str(self):
         return 'Package(%s, [%s])' % (self.name, self.content.to_str())
+
+
+# global symbol table
+symbol_table = None

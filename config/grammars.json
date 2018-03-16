@@ -400,7 +400,7 @@
   ],
   "atom": [
     "new await base trailer",
-    "( expr )",
+    "( expr ) trailer",
     "lambda trailer"
   ],
   "lambda": [
@@ -421,6 +421,7 @@
     "[ expr ] trailer",
     "( func_params ) trailer",
     ". base trailer",
+    "-> base trailer",
     "&"
   ],
   "func_params": [

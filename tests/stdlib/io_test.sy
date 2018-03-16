@@ -1,0 +1,37 @@
+include io;
+include http;
+
+func Main() <- int {
+	$filename = input("Enter a file.\n");
+
+	// open a normal file for reading and writing
+	$file = io.fopen(filename);
+	file.write("Hello, there.\n");
+	file.close();
+
+	// open a file to append data to it
+	$file2 = io.fopen(filename);
+	file2.append("\nGeneral Kenobi!");
+	println(file2.read());
+	file2.close();
+
+	// open file in binary mode
+	$image = io.fbopen("image.png");
+	print(image.read());
+	image.close();
+	
+	// shorthand to read data from a file
+	$data = io.fread("image.png");
+	print(data);
+
+	// shorthand to read encoded string from file
+	$string_data = io.freads(filename);
+	print(string_data);
+
+	// copy stream to file
+	$netfile = io.open("netfile.txt");
+	$h1 = http.client("www.mysite.com");
+	$netdata = h1.get(stream=True);
+	await io.copyStream(netdata, netfile);
+	netfile.close();
+}

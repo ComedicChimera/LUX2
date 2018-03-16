@@ -54,10 +54,27 @@ class DictType:
 
 # special data type class for functions
 class Function:
-    def __init__(self, rt, pointers, is_async):
+    def __init__(self, rt, pointers, is_async, is_generator):
         # value returned from functions as data type
         self.return_type = rt
         # allow for function pointers
         self.pointers = pointers
         # if the function type is asynchronous
         self.async = is_async
+        # if the function is a generator
+        self.generator = is_generator
+
+
+# class to hold all user defined group types
+class CustomType:
+    def __init__(self, symbol, interfaces):
+        # the internal symbol of the custom type
+        self.symbol = symbol
+        # if it can be iterated through by a for loop & subscripted (list based)
+        self.iterable = True if 'IEnumerable' in interfaces else False
+        # if it can be called with parameters (function based)
+        self.callable = True if 'ICallable' in interfaces else False
+        # if it can be used to store a key-value pair and is ENUMERABLE (dict based)
+        self.hashable = True if 'IHashable' in interfaces else False
+        # if it can be used like number (numeric operator overload)
+        self.numeric = True if 'INumeric' in interfaces else False
