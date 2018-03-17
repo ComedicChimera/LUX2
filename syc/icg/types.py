@@ -24,6 +24,9 @@ class DataTypes(Enum):
     # imported package
     PACKAGE = 13
 
+    # type for holding data type
+    DATA_TYPE = 14
+
 
 # parent class for all data type objects
 class DataType:
@@ -67,7 +70,9 @@ class Function:
 
 # class to hold all user defined group types
 class CustomType:
-    def __init__(self, symbol, interfaces):
+    def __init__(self, dt, symbol, interfaces):
+        # data type (struct, type, group)
+        self.data_type = dt
         # the internal symbol of the custom type
         self.symbol = symbol
         # if it can be iterated through by a for loop & subscripted (list based)
@@ -78,3 +83,10 @@ class CustomType:
         self.hashable = True if 'IHashable' in interfaces else False
         # if it can be used like number (numeric operator overload)
         self.numeric = True if 'INumeric' in interfaces else False
+
+
+# type to hold object instances
+class Instance:
+    def __init__(self, dt):
+        # CustomType
+        self.data_type = dt

@@ -10,6 +10,7 @@ def generate_tree(ast):
         if isinstance(item, ASTNode):
             # test code for expr compiler
             if item.name == 'atom':
+                print('Gen tree', util.symbol_table)
                 print(generate_atom(item))
             else:
                 generate_tree(item)

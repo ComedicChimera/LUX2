@@ -1,5 +1,5 @@
 from syc.parser.ASTtools import ASTNode, Token
-from util import symbol_table
+import util
 from syc.icg.action_tree import ActionNode, Identifier
 import syc.icg.types as types
 import errormodule
@@ -38,6 +38,58 @@ def generate_atom(atom):
                 lb = add_trailer(lb)
             # return compiled lambda
             return lb
+        else:
+            # constants to hold whether of not base is awaited or dynamic allocation is called on it
+            await, new, base, = False, False, None
+            # iterate through atom collect components
+            for item in atom.content:
+                # set await to true if element is awaited
+                await = True if item.name == 'await' else False
+                # set new to true if object is dynamically allocated / object
+                new = True if item.name == 'new' else False
+                # create base from atom parts
+                # always occurs
+                base = generate_base(item) if item.name == 'base' else None
+                # add trailer to base
+                base = add_trailer(base) if item.name == 'trailer' else base
+            # TODO fix to take in whether or not base is Incomplete Type of not (AsyncCall)
+            # if awaited and not a function, throw an error
+            if await and isinstance(base, types.Function):
+                # if function is synchronous throw an error
+                if not base.async:
+                    errormodule.throw('semantic_error', 'Function must be asynchronous to be awaited', atom)
+                else:
+                    base = ActionNode('Await', base, base.return_type)
+            else:
+                errormodule.throw('semantic_error', 'Unable to await non function', atom)
+            # if instance type is a custom Type or normal data type
+            if new and (isinstance(base, types.CustomType) or isinstance(base, types.DataType)):
+                # if it is not a structure of a group
+                if base.data_type not in [types.DataType(types.DataTypes.STRUCT, 0), types.DataType(types.DataTypes.GROUP, 0)]:
+                    # if it is not a data type
+                    if base.data_type != types.DataType(types.DataTypes.DATA_TYPE, 0):
+                        # if it is not an integer
+                        if base.data_type != types.DataType(types.DataTypes.INT, 0):
+                            # all tests failed, not allocatable
+                            errormodule.throw('semantic_error', 'Unable to allocate memory for object', atom)
+                        else:
+                            # malloc for just int size
+                            base = ActionNode('Malloc', base, types.DataType(types.DataTypes.OBJECT, 1))
+                    else:
+                        # return memory allocation with size of type
+                        base.data_type.pointers += 1
+                        base = ActionNode('Malloc', ActionNode('SizeOf', base, types.DataType(types.DataTypes.INT, 1)), base.data_type)
+                else:
+                    # return object instance
+                    base = ActionNode('CreateObjectInstance', base, types.Instance(base.data_type))
+            else:
+                # throw error if list, instance, or dict
+                errormodule.throw('semantic_error', 'Unable to dynamically allocate memory for object', atom)
+            return base
+
+
+def generate_base(ast):
+    pass
 
 
 def add_trailer(root):
@@ -50,9 +102,8 @@ def add_trailer(root):
 
 # create a lambda tree from either a lambda expression or lambda statement
 def generate_lambda(lb):
-    print(symbol_table)
     # descend into new scope for lambda
-    symbol_table.add_scope()
+    util.symbol_table.add_scope()
     # arguments for action node
     l_args = []
     # narrow down from LAMBDA ( lambda_expr ) to lambda_expr
@@ -76,13 +127,13 @@ def generate_lambda(lb):
                 #                           ^^^^
                 cond_expr = generate_expr(item.content[1])
                 # check to see if it is conditional
-                if cond_expr.data_type != types.DataType(types.DataTypes.BOOL, []):
+                if cond_expr.data_type != types.DataType(types.DataTypes.BOOL, 0):
                     # throw error if not a boolean
                     errormodule.throw('semantic_error', 'Lambda if statement expression does not evaluate to a boolean', item)
                 # compile final result and add to args
                 l_args.append(ActionNode('If', cond_expr, cond_expr.data_type))
     # exit lambda scope
-    symbol_table.exit_scope()
+    util.symbol_table.exit_scope()
     return ActionNode('LambdaExpr', l_args, l_type)
 
 

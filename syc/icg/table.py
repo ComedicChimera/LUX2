@@ -52,12 +52,12 @@ class SymbolTable:
     def add_scope(self):
         # add on new sub scope
         self.scope.append([])
+        # enter the new scope
+        self.scope = self.scope[self.pos]
         # update the position
         self.pos += 1
         # add previous position to scope path
         self.scope_path.append(self.pos)
-        # enter the new scope
-        self.scope = self.scope[self.pos]
         # reset position
         self.pos = 0
 
@@ -117,6 +117,7 @@ class SymbolTable:
                 sym = Symbol(pkg.name, [], types.DataType(types.DataTypes.PACKAGE, []), [], pkg.content)
             self.scope.append(sym)
 
+    # TODO add modifier tests
     # find symbol in table
     def look_up(self, var):
         # create symbol from variable
