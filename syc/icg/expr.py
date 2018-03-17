@@ -52,16 +52,11 @@ def generate_atom(atom):
                 base = generate_base(item) if item.name == 'base' else None
                 # add trailer to base
                 base = add_trailer(base) if item.name == 'trailer' else base
-            # TODO fix to take in whether or not base is Incomplete Type of not (AsyncCall)
-            # if awaited and not a function, throw an error
-            if await and isinstance(base, types.Function):
-                # if function is synchronous throw an error
-                if not base.async:
-                    errormodule.throw('semantic_error', 'Function must be asynchronous to be awaited', atom)
-                else:
-                    base = ActionNode('Await', base, base.return_type)
+            # if awaited and not an async function, throw an error
+            if await and not isinstance(base.data_type, types.IncompleteType):
+                errormodule.throw('semantic_error', 'Unable to await anything that is not an asynchronous function.', atom)
             else:
-                errormodule.throw('semantic_error', 'Unable to await non function', atom)
+                base = ActionNode('Await', base.data_type.data_type, base)
             # if instance type is a custom Type or normal data type
             if new and (isinstance(base, types.CustomType) or isinstance(base, types.DataType)):
                 # if it is not a structure of a group
@@ -74,14 +69,14 @@ def generate_atom(atom):
                             errormodule.throw('semantic_error', 'Unable to allocate memory for object', atom)
                         else:
                             # malloc for just int size
-                            base = ActionNode('Malloc', base, types.DataType(types.DataTypes.OBJECT, 1))
+                            base = ActionNode('Malloc', types.DataType(types.DataTypes.OBJECT, 1), base)
                     else:
                         # return memory allocation with size of type
                         base.data_type.pointers += 1
-                        base = ActionNode('Malloc', ActionNode('SizeOf', base, types.DataType(types.DataTypes.INT, 1)), base.data_type)
+                        base = ActionNode('Malloc', base.data_type, ActionNode('SizeOf', types.DataType(types.DataTypes.INT, 1), base))
                 else:
                     # return object instance
-                    base = ActionNode('CreateObjectInstance', base, types.Instance(base.data_type))
+                    base = ActionNode('CreateObjectInstance', types.Instance(base.data_type), base)
             else:
                 # throw error if list, instance, or dict
                 errormodule.throw('semantic_error', 'Unable to dynamically allocate memory for object', atom)
@@ -131,10 +126,10 @@ def generate_lambda(lb):
                     # throw error if not a boolean
                     errormodule.throw('semantic_error', 'Lambda if statement expression does not evaluate to a boolean', item)
                 # compile final result and add to args
-                l_args.append(ActionNode('If', cond_expr, cond_expr.data_type))
+                l_args.append(ActionNode('LambdaIf', cond_expr.data_type, cond_expr))
     # exit lambda scope
     util.symbol_table.exit_scope()
-    return ActionNode('LambdaExpr', l_args, l_type)
+    return ActionNode('LambdaExpr', l_type, *l_args)
 
 
 # convert lambda atom to an Iterator
@@ -188,7 +183,7 @@ def generate_lambda_atom(lb_atom):
     # arguments: [compiled root atom, Iterator]
     args = [base_atom, Identifier(iter_name, iterator_type, False, [], [])]
     # return generated iterator
-    return ActionNode('Iterator', args, base_atom.data_type)
+    return ActionNode('Iterator', base_atom.data_type, *args)
 
 
 # gets the name of the new iterator

@@ -6,7 +6,7 @@
 class ActionNode:
     # func = str (name of function / operation)
     # args = list[sub trees / arguments] (can be Literals, Identifiers or other Action Nodes)
-    def __init__(self, func, args, rt_type):
+    def __init__(self, func, rt_type, *args):
         self.name = func
         self.arguments = args
         # return type of sub function

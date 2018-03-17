@@ -90,3 +90,10 @@ class Instance:
     def __init__(self, dt):
         # CustomType
         self.data_type = dt
+
+
+# type to hold incomplete types
+class IncompleteType:
+    def __init__(self, func):
+        self.async_func = func
+        self.data_type = func.return_type
