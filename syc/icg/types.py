@@ -27,6 +27,15 @@ class DataTypes(Enum):
     # type for holding data type
     DATA_TYPE = 14
 
+    # general data type for byte types
+    BYTE = 15
+
+    # null type
+    NULL = 16
+
+    # value type
+    VALUE = 17
+
 
 # parent class for all data type objects
 class DataType:

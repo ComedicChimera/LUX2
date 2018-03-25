@@ -22,16 +22,8 @@ class Literal:
         self.value = val
 
 
-# class representing an identifier (variable)
+# class representing in-expr identifier
 class Identifier:
-    # name = str (var name)
-    # data_type = DataType
-    # is_instance = bool (whether or not it is a member of an instance group, ie. this.x)
-    # group = list[Identifier] (describes all parent groups in order from outermost to innermost)
-    # scope = list[int] (the region of the program in which this Identifier is valid, list of scope nums to descent to get to the desired identifiers)
-    def __init__(self, name, data_type, is_instance, group, mods):
+    def __init__(self, name, instance):
         self.name = name
-        self.data_type = data_type
-        self.instance = is_instance
-        self.group = group
-        self.modifiers = mods
+        self.instance = instance

@@ -30,10 +30,8 @@ class Symbol:
         self.instance = instance
 
     # used to compare self to another symbol
-    def compare(self, sym):
-        # copy self.members to sym.members so members is not a factor in the comparison
-        sym.members = self.members
-        if sym == self:
+    def compare(self, var):
+        if var.name == self.name and var.instance == self.instance:
             return True
         return False
 
@@ -117,11 +115,8 @@ class SymbolTable:
                 sym = Symbol(pkg.name, [], types.DataType(types.DataTypes.PACKAGE, []), [], pkg.content)
             self.scope.append(sym)
 
-    # TODO add modifier tests
     # find symbol in table
     def look_up(self, var):
-        # create symbol from variable
-        sym = Symbol(var.name, var.group, var.data_type, var.modifiers, instance=var.instance)
         # list that holds all visible layers
         layers = list()
         # holds the current layer being appended to layers
@@ -137,7 +132,7 @@ class SymbolTable:
         for layer in reversed(layers):
             for item in layer:
                 if isinstance(item, Symbol):
-                    if item.compare(sym):
+                    if item.compare(var):
                         # if the symbols are relatively equal (excluding members), return Symbol
                         return item
         # return nothing if unable to match

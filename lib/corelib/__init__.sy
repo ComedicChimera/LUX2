@@ -2,7 +2,7 @@ include runtime;
 include __application__;
 
 
-func __main__($args : list[str]) <- int {
+func __main__($args : list[str]) int {
     runtime.begin();
     $exitCode : int;
     if(value(__application__.Main).parameters.length > 0):

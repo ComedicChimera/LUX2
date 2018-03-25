@@ -70,7 +70,7 @@
     "FUNC modifiers id ( func_params_decl ) rt_type functional_block"
   ],
   "rt_type": [
-    "<- types",
+    "types",
     "&"
   ],
   "func_params_decl": [
@@ -128,7 +128,7 @@
     "INTERFACE modifiers id { interface_main }"
   ],
   "interface_main": [
-    "FUNC modifiers rt_type id ( func_params_decl ) ; interface_main",
+    "FUNC modifiers id ( func_params_decl ) rt_type ; interface_main",
     "&"
   ],
   "struct_block": [

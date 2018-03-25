@@ -1,9 +1,10 @@
 from syc.parser.ASTtools import ASTNode, Token
 import util
-from syc.icg.action_tree import ActionNode, Identifier
+from syc.icg.action_tree import ActionNode, Identifier, Literal
 import syc.icg.types as types
 import errormodule
-from syc.icg.groups import get_method
+import syc.icg.groups as groups
+from syc.icg.table import Symbol
 
 
 ################
@@ -84,7 +85,64 @@ def generate_atom(atom):
 
 
 def generate_base(ast):
-    pass
+    # get that actual base from the ast
+    base = ast.content[0]
+    # check if base is token
+    if isinstance(base, Token):
+        # if it is an identifier
+        if base.type == 'IDENTIFIER':
+            # look it up in the s-table
+            sym = util.symbol_table.look_up(Identifier(base.value, False))
+            # if it is not able to found in the table, throw an error
+            if not sym:
+                errormodule.throw('semantic_error', 'Variable used without declaration', ast)
+            # otherwise return the raw symbol
+            return sym
+        # if it is an instance pointer
+        elif base.type == 'THIS':
+            # get the group instance (typeof Instance)
+            group_instance = groups.get_instance()
+            # if there is not current group instance
+            if not group_instance:
+                errormodule.throw('semantic_error', 'This used outside of instance group', ast)
+            # else return group instance
+            return group_instance
+        # if null, return null literal
+        elif base.type == 'NULL':
+            return Literal(types.DataType(types.DataTypes.NULL, 0), None)
+        # if base is a bool literal
+        elif base.type == 'BOOL_LITERAL':
+            return Literal(types.DataType(types.DataTypes.BOOL, 0), base.value.lower())
+        # if base is value, return value
+        else:
+            return Literal(types.DataType(types.DataTypes.VALUE, 0), 'value')
+    else:
+        # if the base is character-like object
+        if base.name == 'string':
+            # if it is a char, return a char literal
+            if base.content[0].type == 'CHAR_LITERAL':
+                return Literal(types.DataType(types.DataTypes.CHAR, 0), base.content[0].value)
+            # otherwise return a string literal
+            else:
+                return Literal(types.DataType(types.DataTypes.STRING, 0), base.content[0].value)
+        # if the base is numeric
+        if base.name == 'number':
+            # if it is a float
+            if base.content[0].type == 'FLOAT_LITERAL':
+                return Literal(types.DataType(types.DataTypes.FLOAT, 0), base.content[0].value)
+            # if it is a complex
+            elif base.content[0].type == 'COMPLEX_LITERAL':
+                return Literal(types.DataType(types.DataTypes.COMPLEX, 0), base.content[0].value)
+            # if it is an integer or long
+            else:
+                # if the integer's value is greater than the maximum value accepted by an int32
+                # it is taken as a long literal
+                if int(base.content[0].value) > 2147483647:
+                    return Literal(types.DataType(types.DataTypes.LONG, 0), base.content[0].value)
+                # otherwise, it is taken as an integer literal (int32)
+                else:
+                    return Literal(types.DataType(types.DataTypes.INT, 0), base.content[0].value)
+        # TODO add rest of ASTNode parsers
 
 
 def add_trailer(root):
@@ -175,13 +233,13 @@ def generate_lambda_atom(lb_atom):
         iterator_type = base_atom.data_type.key_type
     # if is enumerable custom type
     elif base_atom.data_type.iterable:
-        iterator_type = get_method(base_atom, 'subscript').return_type
+        iterator_type = groups.get_method(base_atom, 'subscript').return_type
     # if it is not enumerable and is not either a dict or list, it is an invalid iterative base
     else:
         errormodule.throw('semantic_error', 'Lambda value must be iterable', lb_atom)
         return
     # arguments: [compiled root atom, Iterator]
-    args = [base_atom, Identifier(iter_name, iterator_type, False, [], [])]
+    args = [base_atom, Symbol(iter_name, [], iterator_type, [])]
     # return generated iterator
     return ActionNode('Iterator', base_atom.data_type, *args)
 
