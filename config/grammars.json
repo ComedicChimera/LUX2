@@ -9,7 +9,6 @@
   "main": [
     "blocks main",
     "stmt ; main",
-    "label main",
     "sub_scope main",
     "&"
   ],
@@ -26,7 +25,6 @@
   ],
   "block_declaration": [
     "module_block",
-    "constructor_block",
     "async_block",
     "func_block",
     "type_block",
@@ -43,44 +41,44 @@
     "lambda_stmt"
   ],
   "module_block": [
-    "MODULE modifiers module_type id inherit { module_main }"
+    "MODULE module_modifiers IDENTIFIER inherit { module_main }"
   ],
-  "module_type": [
-    "ACTIVE",
-    "PASSIVE",
-    "AWAIT"
-  ],
-  "module_main": [
-    "module_constructor main"
-  ],
-  "module_constructor": [
-    "CONSTRUCTOR ( func_params_decl ) functional_block"
-  ],
-  "constructor_block": [
-    "CONSTRUCTOR modifiers IDENTIFIER dot_id ( func_params_decl ) inherit functional_block"
+  "module_modifiers": [
+    "EXTERN module_modifiers",
+    "STATIC module_modifiers",
+    "ABSTRACT module_modifiers",
+    "PARTIAL module_modifiers",
+    "&"
   ],
   "inherit": [
     ": id inherit",
     "&"
   ],
+  "module_main": [
+    "constructor module_main",
+    "block_declaration module_main",
+    "member_declaration ; module_main",
+    "&"
+  ],
+  "constructor": [
+    "CONSTRUCTOR modifiers ( func_params_decl ) functional_block"
+  ],
+  "member_declaration": [
+    "modifiers variable_declaration"
+  ],
   "async_block": [
-    "ASYNC modifiers id ( func_params_decl ) rt_type functional_block"
+    "ASYNC modifiers IDENTIFIER ( func_params_decl ) rt_type functional_block"
   ],
   "func_block": [
-    "FUNC modifiers id ( func_params_decl ) rt_type functional_block"
+    "FUNC modifiers IDENTIFIER ( func_params_decl ) rt_type functional_block"
   ],
   "rt_type": [
     "types",
     "&"
   ],
   "func_params_decl": [
-    "func_param_prefix IDENTIFIER extension params_extension n_func_params",
-    "THIS n_func_params",
+    "func_param_prefix IDENTIFIER extension initializer n_func_params",
     "* * func_param_prefix IDENTIFIER extension",
-    "&"
-  ],
-  "params_extension": [
-    "= expr",
     "&"
   ],
   "func_param_prefix": [
@@ -93,7 +91,7 @@
     "&"
   ],
   "n_func_param": [
-    "func_param_prefix IDENTIFIER extension params_extension",
+    "func_param_prefix IDENTIFIER extension initializer",
     "* * func_param_prefix IDENTIFIER extension"
   ],
   "functional_block": [
@@ -106,6 +104,7 @@
     "EXTERN modifiers",
     "access_modifiers modifiers",
     "FINAL modifiers",
+    "STATIC modifiers",
     "&"
   ],
   "access_modifiers": [
@@ -115,24 +114,24 @@
     "SEALED"
   ],
   "type_block": [
-    "TYPE modifiers id { type_main }"
+    "TYPE modifiers IDENTIFIER { type_main }"
   ],
   "type_main": [
-    "IDENTIFIER n_type"
+    "IDENTIFIER initializer n_type"
   ],
   "n_type": [
-    ", IDENTIFIER n_type",
+    ", IDENTIFIER initializer n_type",
     "&"
   ],
   "interface_block": [
-    "INTERFACE modifiers id { interface_main }"
+    "INTERFACE modifiers IDENTIFIER { interface_main }"
   ],
   "interface_main": [
-    "FUNC modifiers id ( func_params_decl ) rt_type ; interface_main",
+    "FUNC modifiers IDENTIFIER ( func_params_decl ) rt_type ; interface_main",
     "&"
   ],
   "struct_block": [
-    "STRUCT modifiers id { struct_main }"
+    "STRUCT modifiers IDENTIFIER { struct_main }"
   ],
   "struct_main": [
     "DOLLAR IDENTIFIER extension n_var"
@@ -191,7 +190,10 @@
     "&"
   ],
   "case": [
-    "CASE expr block"
+    "CASE expr n_case_expr block"
+  ],
+  "n_case_expr": [
+    ", expr n_case_expr"
   ],
   "default": [
     "DEFAULT block"
@@ -214,10 +216,8 @@
     "stmt"
   ],
   "stmt": [
-    "goto_stmt",
     "variable_declaration",
     "throw_stmt",
-    "del_stmt",
     "break_stmt",
     "continue_stmt",
     "return_stmt",
@@ -225,12 +225,6 @@
     "include_stmt",
     "generator_stmt",
     "&"
-  ],
-  "label": [
-    "# IDENTIFIER :"
-  ],
-  "goto_stmt": [
-    "GOTO IDENTIFIER"
   ],
   "break_stmt": [
     "BREAK"
@@ -247,25 +241,12 @@
   "throw_stmt": [
     "THROW expr"
   ],
-  "del_stmt": [
-    "DELETE atom"
-  ],
   "variable_declaration": [
-    "modifiers variable_decl_stmt"
-  ],
-  "variable_decl_stmt": [
-    "DOLLAR id extension initializer",
-    "@ id extension const_initializer"
+    "DOLLAR IDENTIFIER extension initializer",
+    "@ IDENTIFIER extension = expr"
   ],
   "initializer": [
     "= expr",
-    "&"
-  ],
-  "const_initializer": [
-    "= expr"
-  ],
-  "modify_assignment": [
-    "assignment_ops expr",
     "&"
   ],
   "assignment": [
@@ -288,14 +269,14 @@
     ", full_assignment ,"
   ],
   "include_stmt": [
-    "use INCLUDE IDENTIFIER dot_id extern"
+    "external use INCLUDE IDENTIFIER dot_id"
+  ],
+  "external": [
+    "EXTERN",
+    "&"
   ],
   "use": [
     "USE",
-    "&"
-  ],
-  "extern": [
-    "EXTERN",
     "&"
   ],
   "expr": [
@@ -442,24 +423,26 @@
     "THIS",
     "inline_function",
     "list",
-    "dict",
+    "array_dict",
     "NULL",
     "BOOL_LITERAL",
-    "byte_literal",
+    "byte",
     "atom_types",
     "VALUE"
   ],
-  "byte_literal": [
+  "byte": [
     "HEX_LITERAL",
     "BINARY_LITERAL"
   ],
   "atom_types": [
     "pure_types",
     "LIST_TYPE list_modifier",
-    "DICT_TYPE dict_modifier"
+    "DICT_TYPE dict_modifier",
+    "ARRAY_TYPE array_modifier"
   ],
   "inline_function": [
-    "FUNC ( inline_params ) functional_block"
+    "FUNC ( inline_params ) functional_block",
+    "ASYNC ( inline_params ) functional_block"
   ],
   "await": [
     "AWAIT",
@@ -493,29 +476,19 @@
     ", expr n_list",
     "&"
   ],
-  "dict": [
-    "{ dict_builder }"
+  "array_dict": [
+    "{ array_dict_builder }"
   ],
-  "dict_builder": [
-    "dict_base : expr n_dict",
+  "array_dict_builder": [
+    "expr array_dict_branch",
     "&"
   ],
-  "dict_base": [
-    "literals dot_id",
-    "id"
-  ],
-  "literals": [
-    "STRING_LITERAL",
-    "CHAR_LITERAL",
-    "BOOL_LITERAL",
-    "COMPLEX_LITERAL",
-    "FLOAT_LITERAL",
-    "INTEGER_LITERAL",
-    "BINARY_LITERAL",
-    "HEX_LITERAL"
+  "array_dict_branch": [
+    ": expr n_dict",
+    "n_list"
   ],
   "n_dict": [
-    ", base : expr n_dict",
+    ", expr : expr n_dict",
     "&"
   ],
   "assignment_ops": [
@@ -538,6 +511,7 @@
     "pure_types",
     "LIST_TYPE list_modifier",
     "DICT_TYPE dict_modifier",
+    "ARRAY_TYPE array_modifier",
     "id"
   ],
   "list_modifier": [
@@ -552,6 +526,9 @@
   ],
   "d_types": [
     "types , types"
+  ],
+  "array_modifier": [
+    "[ types , expr ]"
   ],
   "id": [
     "THIS . IDENTIFIER dot_id",

@@ -46,6 +46,17 @@ class DataType:
         self.pointers = pointers
 
 
+# adapted data type class for arrays
+class ArrayType:
+    def __init__(self, et, count, pointers):
+        # data type of array elements
+        self.element_type = et
+        # number of elements in array
+        self.element_count = count
+        # pointers
+        self.pointers = pointers
+
+
 # adapted data type class for lists
 class ListType:
     def __init__(self, et, pointers):
@@ -85,7 +96,7 @@ class CustomType:
         # the internal symbol of the custom type
         self.symbol = symbol
         # if it can be iterated through by a for loop & subscripted (list based)
-        self.iterable = True if 'IEnumerable' in interfaces else False
+        self.enumerable = True if 'IEnumerable' in interfaces else False
         # if it can be called with parameters (function based)
         self.callable = True if 'ICallable' in interfaces else False
         # if it can be used to store a key-value pair and is ENUMERABLE (dict based)
@@ -106,3 +117,80 @@ class IncompleteType:
     def __init__(self, func):
         self.async_func = func
         self.data_type = func.return_type
+
+
+#####################
+# UTILITY FUNCTIONS #
+#####################
+
+
+# check if type can be coerced
+def coerce(base_type, unknown):
+    # if either is a not a raw data type, it does not work
+    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
+        return False
+    # if pointers don't match up, automatically not equal
+    if base_type.pointers != unknown.pointers:
+        return False
+    # if it is a complex or float or long, ints and bool can be coerced
+    elif base_type.data_type == DataTypes.COMPLEX | DataTypes.FLOAT | DataTypes.LONG and unknown.data_type == DataTypes.INT | DataTypes.BOOL:
+        return True
+    # chars can be coerced to strings
+    elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
+        return True
+    # check if is null
+    elif not unknown.data_type:
+        return True
+    # check if is byte
+    elif unknown.data_type == DataTypes.BYTE:
+        return True
+    return False
+
+
+# check to see if type will be able to change the data type of a collection or expression
+def dominant(base_type, unknown):
+    # if either is a not a raw data type, it does not work
+    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
+        return
+    # if the types are not equal
+    if base_type.pointers != unknown.pointers:
+        return
+    # if it is a string, dominant over all others
+    elif unknown.data_type == DataTypes.STRING:
+        return unknown
+    # int overriding
+    elif unknown.data_type == DataTypes.FLOAT | DataTypes.COMPLEX | DataTypes.LONG and base_type.data_type == DataTypes.INT:
+        return unknown
+    # bool overriding
+    elif unknown.data_type == DataTypes.FLOAT | DataTypes.COMPLEX | DataTypes.LONG | DataTypes.INT and base_type.data_type == DataTypes.BOOL:
+        return unknown
+    # byte gets overrun by everything
+    elif base_type.data_type == DataTypes.BYTE:
+        return unknown
+
+
+# check if element is mutable
+def mutable(element):
+    # if it is a dict or a list
+    if isinstance(element.data_type, ListType) or isinstance(element.data_type, DictType):
+        return True
+    # return false if not mutable
+    return False
+
+
+# check if element is an enumerable type
+def enumerable(dt):
+    # if element has pointers, it cannot be enumerable
+    if dt.pointers != 0:
+        return False
+    # if it is a collection
+    if isinstance(dt, ListType) or isinstance(dt, ArrayType) or isinstance(dt, DictType):
+        return True
+    # if it is an enumerable CustomType
+    elif isinstance(dt, CustomType):
+        return dt.enumerable
+    # if it is a string
+    elif dt.data_type == DataTypes.STRING:
+        return True
+    else:
+        return False

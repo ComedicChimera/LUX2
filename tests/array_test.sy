@@ -1,0 +1,8 @@
+$myArray : array[int, 2] = { 1, 2 };
+
+$myList : list[int] = [ 2, 3, 5 ];
+
+$myDict : dict[str, int] = {
+	"one": 1,
+	"two": 2
+};

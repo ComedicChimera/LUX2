@@ -1,0 +1,16 @@
+module Greeter {
+    $name : str;
+
+    constructor($name : str) {
+        this.name = name;
+    }
+
+    func greet() => println("Hello, %s!".format(this.name));
+
+    func __finalize__() => println("Bye, %s!".format(this.name));
+}
+
+func Main() int {
+    $bg = new Greeter("Bob");
+    bg.greet();
+}

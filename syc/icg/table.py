@@ -12,14 +12,14 @@ class Modifiers(Enum):
     ABSTRACT = 4
     SEALED = 5
     FINAL = 6
+    STATIC = 7
+    PARTIAL = 8
 
 
 # class representing any declared symbol, not an identifier (variable, function, structure, ect.)
 class Symbol:
-    def __init__(self, name, groups, data_type, modifiers, members=None, instance=False):
+    def __init__(self, name, data_type, modifiers, members=None, instance=False):
         self.name = name
-        # the groups the symbol is apart of
-        self.groups = groups
         self.data_type = data_type
         # modifiers [private, volatile, ect.]
         self.modifiers = modifiers
