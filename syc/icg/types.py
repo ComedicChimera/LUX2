@@ -1,4 +1,6 @@
 from enum import Enum
+from util import unparse
+from syc.parser.ASTtools import Token
 
 
 # enum representing all simple SyClone types
@@ -194,3 +196,50 @@ def enumerable(dt):
         return True
     else:
         return False
+
+
+# generate type from ast (extension or atom types)
+def generate_type(ext):
+    pointers = 0
+    # handle std types (from extension)
+    if ext.name == 'types':
+        if ext.content[0].name == 'deref_op':
+            # extract data type pointers
+            pointers = len(unparse(ext.content[0]))
+        # update ext to simple types
+            ext = ext.content[-1]  # selects last element (always simple types)
+    # if it is token, assume array, list or dict
+    if isinstance(ext.content[0], Token):
+        # assume array
+        if ext.content[0].value == 'ARRAY_TYPE':
+            # ext.content[1].content[1] == pure_types -> array_modifier -> types
+            et = generate_type(ext.content[1].content[1])
+            # count == pure_types -> array_modifier -> INTEGER_LITERAL . value
+            return ArrayType(et, int(ext.content[1].content[3].value), pointers)
+        # assume list
+        elif ext.content[0].value == 'LIST_TYPE':
+            # ext.content[1].content[1] == pure_types -> list_modifier -> types
+            return ListType(generate_type(ext.content[1].content[1]), pointers)
+        # assume dict
+        else:
+            # ext.content[1].content[1] == pure_types -> dict_modifier -> types
+            kt, vt = generate_type(ext.content[1].content[1]), generate_type(ext.content[1].content[3])
+            # compile dictionary type
+            return DictType(kt, vt, pointers)
+    else:
+        if ext.content[0].name == 'pure_types':
+            # return matched pure types
+            return DataType({
+                'INT_TYPE': DataTypes.INT,
+                'BOOL_TYPE': DataTypes.BOOL,
+                'BYTE_TYPE': DataTypes.BYTE,
+                'FLOAT_TYPE': DataTypes.FLOAT,
+                'LONG_TYPE': DataTypes.LONG,
+                'COMPLEX_TYPE': DataTypes.COMPLEX,
+                'STRING_TYPE': DataTypes.STRING,
+                'CHAR_TYPE': DataTypes.CHAR,
+                'OBJECT_TYPE': DataTypes.OBJECT
+                            }[ext.content[0].content[0].type], pointers)
+        else:
+            # TODO add identifier type lookup
+            pass

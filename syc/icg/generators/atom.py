@@ -1,24 +1,17 @@
+import errormodule
+import syc.icg.modules as modules
+from syc.icg.table import Symbol
 from syc.parser.ASTtools import ASTNode, Token
 import util
 from syc.icg.action_tree import ActionNode, Identifier, Literal
 import syc.icg.types as types
-import errormodule
-import syc.icg.groups as groups
-from syc.icg.table import Symbol
-
-
-################
-# EXPRESSIONS #
-###############
-
-# generate a action tree from expr
-def generate_expr(expr):
-    return expr
+import syc.icg.generators.functions as functions
 
 
 #########
 # ATOMS #
 #########
+
 
 def generate_atom(atom):
     # the only component of the atom grammar that begins with token is ( expr ) trailer
@@ -55,7 +48,7 @@ def generate_atom(atom):
                 base = add_trailer(base) if item.name == 'trailer' else base
             # if awaited and not an async function, throw an error
             if await and not isinstance(base.data_type, types.IncompleteType):
-                errormodule.throw('semantic_error', 'Unable to await anything that is not an asynchronous function.', atom)
+                errormodule.throw('semantic_error', 'Unable to await anything that is not an asynchronous function', atom)
             elif await:
                 base = ActionNode('Await', base.data_type.data_type, base)
             # if instance type is a custom Type or normal data type
@@ -84,6 +77,10 @@ def generate_atom(atom):
             return base
 
 
+# move import below to allow for recursive imports
+from syc.icg.generators.expr import generate_expr
+
+
 #########
 # BASES #
 #########
@@ -106,12 +103,12 @@ def generate_base(ast):
         # if it is an instance pointer
         elif base.type == 'THIS':
             # get the group instance (typeof Instance)
-            group_instance = groups.get_instance()
+            module_instance = modules.get_instance()
             # if there is not current group instance
-            if not group_instance:
+            if not module_instance:
                 errormodule.throw('semantic_error', 'This used outside of instance group', ast)
             # else return group instance
-            return group_instance
+            return module_instance
         # if null, return null literal
         elif base.type == 'NULL':
             return Literal(types.DataType(types.DataTypes.NULL, 0), None)
@@ -178,6 +175,29 @@ def generate_base(ast):
         elif base.name == 'array_dict':
             # return generated literal
             return generate_array_dict(base)
+        # handle inline functions
+        elif base.name == 'inline_function':
+            # decide if it is asynchronous or not
+            is_async = False
+            if base.content[0].type == 'ASYNC':
+                is_async = True
+            # generate the parameters (decl_params is 3rd item inward)
+            parameters = functions.generate_parameter_list(base.content[2])
+            if base.content[-1].content[0].type != ';':
+                # if it is not an empty function
+                # generate a return type from center (either { main } or => stmt ;)
+                # gen = is generator
+                rt_type, gen = functions.get_return_type(base.content[-1].content[1])
+            else:
+                errormodule.throw('semantic_error', 'Inline functions must declare a body', base.content[-1])
+                # so compiler won't complain
+                rt_type, gen = None, False
+            dt = types.Function(rt_type, 0, is_async, gen)
+            # in function literals, its value is its parameters
+            return Literal(dt, parameters)
+        elif base.name == 'atom_types':
+            # use types to generate a type result
+            return Literal(types.DataTypes.DATA_TYPE, types.generate_type(base))
 
 
 def add_trailer(root):
@@ -408,7 +428,7 @@ def generate_lambda_atom(lb_atom):
         # assume custom type
         else:
             # get return value of its subscript method
-            iterator_type = groups.get_method(base_atom.data_type, '__subscript__').return_type
+            iterator_type = modules.get_method(base_atom.data_type, '__subscript__').return_type
     # if it is not enumerable and is not either a dict or list, it is an invalid iterative base
     else:
         errormodule.throw('semantic_error', 'Lambda value must be enumerable', lb_atom)

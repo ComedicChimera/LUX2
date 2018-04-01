@@ -233,7 +233,11 @@
     "CONTINUE"
   ],
   "return_stmt": [
-    "RETURN expr"
+    "RETURN r_expr"
+  ],
+  "r_expr": [
+    "expr",
+    "&"
   ],
   "generator_stmt": [
     "YIELD expr"
@@ -441,19 +445,11 @@
     "ARRAY_TYPE array_modifier"
   ],
   "inline_function": [
-    "FUNC ( inline_params ) functional_block",
-    "ASYNC ( inline_params ) functional_block"
+    "FUNC ( func_params_decl ) functional_block",
+    "ASYNC ( func_params_decl ) functional_block"
   ],
   "await": [
     "AWAIT",
-    "&"
-  ],
-  "inline_params": [
-    "DOLLAR IDENTIFIER extension n_inline_params",
-    "&"
-  ],
-  "n_inline_params": [
-    ", DOLLAR IDENTIFIER extension n_inline_params",
     "&"
   ],
   "string": [
@@ -528,7 +524,7 @@
     "types , types"
   ],
   "array_modifier": [
-    "[ types , expr ]"
+    "[ types , INTEGER_LITERAL ]"
   ],
   "id": [
     "THIS . IDENTIFIER dot_id",
