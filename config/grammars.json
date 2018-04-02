@@ -246,8 +246,16 @@
     "THROW expr"
   ],
   "variable_declaration": [
-    "DOLLAR IDENTIFIER extension initializer",
-    "@ IDENTIFIER extension = expr"
+    "DOLLAR var extension initializer",
+    "@ var extension = expr"
+  ],
+  "var": [
+    "( IDENTIFIER initializer multi_var )",
+    "IDENTIFIER"
+  ],
+  "multi_var": [
+    ", IDENTIFIER initializer multi_var",
+    "&"
   ],
   "initializer": [
     "= expr",
@@ -262,6 +270,8 @@
   ],
   "assignment_expr": [
     "core_id expr",
+    "+ +",
+    "- -"
     "&"
   ],
   "full_assignment": [
