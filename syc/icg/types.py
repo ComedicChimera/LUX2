@@ -1,5 +1,5 @@
 from enum import Enum
-from util import unparse
+from util import unparse, symbol_table
 from syc.parser.ASTtools import Token
 
 
@@ -241,5 +241,7 @@ def generate_type(ext):
                 'OBJECT_TYPE': DataTypes.OBJECT
                             }[ext.content[0].content[0].type], pointers)
         else:
-            # TODO add identifier type lookup
+            # TODO add member checking
+            # unable to do until structs, interfaces, modules, and other aliases have been implemented
+            # REMEMBER TO ADD THIS
             pass
