@@ -20,7 +20,7 @@ def generate_atom(atom):
         expr_tree = generate_expr(atom.content[1])
         # if it has a trailer, add to expr root tree
         if isinstance(atom.content[-1], ASTNode):
-            expr_tree = add_trailer(expr_tree)
+            expr_tree = add_trailer(expr_tree, atom.content[-1])
         return expr_tree
     else:
         # all other elements are ASTNodes
@@ -29,7 +29,7 @@ def generate_atom(atom):
             lb = generate_lambda(atom.content[0])
             # if there is extra content, assume trailer and add to lambda root
             if len(atom.content) > 1:
-                lb = add_trailer(lb)
+                lb = add_trailer(lb, atom.content[-1])
             # return compiled lambda
             return lb
         else:
@@ -45,7 +45,7 @@ def generate_atom(atom):
                 # always occurs
                 base = generate_base(item) if item.name == 'base' else None
                 # add trailer to base
-                base = add_trailer(base) if item.name == 'trailer' else base
+                base = add_trailer(base, item) if item.name == 'trailer' else base
             # if awaited and not an async function, throw an error
             if await and not isinstance(base.data_type, types.IncompleteType):
                 errormodule.throw('semantic_error', 'Unable to await anything that is not an asynchronous function', atom)
@@ -79,6 +79,30 @@ def generate_atom(atom):
 
 # move import below to allow for recursive imports
 from syc.icg.generators.expr import generate_expr
+
+
+def add_trailer(root, trailer):
+    # root with trailer added
+    trailer_added = None
+    # assume first is token
+    # if is function call
+    if root.content[0].type == '(':
+        pass
+    # if is subscript
+    elif root.content[0].type == '[':
+        pass
+    # if it is a get member
+    elif root.content[0].type == ',':
+        pass
+    # struct pointer member accessor
+    elif root.content[0].type == '->':
+        pass
+    # continue adding trailer
+    if isinstance(root.content[-1], ASTNode):
+        if root.content[-1].name == 'trailer':
+            return add_trailer(trailer_added, root.content[-1])
+    # otherwise return completed item
+    return trailer_added
 
 
 #########
@@ -198,10 +222,6 @@ def generate_base(ast):
         elif base.name == 'atom_types':
             # use types to generate a type result
             return Literal(types.DataTypes.DATA_TYPE, types.generate_type(base))
-
-
-def add_trailer(root):
-    return root
 
 
 ###############
