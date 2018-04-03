@@ -173,8 +173,8 @@ def dominant(base_type, unknown):
 
 # check if element is mutable
 def mutable(element):
-    # if it is a dict or a list
-    if isinstance(element.data_type, ListType) or isinstance(element.data_type, DictType):
+    # if it is a list, dict, or array
+    if isinstance(element.data_type, ListType) or isinstance(element.data_type, DictType) or isinstance(element.data_type, ArrayType):
         return True
     # return false if not mutable
     return False

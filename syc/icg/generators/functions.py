@@ -66,6 +66,7 @@ def generate_parameter(decl_params):
 
 
 # get the return type from a function body
+# TODO merge with general block parser (to allow id checking and such)
 def get_return_type(function_body):
     # return type holder
     rt_type = None

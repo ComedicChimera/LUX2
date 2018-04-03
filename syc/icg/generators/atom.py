@@ -86,21 +86,49 @@ def add_trailer(root, trailer):
     trailer_added = None
     # assume first is token
     # if is function call
-    if root.content[0].type == '(':
-        pass
+    if trailer.content[0].type == '(':
+        # if it is a function
+        if isinstance(root.data_type, types.Function):
+            # handle invalid calls on function pointers
+            if root.data_type.pointers != 0:
+                errormodule.throw('semantic_error', 'Function pointers are not callable', trailer)
+            else:
+                trailer_added = ActionNode('Call', root.data_type.return_type, root)
+        # throw invalid call error
+        else:
+            errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
     # if is subscript
-    elif root.content[0].type == '[':
-        pass
+    elif trailer.content[0].type == '[':
+        # handle traditional subscripting
+        # the only subscriptable components are mutable (except for strings)
+        if types.mutable(root.data_type):
+            # if not dict, use element type, not value type
+            dt = root.data_type.value_type if isinstance(root.data_type, types.DictType) else root.data_type.element_type
+            trailer_added = ActionNode('Subscript', dt, root)
+        # if it is a module
+        elif root.data_type == types.DataType(types.DataTypes.MODULE, 0):
+            # if it has subscript method
+            subscript_method = modules.get_method(root.value, '__subscript__')
+            if subscript_method:
+                trailer_added = ActionNode('Call', subscript_method.data_type.return_type, subscript_method)
+            # otherwise it is invalid
+            else:
+                errormodule.throw('semantic_error', 'Object has no method \'__subscript__\'', trailer)
+        # strings members can be subscripted, but they cannot modified
+        elif root.data_type == types.DataType(types.DataTypes.STRING, 0):
+            trailer_added = ActionNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), 0, root)
+        else:
+            errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
     # if it is a get member
-    elif root.content[0].type == ',':
+    elif trailer.content[0].type == ',':
         pass
     # struct pointer member accessor
-    elif root.content[0].type == '->':
+    elif trailer.content[0].type == '->':
         pass
     # continue adding trailer
-    if isinstance(root.content[-1], ASTNode):
-        if root.content[-1].name == 'trailer':
-            return add_trailer(trailer_added, root.content[-1])
+    if isinstance(trailer.content[-1], ASTNode):
+        if trailer.content[-1].name == 'trailer':
+            return add_trailer(trailer_added, trailer.content[-1])
     # otherwise return completed item
     return trailer_added
 
@@ -218,6 +246,7 @@ def generate_base(ast):
                 rt_type, gen = None, False
             dt = types.Function(rt_type, 0, is_async, gen)
             # in function literals, its value is its parameters
+            # TODO add body as a parameter
             return Literal(dt, parameters)
         elif base.name == 'atom_types':
             # use types to generate a type result
@@ -448,7 +477,7 @@ def generate_lambda_atom(lb_atom):
         # assume custom type
         else:
             # get return value of its subscript method
-            iterator_type = modules.get_method(base_atom.data_type, '__subscript__').return_type
+            iterator_type = modules.get_method(base_atom.data_type, '__subscript__').data_type.return_type
     # if it is not enumerable and is not either a dict or list, it is an invalid iterative base
     else:
         errormodule.throw('semantic_error', 'Lambda value must be enumerable', lb_atom)
