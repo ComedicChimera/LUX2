@@ -6,8 +6,9 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add Function body parsing/merge return type checking with block parser *(syc/icg/functions.py)*
  - Pass body into literal for inline functions *(syc/icg/atom.py)*
  - Fix Array initialization grammar and ICG for expression based length initialization *(everywhere)*
+ 
    **Notes**
    
      * Fix grammatical expression `[types, INTEGER_LITERAL]` to `[types, expr]`.
      * Remove count parameter entirely?  Array bound checking likely will be runtime 
-     task and not handled at compile time.  *_Unsure_*   
+     task and not handled at compile time.  *__Unsure__*   
