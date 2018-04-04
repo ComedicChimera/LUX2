@@ -271,7 +271,7 @@
   "assignment_expr": [
     "core_id expr",
     "+ +",
-    "- -"
+    "- -",
     "&"
   ],
   "full_assignment": [
