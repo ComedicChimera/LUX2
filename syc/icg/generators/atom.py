@@ -94,6 +94,22 @@ def add_trailer(root, trailer):
                 errormodule.throw('semantic_error', 'Function pointers are not callable', trailer)
             else:
                 trailer_added = ActionNode('Call', root.data_type.return_type, root)
+        elif isinstance(root.data_type, types.DataType):
+            if root.data_type.pointers == 0:
+                # call (struct) constructor
+                if root.data_type.data_type == types.DataTypes.STRUCT:
+                    trailer_added = ActionNode('Constructor', root.data_type, root)
+                else:
+                    errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
+            else:
+                errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
+        # if is module
+        elif isinstance(root.data_type, types.CustomType):
+            if root.pointers != 0:
+                errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
+            else:
+                # TODO stuff
+                return ActionNode('Call', modules.get_constructor(root.data_type.symbol))
         # throw invalid call error
         else:
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -246,7 +262,7 @@ def generate_base(ast):
                 rt_type, gen = None, False
             dt = types.Function(rt_type, 0, is_async, gen)
             # in function literals, its value is its parameters
-            # TODO add body as a parameter
+            # f add body as a parameter
             return Literal(dt, parameters)
         elif base.name == 'atom_types':
             # use types to generate a type result

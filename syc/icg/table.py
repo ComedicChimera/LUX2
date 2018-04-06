@@ -91,9 +91,8 @@ class SymbolTable:
         update_table(self.table)
 
     # add variable to symbol table
-    def add_variable(self, var, ast, members=None):
+    def add_variable(self, sym, ast):
         # compile symbol from action tree Identifier
-        sym = Symbol(var.name, var.data_type, var.modifiers, members, var.instance)
         if sym in self.scope:
             # throw error
             errormodule.throw('semantic_error', 'Variable \'%s\' redeclared.' % sym.name, ast)

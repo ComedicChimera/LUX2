@@ -34,7 +34,11 @@ def generate_modifiers(modifier_tree):
         'PRIVATE': Modifiers.PRIVATE,
         'PARTIAL': Modifiers.PARTIAL,
         'EXTERN': Modifiers.EXTERNAL,
-        'ABSTRACT': Modifiers.ABSTRACT
+        'ABSTRACT': Modifiers.ABSTRACT,
+        'STATIC': Modifiers.STATIC,
+        'FINAL': Modifiers.FINAL,
+        'VOLATILE': Modifiers.VOLATILE,
+        'SEALED': Modifiers.SEALED
     }
     # iterate through unparsed tokens
     for item in util.unparse(modifier_tree):
