@@ -19,3 +19,9 @@ Includes all normal functions, asynchronous functions and methods.
 | Modifiers | Viable Modifiers |
 | Members | `[ parameters, body ]` |
 
+
+Notes
+-----
+
+ - Instance behaves the same for all members that can be instance.  Default static members include: `structs, type, interfaces,
+  and sub-modules`

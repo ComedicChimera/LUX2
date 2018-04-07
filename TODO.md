@@ -5,9 +5,6 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add Identifier based data type checking *(syc/icg/types.py)*
  
  - Add Function body parsing/merge return type checking with block parser *(syc/icg/functions.py)*
- 
- - Pass body into literal for inline functions *(syc/icg/atom.py)*
 
  - Check context for modifiers on structs and other elements *(syc/icg/generators/structs.py)*
  
- - Work on the function data type either hold body or store in call *(syc/icg/\*)*
