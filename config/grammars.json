@@ -534,7 +534,7 @@
     "types , types"
   ],
   "array_modifier": [
-    "[ types , INTEGER_LITERAL ]"
+    "[ types , expr ]"
   ],
   "id": [
     "THIS . IDENTIFIER dot_id",

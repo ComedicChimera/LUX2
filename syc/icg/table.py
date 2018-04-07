@@ -15,6 +15,9 @@ class Modifiers(Enum):
     STATIC = 7
     PARTIAL = 8
 
+    # special modifier for variables
+    CONSTANT = 9
+
 
 # class representing any declared symbol, not an identifier (variable, function, structure, ect.)
 class Symbol:

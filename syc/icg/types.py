@@ -50,11 +50,9 @@ class DataType:
 
 # adapted data type class for arrays
 class ArrayType:
-    def __init__(self, et, count, pointers):
+    def __init__(self, et, pointers):
         # data type of array elements
         self.element_type = et
-        # number of elements in array
-        self.element_count = count
         # pointers
         self.pointers = pointers
 

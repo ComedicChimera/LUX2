@@ -108,7 +108,6 @@ def add_trailer(root, trailer):
             if root.pointers != 0:
                 errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
             else:
-                # TODO stuff
                 return ActionNode('Call', modules.get_constructor(root.data_type.symbol))
         # throw invalid call error
         else:
@@ -262,8 +261,8 @@ def generate_base(ast):
                 rt_type, gen = None, False
             dt = types.Function(rt_type, 0, is_async, gen)
             # in function literals, its value is its parameters
-            # f add body as a parameter
-            return Literal(dt, parameters)
+            fbody = base.content[-1].content[1]
+            return Literal(dt, (parameters, fbody))
         elif base.name == 'atom_types':
             # use types to generate a type result
             return Literal(types.DataTypes.DATA_TYPE, types.generate_type(base))
@@ -282,7 +281,7 @@ def generate_array_dict(array_dict):
         # get the element
         elem = generate_expr(array_dict_builder.content[0])
         # et = elem data_type
-        return Literal(types.ArrayType(elem.data_type, 0, 0), [elem])
+        return Literal(types.ArrayType(elem.data_type, 0), [elem])
     # if the last element's (array_dict_branch) first element is a token (:) assume dict
     elif isinstance(array_dict_builder.content[-1].content[0], Token):
         # raw dict == expr : expr n_dict (as a list)
@@ -346,7 +345,7 @@ def generate_array_dict(array_dict):
         # reuse list generator
         lst = generate_list(array_dict)
         # reformed list classified as array
-        return Literal(types.ArrayType(lst.data_type.element_type, len(lst.value), 0), lst.value)
+        return Literal(types.ArrayType(lst.data_type.element_type,  0), lst.value)
 
 
 # generate a byte array from value of byte token
@@ -358,7 +357,7 @@ def generate_byte_array(bytes_string):
     # get each hexadecimal element organized into pairs (and re-add prefix)
     bytes_array = ['0x' + x for x in map(''.join, zip(*[iter(bytes_string)] * 2))]
     # create array literal
-    return Literal(types.ArrayType(types.DataTypes.BYTE, len(bytes_array), 0), bytes_string)
+    return Literal(types.ArrayType(types.DataTypes.BYTE, 0), bytes_array)
 
 
 # generate a list literal from list astnode
