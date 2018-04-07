@@ -224,7 +224,15 @@
     "assignment",
     "include_stmt",
     "generator_stmt",
+    "external_stmt",
     "&"
+  ],
+  "external_stmt": [
+    "EXTERN external_variants"
+  ],
+  "external_variants": [
+    "variable_declaration",
+    "INCLUDE IDENTIFIER dot_id"
   ],
   "break_stmt": [
     "BREAK"
@@ -283,11 +291,7 @@
     ", full_assignment ,"
   ],
   "include_stmt": [
-    "external use INCLUDE IDENTIFIER dot_id"
-  ],
-  "external": [
-    "EXTERN",
-    "&"
+    "use INCLUDE IDENTIFIER dot_id"
   ],
   "use": [
     "USE",
