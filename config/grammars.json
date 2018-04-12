@@ -92,7 +92,7 @@
   ],
   "n_func_param": [
     "func_param_prefix IDENTIFIER extension initializer",
-    "* * func_param_prefix IDENTIFIER extension"
+    "~ func_param_prefix IDENTIFIER extension"
   ],
   "functional_block": [
     "{ main }",
@@ -390,7 +390,8 @@
   "prefix": [
     "-",
     "* deref_op",
-    "AMP"
+    "AMP",
+    "~"
   ],
   "deref_op": [
     "* deref_op",

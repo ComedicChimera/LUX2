@@ -5,12 +5,6 @@ import json
 # used to locally retrieve a package
 # name is the raw code identifier (ie http.client or compiler.parser)
 def get(name):
-    # __application__ is an alias for build_file
-    # loads util.build_file
-    if name == '__application__':
-        with open(util.build_file) as bf:
-            data = bf.read()
-        return data, '/'.join(util.build_file.split('/')[:-1])
     # open the package index
     with open(util.SOURCE_DIR + '/lib/package_index.json') as file:
         index = json.load(file)

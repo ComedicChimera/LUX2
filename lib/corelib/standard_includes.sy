@@ -1,0 +1,20 @@
+include stdio;
+
+func extern println($a: object, ~$b: object) {
+	print(str(a) + '\n', ~b);
+}
+
+func extern print($a: object, ~$b: object) {
+	stdio.Printf(([a] + b).join(' '));
+}
+
+func extern fprint($a: format, ~$a: object) {
+	stdio.Printf(a, ~b);
+}
+
+func extern input($prompt: str) str {
+	println(prompt);
+	$result: str;
+	stdio.Scanln(&result);
+	return result;
+}

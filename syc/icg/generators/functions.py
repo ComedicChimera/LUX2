@@ -56,7 +56,7 @@ def generate_parameter(decl_params):
                 param['default_value'] = generate_expr(item.content[-1])
         else:
             # handle indefinite params
-            if item.type == '*':
+            if item.type == '~':
                 param['indefinite'] = True
             # add name
             elif item.type == 'IDENTIFIER':

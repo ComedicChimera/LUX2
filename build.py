@@ -34,7 +34,7 @@ def build(args):
             mods.append(arg)
     # first open and compile the startup file
     # loads all constants into memory
-    with open(util.SOURCE_DIR + '/lib/corelib/__init__.sy') as file:
+    with open(util.build_file) as file:
         ast = get_ast(file.read())
     global imports
     # reset imports (free memory)
