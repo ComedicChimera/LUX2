@@ -1,5 +1,6 @@
 from syc.parser.ASTtools import ASTNode
 from syc.icg.action_tree import ActionNode
+import errormodule
 
 
 def generate_expr(expr):
@@ -31,7 +32,7 @@ def generate_unary_atom(u_atom):
                         return ActionNode('ChangeSine', atom.data_type, atom)
                 else:
                     # throw error
-                    pass
+                    errormodule.throw('semantic_error', 'Unable to change sine on non-numeric type.', atom)
     else:
         return generate_atom(u_atom.content[0])
 
