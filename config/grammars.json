@@ -232,7 +232,11 @@
   ],
   "external_variants": [
     "variable_declaration",
-    "INCLUDE IDENTIFIER dot_id"
+    "include_stmt"
+  ],
+  "rename": [
+    "STRING_LITERAL",
+    "&"
   ],
   "break_stmt": [
     "BREAK"
@@ -291,7 +295,7 @@
     ", full_assignment ,"
   ],
   "include_stmt": [
-    "use INCLUDE IDENTIFIER dot_id"
+    "use INCLUDE IDENTIFIER dot_id rename"
   ],
   "use": [
     "USE",

@@ -65,6 +65,12 @@ def resolve_imports(ast):
             # if these is an include statement, process it
             if item.name == 'include_stmt':
                 ast.content[i] = load_package(item)
+            # check extern includes
+            if item.name == 'external_stmt':
+                # if it is an inclusion
+                if item.content[1].content[0].name == 'include_stmt':
+                    # parse it and add to table
+                    ast.content[i] = load_package(item.content[1].content[0], True)
             # recur and continue checking for includes
             else:
                 ast.content[i] = resolve_imports(item)
@@ -72,13 +78,13 @@ def resolve_imports(ast):
 
 
 # open package from ast
-def load_package(include_stmt):
+def load_package(include_stmt, extern=False):
     # package name
     name = ''
     # if it is anonymous
     used = False
-    # if it is external
-    extern = False
+    # alias if necessary
+    alias = None
     for item in include_stmt.content:
         if isinstance(item, ASTNode):
             # add suffix to main name
@@ -87,9 +93,9 @@ def load_package(include_stmt):
             # if this sub tree exists, that means the inclusion is used
             elif item.name == 'use':
                 used = True
-            # if this exists that means that the inclusion is meant to be exported
-            elif item.name == 'extern':
-                extern = True
+            # if there is a rename, that means an alias was used
+            elif item.name == 'rename':
+                alias = item.content[0].value[1:-1]
         else:
             # get base name
             if item.type == 'IDENTIFIER':
@@ -123,5 +129,8 @@ def load_package(include_stmt):
     else:
         # just get the ast, no cwd recursion necessary
         ast = get_ast(code)
-    return util.Package(name, extern, used, ast)
+    # set alias if there was none provided
+    if not alias:
+        alias = name
+    return util.Package(alias, extern, used, ast)
 
