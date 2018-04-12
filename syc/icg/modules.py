@@ -8,3 +8,7 @@ def get_instance():
 
 def get_constructor(symbol):
     pass
+
+
+def check_modifiers(modifiers):
+    pass

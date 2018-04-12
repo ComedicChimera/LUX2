@@ -6,5 +6,4 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add Function body parsing/merge return type checking with block parser *(syc/icg/functions.py)*
 
- - Check context for modifiers on structs and other elements *(syc/icg/generators/structs.py)*
  

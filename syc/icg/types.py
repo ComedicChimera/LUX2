@@ -212,8 +212,7 @@ def generate_type(ext):
         if ext.content[0].value == 'ARRAY_TYPE':
             # ext.content[1].content[1] == pure_types -> array_modifier -> types
             et = generate_type(ext.content[1].content[1])
-            # count == pure_types -> array_modifier -> INTEGER_LITERAL . value
-            return ArrayType(et, int(ext.content[1].content[3].value), pointers)
+            return ArrayType(et, pointers)
         # assume list
         elif ext.content[0].value == 'LIST_TYPE':
             # ext.content[1].content[1] == pure_types -> list_modifier -> types

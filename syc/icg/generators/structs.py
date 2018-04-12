@@ -1,6 +1,7 @@
 from syc.parser.ASTtools import ASTNode
 from syc.icg.table import Symbol, Modifiers
 import syc.icg.types as types
+import syc.icg.modules as modules
 import util
 
 
@@ -44,9 +45,25 @@ def generate_modifiers(modifier_tree):
     for item in util.unparse(modifier_tree):
         # map to enum representation
         mods.append(mod_map[item.type])
+    # check modifiers
+    modules.check_modifiers(mods)
     # return
     return mods
 
 
 def generate_members(member_tree):
-    return member_tree
+    members = []
+    working_member = {}
+    for item in member_tree.content:
+        if isinstance(item, ASTNode):
+            if item.name == 'n_var':
+                members += generate_members(item)
+            elif item.name == 'extension':
+                working_member['data_type'] = types.generate_type(item.content[1])
+        elif item.type == 'IDENTIFIER':
+            working_member['name'] = item.value
+    if 'data_type' not in working_member.keys():
+        working_member['data_type'] = types.DataType(types.DataTypes.OBJECT, 0)
+    members.append(type('Object', (), working_member))
+    return members
+
