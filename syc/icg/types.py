@@ -196,6 +196,24 @@ def enumerable(dt):
         return False
 
 
+# check if element is a numeric type
+def numeric(dt):
+    # if element has pointers, it cannot be enumerable
+    if dt.pointers != 0:
+        return False
+    # if it is a collection
+    if isinstance(dt, ListType) or isinstance(dt, ArrayType) or isinstance(dt, DictType):
+        return False
+    # if it is an enumerable CustomType
+    elif isinstance(dt, CustomType):
+        return dt.numeric
+    # check if is a number
+    elif dt.data_type == DataTypes.INT | DataTypes.FLOAT | DataTypes.COMPLEX | DataTypes.LONG:
+        return True
+    else:
+        return False
+
+
 # generate type from ast (extension or atom types)
 def generate_type(ext):
     pointers = 0
