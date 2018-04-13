@@ -121,4 +121,8 @@ def get_return_type(function_body):
     return rt_type, generator
 
 
+def check_parameters(func, params):
+    pass
+
+
 from syc.icg.generators.expr import generate_expr

@@ -67,3 +67,6 @@ def generate_members(member_tree):
     members.append(type('Object', (), working_member))
     return members
 
+
+def check_constructor(struct, params):
+    pass

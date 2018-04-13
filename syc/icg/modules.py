@@ -12,3 +12,7 @@ def get_constructor(symbol):
 
 def check_modifiers(modifiers):
     pass
+
+
+def check_constructor_parameters(constructor, parameters):
+    pass

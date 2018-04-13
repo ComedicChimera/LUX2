@@ -79,6 +79,7 @@ def generate_atom(atom):
 
 # move import below to allow for recursive imports
 from syc.icg.generators.expr import generate_expr
+import syc.icg.generators.structs as structs
 
 
 def add_trailer(root, trailer):
@@ -93,12 +94,15 @@ def add_trailer(root, trailer):
             if root.data_type.pointers != 0:
                 errormodule.throw('semantic_error', 'Function pointers are not callable', trailer)
             else:
-                trailer_added = ActionNode('Call', root.data_type.return_type, root)
+                parameters = functions.check_parameters(root, trailer.content[1])
+                trailer_added = ActionNode('Call', root.data_type.return_type, root, parameters)
         elif isinstance(root.data_type, types.DataType):
             if root.data_type.pointers == 0:
                 # call (struct) constructor
                 if root.data_type.data_type == types.DataTypes.STRUCT:
-                    trailer_added = ActionNode('Constructor', root.data_type, root)
+                    # check struct generator
+                    parameters = structs.check_constructor(root.data_type, trailer.content[1])
+                    trailer_added = ActionNode('Constructor', root.data_type, root, parameters)
                 else:
                     errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
             else:
@@ -108,7 +112,9 @@ def add_trailer(root, trailer):
             if root.pointers != 0:
                 errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
             else:
-                return ActionNode('Call', modules.get_constructor(root.data_type.symbol))
+                constructor = modules.get_constructor(root.data_type.symbol)
+                parameters = modules.check_constructor_parameters(constructor, trailer.content[1])
+                return ActionNode('Call', root.data_type, constructor, parameters)
         # throw invalid call error
         else:
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -119,7 +125,7 @@ def add_trailer(root, trailer):
         if types.mutable(root.data_type):
             # if not dict, use element type, not value type
             dt = root.data_type.value_type if isinstance(root.data_type, types.DictType) else root.data_type.element_type
-            trailer_added = ActionNode('Subscript', dt, root)
+            trailer_added = ActionNode('Subscript', dt, generate_expr(trailer.content[1]), root)
         # if it is a module
         elif root.data_type == types.DataType(types.DataTypes.MODULE, 0):
             # if it has subscript method
@@ -131,14 +137,11 @@ def add_trailer(root, trailer):
                 errormodule.throw('semantic_error', 'Object has no method \'__subscript__\'', trailer)
         # strings members can be subscripted, but they cannot modified
         elif root.data_type == types.DataType(types.DataTypes.STRING, 0):
-            trailer_added = ActionNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), 0, root)
+            trailer_added = ActionNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), generate_expr(trailer.content[1]), root)
         else:
             errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
     # if it is a get member
-    elif trailer.content[0].type == ',':
-        pass
-    # struct pointer member accessor
-    elif trailer.content[0].type == '->':
+    elif trailer.content[0].type == '.':
         pass
     # continue adding trailer
     if isinstance(trailer.content[-1], ASTNode):

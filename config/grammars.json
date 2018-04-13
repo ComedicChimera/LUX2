@@ -73,7 +73,15 @@
     "FUNC modifiers IDENTIFIER ( func_params_decl ) rt_type functional_block"
   ],
   "rt_type": [
-    "types",
+    "<- rt_types",
+    "&"
+  ],
+  "rt_types": [
+    "( types n_types )",
+    "types"
+  ],
+  "n_types": [
+    ", types n_types",
     "&"
   ],
   "func_params_decl": [
@@ -190,10 +198,7 @@
     "&"
   ],
   "case": [
-    "CASE expr n_case_expr block"
-  ],
-  "n_case_expr": [
-    ", expr n_case_expr"
+    "CASE expr n_list block"
   ],
   "default": [
     "DEFAULT block"
@@ -281,18 +286,18 @@
     "THIS"
   ],
   "assignment_expr": [
-    "core_id expr",
+    "n_assignment assignment_op expr n_list",
     "+ +",
     "- -",
     "&"
   ],
-  "full_assignment": [
-    "atom core_id expr"
+  "n_assignment": [
+    ", id_types trailer n_assignment",
+    "&"
   ],
-  "core_id": [
-    "assignment_ops",
+  "assignment_op": [
     "=",
-    ", full_assignment ,"
+    "assignment_ops"
   ],
   "include_stmt": [
     "use INCLUDE IDENTIFIER dot_id rename"
@@ -424,7 +429,6 @@
     "[ expr ] trailer",
     "( func_params ) trailer",
     ". base trailer",
-    "-> base trailer",
     "&"
   ],
   "func_params": [

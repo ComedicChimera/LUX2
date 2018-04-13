@@ -1,7 +1,7 @@
 include io;
 include http;
 
-func Main() int {
+func Main() <- int {
 	$filename = input("Enter a file.\n");
 
 	// open a normal file for reading and writing

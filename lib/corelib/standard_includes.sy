@@ -12,7 +12,7 @@ func extern fprint($a: format, ~$a: object) {
 	stdio.Printf(a, ~b);
 }
 
-func extern input($prompt: str) str {
+func extern input($prompt: str) <- str {
 	println(prompt);
 	$result: str;
 	stdio.Scanln(&result);
