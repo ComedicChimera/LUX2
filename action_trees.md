@@ -14,3 +14,5 @@ This table documents all the names of the action tree nodes, their functions and
 | Subscript | Index, Collection | Get a value from a collection | \[ndx\] |
 | Dereference | Object | Dereference an Object | * |
 | ChangeSine | Numeric Object | Change the sine of a numeric object | - |
+| Reference | Object | Create a pointer to an object | & |
+

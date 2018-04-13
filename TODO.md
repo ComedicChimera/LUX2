@@ -7,5 +7,4 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add Function body parsing/merge return type checking with block parser *(syc/icg/functions.py)*
  
  - Add GetMember trailer checking *(syc/icg/generators/atom.py)*
-
  
