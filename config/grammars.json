@@ -17,7 +17,7 @@
   ],
   "block": [
     "{ main }",
-    ": stmt ;"
+    "stmt ;"
   ],
   "blocks": [
     "block_declaration",
@@ -37,8 +37,7 @@
     "select_stmt",
     "with_block",
     "except_block",
-    "for_block",
-    "lambda_stmt"
+    "for_block"
   ],
   "module_block": [
     "MODULE module_modifiers IDENTIFIER inherit { module_main }"
@@ -73,15 +72,11 @@
     "FUNC modifiers IDENTIFIER ( func_params_decl ) rt_type functional_block"
   ],
   "rt_type": [
-    "<- rt_types",
+    "types n_rt_type",
     "&"
   ],
-  "rt_types": [
-    "( types n_types )",
-    "types"
-  ],
-  "n_types": [
-    ", types n_types",
+  "n_rt_type": [
+    ", types n_rt_type",
     "&"
   ],
   "func_params_decl": [
@@ -198,7 +193,11 @@
     "&"
   ],
   "case": [
-    "CASE expr n_list block"
+    "CASE expr n_list case_block"
+  ],
+  "case_block": [
+    ": stmt ;",
+    "{ main }"
   ],
   "default": [
     "DEFAULT block"
@@ -212,13 +211,6 @@
   "handle_block": [
     "{ main }",
     ";"
-  ],
-  "lambda_stmt": [
-    "LAMBDA ( atom => lambda_body lambda_if ) ;"
-  ],
-  "lambda_body": [
-    "sub_scope",
-    "stmt"
   ],
   "stmt": [
     "variable_declaration",

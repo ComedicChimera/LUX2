@@ -10,7 +10,7 @@ module Greeter {
     func __finalize__() => println("Bye, %s!".format(this.name));
 }
 
-func Main() <- int {
+func Main() int {
     $bg = new Greeter("Bob");
     bg.greet();
 }

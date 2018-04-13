@@ -1,19 +1,19 @@
-func extern len($collection) <- int {
+func extern len($collection) int {
     $length = value(collection).length;
     except(ValueError, func($e) => throw ValueError("Object has no len"); );
 }
 
-func extern cap($collection) <- int {
+func extern cap($collection) int {
     $capacity = value(collection).capacity;
     except(ValueError, func($e) => throw ValueError("Object has no cap"); );
 }
 
-func extern sizeof($obj) <- float =>
+func extern sizeof($obj) float =>
     return value(obj).size;
 
-func extern range($min: int, $max: int = null, $step: int = 1) <- list[int] {
+func extern range($min: int, $max: int = null, $step: int = 1) list[int] {
     $i = min;
-    if (!max):
+    if (!max)
         max, i = min, 0;
     $values = [];
     for (i < max) {
@@ -23,9 +23,9 @@ func extern range($min: int, $max: int = null, $step: int = 1) <- list[int] {
     return values;
 }
 
-func extern map($list1: list[object], $list2: list[object]) <- dict[object, object] {
+func extern map($list1: list[object], $list2: list[object]) dict[object, object] {
     $newDict: dict[object, object];
-    if (len(list1) != len(list2)): throw ValueError("List lengths must be equal in order to map");
+    if (len(list1) != len(list2)) throw ValueError("List lengths must be equal in order to map");
     for range(len(list1))[i] => {
         newDict[list1[i]] = list2[i];
     }
