@@ -55,11 +55,11 @@ def generate_shift(shift):
                 errormodule.throw('semantic_error', 'Invalid type for right operand of binary shift', shift)
             else:
                 if item.name == '<<':
-                    op = 'alshift'
+                    op = 'Alshift'
                 elif item.name == '>>':
-                    op = 'rshift'
+                    op = 'Rshift'
                 else:
-                    op = 'llshift'
+                    op = 'Llshift'
         return root
     else:
         return generate_arithmetic(shift.content[0])
