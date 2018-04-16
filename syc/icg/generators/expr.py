@@ -32,6 +32,26 @@ def generate_comparison(comparison):
                     errormodule.throw('semantic_error', 'Object has no method \'__not__\'', comparison)
             else:
                 errormodule.throw('semantic_error', 'The \'!\' operator is not applicable to object', comparison)
+        else:
+            unpacked_tree = comparison.content
+            for item in unpacked_tree:
+                if item.name == 'n_comparison':
+                    unpacked_tree += unpacked_tree.pop().content
+            root, op = generate_comparison(unpacked_tree.pop(0)), None
+            for item in unpacked_tree:
+                if item.name == 'not':
+                    n_tree = generate_comparison(item)
+                    if op in {'<=', '>=', '<', '>'}:
+                        if types.numeric(n_tree) and types.numeric(root):
+                            root = ActionNode(op, types.DataType(types.DataTypes.BOOL, 0), root, n_tree)
+                        else:
+                            errormodule.throw('semantic_error', 'Unable to use numeric comparison with non-numeric type'
+                                              , comparison)
+                elif item.name == 'comparison_op':
+                    op = item.content[0].value
+            return root
+
+
     else:
         return generate_shift(comparison.content[0]) if comparison.content[0].name == 'shift' else generate_comparison(comparison.content[0])
 

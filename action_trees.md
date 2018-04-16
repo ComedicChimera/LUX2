@@ -25,4 +25,12 @@ This table documents all the names of the action tree nodes, their functions and
 | Rshift | Object, Integer | Right Shift | >> |
 | Alshift | Object, Integer | Arithmetic Left Shift | << |
 | Llshift | Object, Integer | Logical Left Shift | <<< |
-| Not | Object | Not Operator (invert) | ! |  
+| Not | Object | Not Operator (invert) | ! |
+| > | Numeric, Numeric | Greater Than | > |
+| < | Numeric, Numeric | Less Than | < |
+| >= | Numeric, Numeric | Greater Than / Equal To | >= |
+| <= | Numeric, Numeric | Greater Than / Equal To | <= |
+| == | Object, Object | Equal To | == |
+| != | Object, Object | Not Equal To | != |
+| === | Object, Object | Strict Equal To | === |
+| !== | Object, Object | Strict Unequal To | !== |
