@@ -16,13 +16,13 @@ This table documents all the names of the action tree nodes, their functions and
 | ChangeSine | Numeric Object | Change the sine of a numeric object | - |
 | Reference | Object | Create a pointer to an object | & |
 | Unwrap | Collection | Unwraps a collection into a tuple | ~ |
-| + | **Object | Add / Concat | + |
-| - | **Object | Subtract | - |
-| * | **Object | Multiply / Multiconcat | * |
-| / | **Object | Divide | / |
-| % | **Object | Modulus | % |
-| ^ | **Object | Exponent | ^ |
-| rshift | Object, Integer | Right Shift | >> |
-| alshift | Object, Integer | Arithmetic Left Shift | << |
-| llshift | Object, Integer | Logical Left Shift | <<< |
-
+| + | ~Object | Add / Concat | + |
+| - | ~Object | Subtract | - |
+| * | ~Object | Multiply / Multiconcat | * |
+| / | ~Object | Divide | / |
+| % | ~Object | Modulus | % |
+| ^ | ~Object | Exponent | ^ |
+| Rshift | Object, Integer | Right Shift | >> |
+| Alshift | Object, Integer | Arithmetic Left Shift | << |
+| Llshift | Object, Integer | Logical Left Shift | <<< |
+| Not | Object | Not Operator (invert) | ! |  
