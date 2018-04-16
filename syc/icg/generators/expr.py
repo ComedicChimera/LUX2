@@ -18,6 +18,35 @@ import syc.icg.types as types
 import syc.icg.modules as modules
 
 
+def generate_shift(shift):
+    if len(shift.content) > 1:
+        unpacked_tree = shift.content
+        while unpacked_tree[-1].name == 'n_shift':
+            unpacked_tree += unpacked_tree.pop().content
+        root = generate_arithmetic(unpacked_tree.pop(0))
+        if not isinstance(root.data_type, types.DataType):
+            errormodule.throw('semantic_error', 'Invalid type for left operand of binary shift', shift)
+        op = ''
+        for item in unpacked_tree:
+            if isinstance(item, ASTNode):
+                tree = generate_arithmetic(item)
+                if isinstance(tree.data_type, types.DataType):
+                    if tree.data_type.data_type == types.DataTypes.INT and tree.data_type.pointers == 0:
+                        root = ActionNode(op, root.data_type, root, tree)
+                        continue
+                errormodule.throw('semantic_error', 'Invalid type for right operand of binary shift', shift)
+            else:
+                if item.name == '<<':
+                    op = 'alshift'
+                elif item.name == '>>':
+                    op = 'rshift'
+                else:
+                    op = 'llshift'
+        return root
+    else:
+        return generate_arithmetic(shift.content[0])
+
+
 def generate_arithmetic(ari):
     unpacked_tree = ari.content
     while unpacked_tree[-1].name in {'add_sub_op', 'mul_div_mod_op', 'exp_op'}:

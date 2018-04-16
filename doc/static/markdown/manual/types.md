@@ -15,7 +15,7 @@ The only value to break from this trend are integers as you'll see later on.
 ## Printing to the Console <a name="console">
 
 Sometimes it is necessary to view to value of item or result of a function call.
-To do this, you can **print** its value to the console.  This is done with the
+To do this, you can **print** its values to the console.  This is done with the
 `println` function.
 
 The example syntax for displaying a value to the console would be:

@@ -7,7 +7,7 @@ This table documents all the names of the action tree nodes, their functions and
 | LambdaIf | Conditional Expression | If part of lambda | if boolean |
 | LambdaExpr | Iterator, Expression, \[Lambda If\] | Generate a lambda expression | *No direct example, expr of lambda* |
 | Await | Incomplete Type (result of function call) | Await an async function | await |
-| Malloc | Size | Dynamically allocate a block of memory | new *data_type/size*|
+| Malloc | Integer/Data Type | Dynamically allocate a block of memory | new *size/data_type*|
 | CreateObjectInstance | Object | Create an instance of an object | new Constructor() |
 | Call | Function, Parameters | Call a function | () |
 | Constructor | Constructor, Parameters | Call a constructor | *constructor*() |
@@ -22,4 +22,7 @@ This table documents all the names of the action tree nodes, their functions and
 | / | **Object | Divide | / |
 | % | **Object | Modulus | % |
 | ^ | **Object | Exponent | ^ |
+| rshift | Object, Integer | Right Shift | >> |
+| alshift | Object, Integer | Arithmetic Left Shift | << |
+| llshift | Object, Integer | Logical Left Shift | <<< |
 
