@@ -18,6 +18,24 @@ import syc.icg.types as types
 import syc.icg.modules as modules
 
 
+def generate_comparison(comparison):
+    if len(comparison.content) > 1:
+        if comparison.name == 'not':
+            tree = generate_shift(comparison.content[1])
+            if isinstance(tree.data_type, types.DataType):
+                return ActionNode('Not', tree.data_type, tree)
+            elif isinstance(tree.data_type, types.CustomType):
+                not_method = modules.get_method(tree.symbol, '__not__')
+                if not_method:
+                    return ActionNode('Call', not_method.data_type.return_type, not_method, tree)
+                else:
+                    errormodule.throw('semantic_error', 'Object has no method \'__not__\'', comparison)
+            else:
+                errormodule.throw('semantic_error', 'The \'!\' operator is not applicable to object', comparison)
+    else:
+        return generate_shift(comparison.content[0]) if comparison.content[0].name == 'shift' else generate_comparison(comparison.content[0])
+
+
 def generate_shift(shift):
     if len(shift.content) > 1:
         unpacked_tree = shift.content
@@ -139,7 +157,7 @@ def generate_unary_atom(u_atom):
                     # handle modules
                     if isinstance(atom.data_type, types.CustomType):
                         invert_method = modules.get_method(atom.data_type.symbol, '__invert__')
-                        return ActionNode('Call', invert_method.data_type.rt_type, invert_method)
+                        return ActionNode('Call', invert_method.data_type.return_type, invert_method)
                     # change the sine of an element
                     else:
                         return ActionNode('ChangeSine', atom.data_type, atom)
