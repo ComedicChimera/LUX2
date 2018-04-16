@@ -16,7 +16,7 @@ SyClone can be installed either from building the source or by downloading an in
 
 ### Building from Source
 
-If your operating system is lacks and installer, you can build SyClone's source locally.
+If your operating system is lacks an installer, you can build SyClone's source locally.
 
  1. Download a version of **Python 3.6**
  2. Open up your Anaconda Prompt and type in `pip install <insert build tool here>`
@@ -39,13 +39,13 @@ syc build script.sy
 
 *Replace script.sy with the name and/or path to your script.*
 
-For information on using the command line, go here.
+For information on using the command line, go [here](cmd).
 
 ## Asking Questions <a name="questions">
 
-If you are struggling with something and can't seem to find a solution to a
+If you are struggling with something or can't seem to find a solution to a
 problem, **ask questions!**.  There are plenty of people out there that can help you.
-Don't feel bad about being confused; it happens to the best of us, and failure is key
+Don't feel bad about being confused; it happens to the best of us, and failure is a key
 part of learning.  Just remember, to try to learn **why** your solution didn't work, not just
 what the solution is.
 
