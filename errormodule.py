@@ -1,4 +1,6 @@
 import re
+from util import unparse
+from syc.parser.ASTtools import ASTNode
 
 code = ""
 
@@ -18,13 +20,26 @@ def get_position(ndx):
         line += 1
     else:
         ndx -= new_lines[-1].start() + 1
-    return [line, ndx]
+    return line, ndx
 
 
-def getln(pos, len_carrots):
-    return code.split("\n")[pos[0]] + "\n" + " " * pos[1] + ("^" * len_carrots)
+def getln(line, ndx, len_carrots):
+    return code.split("\n")[line] + "\n" + " " * ndx + ("^" * len_carrots)
 
 
-def throw(type, error, params):
-    print(type, error, params[0].value)
-    exit(0)
+def throw(error_type, error, params):
+    if error_type == 'semantic_error':
+        _print_semantic_error(error, params)
+    exit(1)
+
+
+def _print_semantic_error(message, params):
+    if isinstance(params, ASTNode):
+        raw_tokens = unparse(params)
+    else:
+        raw_tokens = [params]
+    len_carrots = raw_tokens[-1].ndx - raw_tokens[0].ndx if len(raw_tokens) > 1 else len(raw_tokens[0].value)
+    line, ndx = get_position(raw_tokens[0].ndx)
+    message += ' [line:%d position:%d]' % (line, ndx)
+    message += '\n\n%s' % getln(line, ndx, len_carrots)
+    print(message)

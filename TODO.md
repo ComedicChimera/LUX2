@@ -8,3 +8,7 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add GetMember trailer checking *(syc/icg/generators/atom.py)*
  
+ - Implement Tuples for Collections *(syc/icg/\*)*
+ 
+ - Remove to_str methods once testing is complete *(everywhere)*
+ 

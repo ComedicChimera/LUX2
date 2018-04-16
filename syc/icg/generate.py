@@ -10,7 +10,7 @@ def generate_tree(ast):
         if isinstance(item, ASTNode):
             # test code for expr compiler
             if item.name == 'expr':
-                generate_expr(item)
+                print(generate_expr(item))
             else:
                 generate_tree(item)
         elif isinstance(item, util.Package):

@@ -37,7 +37,8 @@
     "select_stmt",
     "with_block",
     "except_block",
-    "for_block"
+    "for_block",
+    "match_stmt"
   ],
   "module_block": [
     "MODULE module_modifiers IDENTIFIER inherit { module_main }"
@@ -63,7 +64,8 @@
     "CONSTRUCTOR modifiers ( func_params_decl ) functional_block"
   ],
   "member_declaration": [
-    "modifiers variable_declaration"
+    "modifiers variable_declaration",
+    "VOLATILE modifiers variable_declaration"
   ],
   "async_block": [
     "ASYNC modifiers IDENTIFIER ( func_params_decl ) rt_type functional_block"
@@ -103,11 +105,10 @@
     ";"
   ],
   "modifiers": [
-    "VOLATILE modifiers",
     "EXTERN modifiers",
     "access_modifiers modifiers",
     "FINAL modifiers",
-    "STATIC modifiers",
+    "PROPERTY modifiers",
     "&"
   ],
   "access_modifiers": [
@@ -186,8 +187,6 @@
     "SELECT ( expr ) { select_block }"
   ],
   "select_block": [
-    "block_stmt select_block",
-    "stmt ; select_block",
     "case select_block",
     "default select_block",
     "&"
@@ -200,7 +199,7 @@
     "{ main }"
   ],
   "default": [
-    "DEFAULT block"
+    "DEFAULT case_block"
   ],
   "with_block": [
     "WITH ( stmt ) block"
@@ -212,6 +211,13 @@
     "{ main }",
     ";"
   ],
+  "match_stmt": [
+    "MATCH { match_block }"
+  ],
+  "match_block": [
+    "? expr case_block match_block",
+    "&"
+  ],
   "stmt": [
     "variable_declaration",
     "throw_stmt",
@@ -222,7 +228,15 @@
     "include_stmt",
     "generator_stmt",
     "external_stmt",
+    "volatile_stmt",
+    "value_stmt",
     "&"
+  ],
+  "value_stmt": [
+    "VALUE ( expr ) trailer initializer"
+  ],
+  "volatile_stmt": [
+    "VOLATILE variable_declaration"
   ],
   "external_stmt": [
     "EXTERN external_variants"

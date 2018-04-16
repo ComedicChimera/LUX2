@@ -31,3 +31,10 @@ func extern map($list1: list[object], $list2: list[object]) dict[object, object]
     }
     return newDict;
 }
+
+func extern even($x: int) bool => return x % 2 == 0;
+
+func extern odd($x: int) bool => return x % 2 != 0;
+
+func extern whole($x: float) bool => return x % 1 == 0;
+

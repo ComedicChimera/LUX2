@@ -397,7 +397,7 @@ def generate_list(lst):
                     ndt = types.dominant(dt, elem.data_type)
                     # if it is None
                     if not ndt:
-                        errormodule.throw('semantic_error', 'All elements of a list must be of the same type', lst)
+                        errormodule.throw('semantic_error', 'All elements of a list/array must be of the same type', lst)
                     dt = ndt
         else:
             # get root element type (assumed from first element)
@@ -500,8 +500,10 @@ def generate_lambda_atom(lb_atom):
     else:
         errormodule.throw('semantic_error', 'Lambda value must be enumerable', lb_atom)
         return
+    sym = Symbol(iter_name, iterator_type, [])
+    util.symbol_table.add_variable(sym, lb_atom)
     # arguments: [compiled root atom, Iterator]
-    args = [base_atom, Symbol(iter_name, iterator_type, [])]
+    args = [base_atom, sym]
     # return generated iterator
     return ActionNode('Iterator', base_atom.data_type, *args)
 

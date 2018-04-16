@@ -50,6 +50,13 @@ class DataType:
         # all pointers to that type (*int would be DataType(DataTypes.INT, 1))
         self.pointers = pointers
 
+    # equality operator override
+    def __eq__(self, other):
+        if isinstance(other, DataType):
+            if other.data_type == self.data_type and other.pointers == self.pointers:
+                return True
+        return False
+
 
 # adapted data type class for arrays
 class ArrayType:
@@ -136,7 +143,7 @@ def coerce(base_type, unknown):
     if base_type.pointers != unknown.pointers:
         return False
     # if it is a complex or float or long, ints and bool can be coerced
-    elif base_type.data_type == DataTypes.COMPLEX | DataTypes.FLOAT | DataTypes.LONG and unknown.data_type == DataTypes.INT | DataTypes.BOOL:
+    elif base_type.data_type in {DataTypes.COMPLEX, DataTypes.FLOAT, DataTypes.LONG} and unknown.data_type in {DataTypes.INT, DataTypes.BOOL}:
         return True
     # chars can be coerced to strings
     elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
@@ -162,10 +169,10 @@ def dominant(base_type, unknown):
     elif unknown.data_type == DataTypes.STRING:
         return unknown
     # int overriding
-    elif unknown.data_type == DataTypes.FLOAT | DataTypes.COMPLEX | DataTypes.LONG and base_type.data_type == DataTypes.INT:
+    elif unknown.data_type in {DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG} and base_type.data_type == DataTypes.INT:
         return unknown
     # bool overriding
-    elif unknown.data_type == DataTypes.FLOAT | DataTypes.COMPLEX | DataTypes.LONG | DataTypes.INT and base_type.data_type == DataTypes.BOOL:
+    elif unknown.data_type in {DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG, DataTypes.INT} and base_type.data_type == DataTypes.BOOL:
         return unknown
     # byte gets overrun by everything
     elif base_type.data_type == DataTypes.BYTE:
@@ -211,7 +218,7 @@ def numeric(dt):
     elif isinstance(dt, CustomType):
         return dt.numeric
     # check if is a number
-    elif dt.data_type == DataTypes.INT | DataTypes.FLOAT | DataTypes.COMPLEX | DataTypes.LONG:
+    elif dt.data_type in {DataTypes.INT, DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG}:
         return True
     else:
         return False

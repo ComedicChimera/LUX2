@@ -16,4 +16,10 @@ This table documents all the names of the action tree nodes, their functions and
 | ChangeSine | Numeric Object | Change the sine of a numeric object | - |
 | Reference | Object | Create a pointer to an object | & |
 | Unwrap | Collection | Unwraps a collection into a tuple | ~ |
+| + | **Object | Add / Concat | + |
+| - | **Object | Subtract | - |
+| * | **Object | Multiply / Multiconcat | * |
+| / | **Object | Divide | / |
+| % | **Object | Modulus | % |
+| ^ | **Object | Exponent | ^ |
 

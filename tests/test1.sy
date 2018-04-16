@@ -1,4 +1,10 @@
 func Main() int {
-    println("Hello, world!");
-    $x = lambda(lst[x] => x * 3);
+    println("Hello, world!" * 3);
+    $x = len(lambda({1, 2, 3}[y] => y * 3));
+
+    match {
+        ? even(x): println("X is even");
+        ? x < 5: println("X is less than 5");
+        ? whole(x * 1.5): println("X * 1.5 is a whole number");
+    }
 }

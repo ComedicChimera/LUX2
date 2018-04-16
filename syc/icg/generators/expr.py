@@ -8,14 +8,77 @@ import syc.icg.tuples as tuples
 def generate_expr(expr):
     for item in expr.content:
         if isinstance(item, ASTNode):
-            if item.name == 'unary_atom':
-                print(generate_unary_atom(item))
+            if item.name == 'arithmetic':
+                return generate_arithmetic(item)
             else:
-                generate_expr(item)
+                return generate_expr(item)
 
 
 import syc.icg.types as types
 import syc.icg.modules as modules
+
+
+def generate_arithmetic(ari):
+    unpacked_tree = ari.content
+    while unpacked_tree[-1].name in {'add_sub_op', 'mul_div_mod_op', 'exp_op'}:
+        unpacked_tree += unpacked_tree.pop().content
+    root, op, tree = None, None, None
+    for item in unpacked_tree:
+        if isinstance(item, ASTNode):
+            if op:
+                val2 = generate_unary_atom(item) if item.name == 'unary_atom' else generate_arithmetic(item)
+                dt = check_operands(root, val2, op, ari)
+                if tree:
+                    if tree.name == op:
+                        tree.arguments.append(val2)
+                    else:
+                        tree = ActionNode(op, dt, tree, val2)
+                else:
+                    tree = ActionNode(op, dt, root, val2)
+                op, root, = None, None
+            else:
+                root = generate_unary_atom(item) if item.name == 'unary_atom' else generate_arithmetic(item)
+        else:
+            op = item.value
+    if not tree:
+        tree = root
+    return tree
+
+
+def check_operands(val1, val2, operator, ast):
+    if val1.data_type.pointers > 0:
+        if isinstance(val2.data_type, types.DataType):
+            if val2.data_type.data_type == types.DataTypes.INT and val2.pointers == 0:
+                return val1.data_type
+        errormodule.throw('semantic_error', 'Pointer arithmetic can only be performed between an integer and a pointer', ast)
+    if operator == '+':
+        if types.numeric(val1.data_type) and types.numeric(val2.data_type):
+            if types.dominant(val1.data_type, val2.data_type):
+                return val2.data_type
+            return val1.data_type
+        elif types.enumerable(val1.data_type) and types.enumerable(val2.data_type):
+            if val1.data_type == val2.data_type:
+                return val1.data_type
+            errormodule.throw('semantic_error', 'Unable to apply operator to dissimilar enumerable types', ast)
+        errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
+    elif operator == '*':
+        if types.numeric(val1.data_type) and types.numeric(val2.data_type):
+            if types.dominant(val1.data_type, val2.data_type):
+                return val2.data_type
+            return val1.data_type
+        if isinstance(val1.data_type, types.DataType) and isinstance(val2.data_type, types.DataType):
+            # we can assume val1's pointers
+            if val2.data_type.pointers == 0:
+                if val1.data_type.data_type == types.DataTypes.STRING and val2.data_type.data_type == types.DataTypes.INT:
+                    return val1.data_type
+        errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
+    elif operator in {'-', '%', '^'}:
+        if types.numeric(val1.data_type) and types.numeric(val2.data_type):
+            if types.dominant(val1.data_type, val2.data_type):
+                return val2.data_type
+            return val1.data_type
+        errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
+    return val1.data_type
 
 
 def generate_unary_atom(u_atom):
@@ -69,6 +132,7 @@ def generate_unary_atom(u_atom):
                     if not tpl:
                         errormodule.throw('semantic_error', 'Tuple cannot be created from a non enumerable object',
                                           u_atom)
+                    tpl = ActionNode('Unwrap', tpl, root)
                 else:
                     empty_tuple = tuples.Tuple()
                     empty_tuple.count = -1  # set to designate it is runtime determined
@@ -78,8 +142,6 @@ def generate_unary_atom(u_atom):
                                 errormodule.throw('semantic_error', 'Unable to unwrap non-collection', u_atom)
                     tpl = ActionNode('Unwrap', empty_tuple, root)
                 return tpl
-
-
     else:
         return generate_atom(u_atom.content[0])
 

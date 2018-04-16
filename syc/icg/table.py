@@ -50,15 +50,27 @@ class SymbolTable:
         # current position in the working scope
         self.pos = 0
 
+    # adds the new scope to the table
+    def update_scope(self, tb, scope_pos=0):
+        if scope_pos < len(self.scope_path):
+            tb[self.scope_path[scope_pos]] = self.update_scope(tb[self.scope_path[scope_pos]], scope_pos + 1)
+            return tb
+        else:
+            return self.scope
+
     def add_scope(self):
         # add on new sub scope
         self.scope.append([])
+
+        # update table
+        self.table = self.update_scope(self.table)
+
         # enter the new scope
         self.scope = self.scope[self.pos]
         # update the position
         self.pos += 1
         # add previous position to scope path
-        self.scope_path.append(self.pos)
+        self.scope_path.append(self.pos - 1)
         # reset position
         self.pos = 0
 
@@ -87,11 +99,12 @@ class SymbolTable:
             # return the current scope
             # updates the scope path
             else:
-                self.scope_path.pop()
                 return self.scope
 
         # call with global table
-        update_table(self.table)
+        self.table = update_table(self.table)
+        # remove layer from scope path
+        self.scope_path.pop()
 
     # add variable to symbol table
     def add_variable(self, sym, ast):
@@ -100,6 +113,8 @@ class SymbolTable:
             # throw error
             errormodule.throw('semantic_error', 'Variable \'%s\' redeclared.' % sym.name, ast)
         self.scope.append(sym)
+        # update table
+        self.table = self.update_scope(self.table)
 
     # add package to symbol table
     # NOTE packages content is expected to be IR Object

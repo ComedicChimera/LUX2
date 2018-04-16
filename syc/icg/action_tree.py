@@ -12,6 +12,9 @@ class ActionNode:
         # return type of sub function
         self.data_type = rt_type
 
+    def __str__(self):
+        return '(%s, %s){%s}' % (self.name, self.data_type, ', '.join(map(lambda x: str(x), self.arguments)))
+
 
 # class representing literal value
 class Literal:
@@ -20,6 +23,9 @@ class Literal:
     def __init__(self, data_type, val):
         self.data_type = data_type
         self.value = val
+
+    def __str__(self):
+        return 'Literal{%s, %s}' % (self.data_type, self.value)
 
 
 # class representing in-expr identifier
