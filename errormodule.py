@@ -30,6 +30,8 @@ def getln(line, ndx, len_carrots):
 def throw(error_type, error, params):
     if error_type == 'semantic_error':
         _print_semantic_error(error, params)
+    elif error_type == 'syntax_error':
+        _print_syntax_error(error, params)
     exit(1)
 
 
@@ -42,4 +44,14 @@ def _print_semantic_error(message, params):
     line, ndx = get_position(raw_tokens[0].ndx)
     message += ' [line:%d position:%d]' % (line, ndx)
     message += '\n\n%s' % getln(line, ndx, len_carrots)
+    print(message)
+
+
+def _print_syntax_error(message, params):
+    len_carrots = len(params[0].value)
+    line, ndx = get_position(params[0].ndx)
+    message += ' [line:%d position:%d]' % (line, ndx)
+    message += '\n\n%s' % getln(line, ndx, len_carrots)
+    if len(params[1]) > 1:
+        message += '\n\nExpected ' + ', '.join(params[1])
     print(message)

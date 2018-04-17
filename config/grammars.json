@@ -38,7 +38,8 @@
     "with_block",
     "except_block",
     "for_block",
-    "match_stmt"
+    "match_stmt",
+    "unsafe_block"
   ],
   "module_block": [
     "MODULE module_modifiers IDENTIFIER inherit { module_main }"
@@ -218,6 +219,9 @@
     "? expr case_block match_block",
     "&"
   ],
+  "unsafe_block": [
+    "UNSAFE block"
+  ],
   "stmt": [
     "variable_declaration",
     "throw_stmt",
@@ -256,11 +260,7 @@
     "CONTINUE"
   ],
   "return_stmt": [
-    "RETURN r_expr"
-  ],
-  "r_expr": [
-    "expr",
-    "&"
+    "RETURN optional_expr"
   ],
   "generator_stmt": [
     "YIELD expr"
@@ -432,9 +432,21 @@
     "&"
   ],
   "trailer": [
-    "[ expr ] trailer",
+    "[ subscript ] trailer",
     "( func_params ) trailer",
     ". base trailer",
+    "&"
+  ],
+  "subscript": [
+    ": expr",
+    "expr slice"
+  ],
+  "slice": [
+    ": optional_expr",
+    "&"
+  ],
+  "optional_expr": [
+    "expr",
     "&"
   ],
   "func_params": [
