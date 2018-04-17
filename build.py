@@ -9,6 +9,8 @@ import syc.parser.lexer as lexer
 import util
 from lib.package_manager import get
 
+import re
+
 
 # dictionary to hold used imports
 imports = {
@@ -87,15 +89,17 @@ def load_package(include_stmt, extern=False):
     alias = None
     for item in include_stmt.content:
         if isinstance(item, ASTNode):
-            # add suffix to main name
+            # update name to be end of suffix
             if item.name == 'dot_id':
-                name += ''.join(util.unparse(item))
+                name = util.unparse(item)[-1].value
             # if this sub tree exists, that means the inclusion is used
             elif item.name == 'use':
                 used = True
             # if there is a rename, that means an alias was used
             elif item.name == 'rename':
                 alias = item.content[0].value[1:-1]
+                if not re.match(r'[^\d\W]\w*', alias):
+                    errormodule.throw('package_error', 'Invalid package name', include_stmt)
         else:
             # get base name
             if item.type == 'IDENTIFIER':
