@@ -34,3 +34,10 @@ This table documents all the names of the action tree nodes, their functions and
 | != | Object, Object | Not Equal To | != |
 | === | Object, Object | Strict Equal To | === |
 | !== | Object, Object | Strict Unequal To | !== |
+| Or | Boolean, Boolean | Perform Boolean Or Operation | \|\| |
+| And | Boolean, Boolean | Perform Boolean And Operation | && |
+| Xor | Boolean, Boolean | Perform Boolean Xor Operation | ^^ |
+| BitwiseOr | Simple, Simple | Perform Bitwise Or Operation | \|\| |
+| BitwiseAnd | Simple, Simple | Perform Bitwise And Operation | && |
+| BitwiseXor | Simple, Simple | Perform Bitwise Xor Operation | ^^ |
+

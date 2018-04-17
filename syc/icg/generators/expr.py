@@ -16,16 +16,52 @@ def generate_expr(expr):
 
 import syc.icg.types as types
 import syc.icg.modules as modules
+import syc.icg.generators.functions as functions
+
+
+def generate_logical(logical):
+    if len(logical.content) > 1:
+        unpacked_tree = logical.content
+        for item in unpacked_tree:
+            if isinstance(item, ASTNode):
+                if item.name in {'n_or', 'n_xor', 'n_and'}:
+                    unpacked_tree += unpacked_tree.pop().content
+        root, op = generate_logical(unpacked_tree.pop(0)), None
+        for item in unpacked_tree:
+            if isinstance(item, ASTNode):
+                tree = generate_comparison(item) if item.name == 'comparison' else generate_logical(item)
+                if isinstance(tree.data_type, types.DataType) and isinstance(root.data_type, types.DataType):
+                    if tree.data_type.data_type == types.DataTypes.BOOL and tree.data_type.pointers == 0 and \
+                                    root.data_type.data_type == types.DataTypes.BOOL and root.data_type.pointers == 0:
+                        root = ActionNode(op, types.DataType(types.DataTypes.BOOL, 0), root, tree)
+                        continue
+                    else:
+                        root = ActionNode('Bitwise' + op, root.data_type, root, tree)
+                elif isinstance(root.data_type, types.CustomType):
+                    method = modules.get_method(tree.data_type.symbol, '__%s__' % op.lower())
+                    functions.check_parameters(method, tree)
+                    if method:
+                        root = ActionNode('Call', method.data_type.return_type, method, tree)
+                    else:
+                        errormodule.throw('semantic_error', 'Object has no method \'__%s__\'' % op.lower(), logical)
+                else:
+                    errormodule.throw('semantic_error', 'Unable to apply bitwise operator to collection', logical)
+            else:
+                name = item.type.lower()
+                op = name[0].upper() + name[1:]
+    else:
+        return generate_comparison(logical) if logical.name == 'comparison' else generate_logical(logical.content[0])
 
 
 def generate_comparison(comparison):
     if len(comparison.content) > 1:
         if comparison.name == 'not':
-            tree = generate_shift(comparison.content[1])
+            tree = generate_shift(comparison)
             if isinstance(tree.data_type, types.DataType):
                 return ActionNode('Not', tree.data_type, tree)
             elif isinstance(tree.data_type, types.CustomType):
                 not_method = modules.get_method(tree.symbol, '__not__')
+                functions.check_parameters(not_method, tree)
                 if not_method:
                     return ActionNode('Call', not_method.data_type.return_type, not_method, tree)
                 else:
@@ -50,10 +86,8 @@ def generate_comparison(comparison):
                 elif item.name == 'comparison_op':
                     op = item.content[0].value
             return root
-
-
     else:
-        return generate_shift(comparison.content[0]) if comparison.content[0].name == 'shift' else generate_comparison(comparison.content[0])
+        return generate_shift(comparison) if comparison.name == 'shift' else generate_comparison(comparison.content[0])
 
 
 def generate_shift(shift):
