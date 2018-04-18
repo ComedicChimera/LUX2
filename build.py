@@ -107,21 +107,17 @@ def load_package(include_stmt, extern=False):
     # package cannot be used and external
     if used and extern:
         errormodule.throw('package_error', 'Package cannot be both external and anonymous.', include_stmt)
+    # if get fails due to file path not being found
+    try:
+        code, path = get(name)
+    except FileNotFoundError:
+        errormodule.throw('package_error', 'Unable to locate package by name \'%s\'.' % name, include_stmt)
+        return
     # prevent redundant imports
     if name in imports:
-        code, path = imports[name]
-    # if import not redundant, fetch new import
-    else:
-        # if get fails due to file path not being found
-        try:
-            code, path = get(name)
-        except FileNotFoundError:
-            errormodule.throw('package_error', 'Unable to locate package by name \'%s\'.' % name, include_stmt)
-            return
-        # add to dictionary so it is not imported multiple times
-        imports[name] = code, path
+        ast = imports[name]
     # if working directory needs to be updated
-    if path:
+    elif path:
         # store cwd
         cwd = os.getcwd()
         # chdir to the parent directory of the file to allow for local importing
@@ -136,5 +132,7 @@ def load_package(include_stmt, extern=False):
     # set alias if there was none provided
     if not alias:
         alias = name
+    if name not in imports:
+        imports[name] = ast
     return util.Package(alias, extern, used, ast)
 
