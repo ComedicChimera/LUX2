@@ -317,7 +317,7 @@
   ],
   "n_expr": [
     "?? or n_expr",
-    "ternary_operator n_expr",
+    "ternary_operator",
     "&"
   ],
   "ternary_operator": [

@@ -6,12 +6,27 @@ import syc.icg.tuples as tuples
 
 
 def generate_expr(expr):
+    root = None
     for item in expr.content:
         if isinstance(item, ASTNode):
-            if item.name == 'arithmetic':
-                return generate_arithmetic(item)
-            else:
-                return generate_expr(item)
+            if item.name == 'or':
+                root = generate_logical(item)
+            elif item.name == 'n_expr':
+                if item.content[0].type == '?':
+                    pass
+                else:
+                    n_expr = item
+                    while n_expr.name == 'n_expr':
+                        logical = generate_logical(n_expr.content[1])
+                        if logical.data_type == root.data_type:
+                            root = ActionNode('NullCoalesce', root.data_type, root, logical)
+                        else:
+                            dom_type = types.dominant(root.data_type, logical.data_type)
+                            if dom_type:
+                                root = ActionNode('NullCoalesce', dom_type, root, logical)
+                            else:
+                                errormodule.throw('semantic_error', 'Types of null coalescing must be similar', expr)
+    return root
 
 
 import syc.icg.types as types
