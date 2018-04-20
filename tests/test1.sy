@@ -1,6 +1,6 @@
 func Main() int {
     println("Hello, world!" * 3);
-    $x = len(lambda({1, 2, 3}[y] => y * 3));
+    $x = len(for({1, 2, 3}[y] => y * 3));
 
     match {
         ? even(x): println("X is even");

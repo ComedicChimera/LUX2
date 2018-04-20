@@ -415,10 +415,10 @@
   "atom": [
     "new await base trailer",
     "( expr ) trailer",
-    "lambda trailer"
+    "inline_for trailer"
   ],
-  "lambda": [
-    "LAMBDA ( lambda_expr )"
+  "inline_for": [
+    "FOR ( lambda_expr )"
   ],
   "lambda_expr": [
     "atom => expr lambda_if"

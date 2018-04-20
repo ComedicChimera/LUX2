@@ -25,7 +25,7 @@ def generate_atom(atom):
     else:
         # all other elements are ASTNodes
         # if the first element is lambda (as in 'lambda trailer')
-        if atom.content[0].name == 'lambda':
+        if atom.content[0].name == 'inline_for':
             lb = generate_lambda(atom.content[0])
             # if there is extra content, assume trailer and add to lambda root
             if len(atom.content) > 1:
@@ -415,7 +415,7 @@ def generate_lambda(lb):
     util.symbol_table.add_scope()
     # arguments for action node
     l_args = []
-    # narrow down from LAMBDA ( lambda_expr ) to lambda_expr
+    # narrow down from FOR ( lambda_expr ) to lambda_expr
     lb = lb.content[2]
     # data type of return value from lambda (data_type == typeof lambda_atom)
     l_type = None
