@@ -549,7 +549,13 @@
     "LIST_TYPE list_modifier",
     "DICT_TYPE dict_modifier",
     "ARRAY_TYPE array_modifier",
+    "FUNC func_modifier",
+    "ASYNC func_modifier",
     "id"
+  ],
+  "func_modifier": [
+    "( func_params_decl ) ( rt_type )",
+    "&"
   ],
   "list_modifier": [
     "[ e_types ]"
@@ -584,6 +590,7 @@
     "BYTE_TYPE",
     "COMPLEX_TYPE",
     "LONG_TYPE",
-    "OBJECT_TYPE"
+    "OBJECT_TYPE",
+    "PACKAGE_TYPE"
   ]
 }

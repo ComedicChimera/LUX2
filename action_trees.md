@@ -40,4 +40,6 @@ This table documents all the names of the action tree nodes, their functions and
 | BitwiseOr | Simple, Simple | Perform Bitwise Or Operation | \|\| |
 | BitwiseAnd | Simple, Simple | Perform Bitwise And Operation | && |
 | BitwiseXor | Simple, Simple | Perform Bitwise Xor Operation | ^^ |
+| NullCoalesce | Object, Object | Perform a null coalescence on an object | ?? |
+| InlineCompare | Object, Object, Object | Perform an inline comparison between 2 objects | ? : |
 

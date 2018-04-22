@@ -159,6 +159,8 @@ def coerce(base_type, unknown):
 
 # check to see if type will be able to change the data type of a collection or expression
 def dominant(base_type, unknown):
+    if base_type == unknown:
+        return base_type
     # if either is a not a raw data type, it does not work
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return
@@ -263,7 +265,8 @@ def generate_type(ext):
                 'COMPLEX_TYPE': DataTypes.COMPLEX,
                 'STRING_TYPE': DataTypes.STRING,
                 'CHAR_TYPE': DataTypes.CHAR,
-                'OBJECT_TYPE': DataTypes.OBJECT
+                'OBJECT_TYPE': DataTypes.OBJECT,
+                'PACKAGE_TYPE': DataTypes.PACKAGE
                             }[ext.content[0].content[0].type], pointers)
         else:
             # TODO add member checking

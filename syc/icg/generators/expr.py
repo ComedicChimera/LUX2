@@ -13,7 +13,17 @@ def generate_expr(expr):
                 root = generate_logical(item)
             elif item.name == 'n_expr':
                 if item.content[0].type == '?':
-                    pass
+                    val1 = generate_logical(item.content[1])
+                    val2 = generate_logical(item.content[3])
+                    dt = root.data_type
+                    if not (root.data_type == val1.data_type == val2.data_type):
+                        dt = types.dominant(root.data_type, val1.data_type)
+                        if not dt:
+                            errormodule.throw('semantic_error', 'Types of inline comparison must be similar', expr)
+                        dt = types.dominant(dt, val2.data_type)
+                        if not dt:
+                            errormodule.throw('semantic_error', 'Types of inline comparison must be similar', expr)
+                    return ActionNode('InlineCompare', dt, root, val1, val2)
                 else:
                     n_expr = item
                     while n_expr.name == 'n_expr':
