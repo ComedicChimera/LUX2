@@ -246,6 +246,7 @@ def generate_base(ast):
             # return generated literal
             return generate_array_dict(base)
         # handle inline functions
+        # TODO revise inline function parsing
         elif base.name == 'inline_function':
             # decide if it is asynchronous or not
             is_async = False

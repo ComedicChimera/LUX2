@@ -466,7 +466,7 @@
     "number",
     "IDENTIFIER",
     "THIS",
-    "inline_function",
+    "function_components",
     "list",
     "array_dict",
     "NULL",
@@ -486,8 +486,12 @@
     "ARRAY_TYPE array_modifier"
   ],
   "inline_function": [
-    "FUNC ( func_params_decl ) functional_block",
-    "ASYNC ( func_params_decl ) functional_block"
+    "FUNC ( func_params_decl ) ending",
+    "ASYNC ( func_params_decl ) ending"
+  ],
+  "ending": [
+    "( rt_type )",
+    "functional_block"
   ],
   "await": [
     "AWAIT",
@@ -554,8 +558,7 @@
     "id"
   ],
   "func_modifier": [
-    "( func_params_decl ) ( rt_type )",
-    "&"
+    "( func_params_decl ) ( rt_type )"
   ],
   "list_modifier": [
     "[ e_types ]"
