@@ -245,8 +245,7 @@ def generate_base(ast):
         elif base.name == 'array_dict':
             # return generated literal
             return generate_array_dict(base)
-        # handle inline functions
-        # TODO revise inline function parsing
+        # handle inline functions / function data types
         elif base.name == 'inline_function':
             # decide if it is asynchronous or not
             is_async = False
@@ -254,22 +253,27 @@ def generate_base(ast):
                 is_async = True
             # generate the parameters (decl_params is 3rd item inward)
             parameters = functions.generate_parameter_list(base.content[2])
-            if base.content[-1].content[0].type != ';':
-                # if it is not an empty function
-                # generate a return type from center (either { main } or => stmt ;)
-                # gen = is generator
-                rt_type, gen = functions.get_return_type(base.content[-1].content[1])
+            if isinstance(base.content[-1].content[0], ASTNode):
+                if base.content[-1].content[0].content[0].type != ';':
+                    # if it is not an empty function
+                    # generate a return type from center (either { main } or => stmt ;)
+                    # gen = is generator
+                    rt_type, gen = functions.get_return_type(base.content[-1].content[0].content[1])
+                else:
+                    errormodule.throw('semantic_error', 'Inline functions must declare a body', base.content[-1])
+                    # so pycharm won't complain
+                    rt_type, gen = None, False
+                dt = types.Function(rt_type, 0, is_async, gen)
+                # in function literals, its value is its parameters
+                # TODO add body parsing to inline functions
+                fbody = base.content[-1].content[0].content[1]
+                return Literal(dt, (parameters, fbody))
             else:
-                errormodule.throw('semantic_error', 'Inline functions must declare a body', base.content[-1])
-                # so compiler won't complain
-                rt_type, gen = None, False
-            dt = types.Function(rt_type, 0, is_async, gen)
-            # in function literals, its value is its parameters
-            fbody = base.content[-1].content[1]
-            return Literal(dt, (parameters, fbody))
+                return_type = functions.get_return_from_type(base.content[-1].content[1])
+                return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), types.Function(return_type, 0, is_async, False))
         elif base.name == 'atom_types':
             # use types to generate a type result
-            return Literal(types.DataTypes.DATA_TYPE, types.generate_type(base))
+            return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), types.generate_type(base))
 
 
 ###############

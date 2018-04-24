@@ -466,7 +466,7 @@
     "number",
     "IDENTIFIER",
     "THIS",
-    "function_components",
+    "inline_function",
     "list",
     "array_dict",
     "NULL",
