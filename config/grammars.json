@@ -38,8 +38,7 @@
     "with_block",
     "except_block",
     "for_block",
-    "match_stmt",
-    "unsafe_block"
+    "match_stmt"
   ],
   "module_block": [
     "MODULE module_modifiers IDENTIFIER inherit { module_main }"
@@ -218,9 +217,6 @@
   "match_block": [
     "? expr case_block match_block",
     "&"
-  ],
-  "unsafe_block": [
-    "UNSAFE block"
   ],
   "stmt": [
     "variable_declaration",
