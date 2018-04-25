@@ -80,6 +80,7 @@ def generate_atom(atom):
 # move import below to allow for recursive imports
 from syc.icg.generators.expr import generate_expr
 import syc.icg.generators.structs as structs
+import syc.icg.casting as casting
 
 
 def add_trailer(root, trailer):
@@ -103,6 +104,23 @@ def add_trailer(root, trailer):
                     # check struct generator
                     parameters = structs.check_constructor(root.data_type, trailer.content[1])
                     trailer_added = ActionNode('Constructor', root.data_type, root, parameters)
+                elif root.data_type.data_type == types.DataTypes.DATA_TYPE:
+                    parameters = trailer.content[1].content
+                    if len(parameters) > 1:
+                        if parameters[1].name == 'named_params':
+                            errormodule.throw('semantic_error', 'Type cast does not accept named parameters',
+                                              trailer.content[1])
+                        else:
+                            errormodule.throw('semantic_error', 'Unable to perform type cast on multiple objects',
+                                              trailer.content[1])
+                    obj = generate_expr(parameters[0])
+                    if isinstance(root, Literal):
+                        tp = root.value
+                        casting.static_cast(tp, obj)
+                        return ActionNode('StaticCast', tp, obj)
+                    else:
+                        errormodule.warn('Dynamic cast performed in place of static cast', trailer)
+                        return ActionNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
                 else:
                     errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
             else:

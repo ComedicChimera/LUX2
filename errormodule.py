@@ -35,6 +35,15 @@ def throw(error_type, error, params):
     exit(1)
 
 
+def warn(message, params):
+    if isinstance(params, ASTNode):
+        raw_tokens = unparse(params)
+    else:
+        raw_tokens = [params]
+    line, ndx = get_position(raw_tokens[0].ndx)
+    print('[WARNING] %s %s' % (message, '[line:%d position:%d]' % (line, ndx)))
+
+
 def _print_semantic_error(message, params):
     if isinstance(params, ASTNode):
         raw_tokens = unparse(params)

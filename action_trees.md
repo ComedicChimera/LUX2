@@ -10,7 +10,7 @@ This table documents all the names of the action tree nodes, their functions and
 | Malloc | Integer/Data Type | Dynamically allocate a block of memory | new *size/data_type*|
 | CreateObjectInstance | Object | Create an instance of an object | new Constructor() |
 | Call | Function, Parameters | Call a function | () |
-| Constructor | Constructor, Parameters | Call a constructor | *constructor*() |
+| Constructor | Constructor, Parameters | Call a constructor for a struct | *constructor*() |
 | Subscript | Index, Collection | Get a value from a collection | \[ndx\] |
 | Dereference | Object | Dereference an Object | * |
 | ChangeSine | Numeric Object | Change the sine of a numeric object | - |
@@ -42,4 +42,5 @@ This table documents all the names of the action tree nodes, their functions and
 | BitwiseXor | Simple, Simple | Perform Bitwise Xor Operation | ^^ |
 | NullCoalesce | Object, Object | Perform a null coalescence on an object | ?? |
 | InlineCompare | Object, Object, Object | Perform an inline comparison between 2 objects | ? : |
-
+| StaticCast | Object | Perform a static cast on an object to the return type of the Action Node | *typename*() |
+| DynamicCast | Type, Object | Perform a dynamic cast on an object (warning) | *type yielding expr*() |
