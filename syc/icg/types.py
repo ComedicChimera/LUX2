@@ -17,7 +17,7 @@ class DataTypes(Enum):
     STRUCT = 7
     GROUP = 8
     MODULE = 9
-    ENUM_TYPE = 10
+    ENUM = 10
     INTERFACE = 11
 
     # object type (parent type for all types)

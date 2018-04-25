@@ -27,7 +27,7 @@
     "module_block",
     "async_block",
     "func_block",
-    "type_block",
+    "enum_block",
     "interface_block",
     "struct_block"
   ],
@@ -117,14 +117,14 @@
     "ABSTRACT",
     "SEALED"
   ],
-  "type_block": [
-    "TYPE modifiers IDENTIFIER { type_main }"
+  "enum_block": [
+    "ENUM modifiers IDENTIFIER { enum_main }"
   ],
-  "type_main": [
-    "IDENTIFIER initializer n_type"
+  "enum_main": [
+    "IDENTIFIER initializer n_enum"
   ],
-  "n_type": [
-    ", IDENTIFIER initializer n_type",
+  "n_enum": [
+    ", IDENTIFIER initializer n_enum",
     "&"
   ],
   "interface_block": [
