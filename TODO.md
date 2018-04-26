@@ -16,3 +16,5 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Comment expr.py *(syc/icg/generators/expr.py)* 
  
+ - Ensure that hex literals aren't getting cut off too soon *(syc/icg/generators/atom.py)*
+ 
