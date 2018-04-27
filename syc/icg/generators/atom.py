@@ -383,7 +383,7 @@ def generate_byte_array(bytes_string):
     # get each hexadecimal element organized into pairs (and re-add prefix)
     bytes_array = ['0x' + x for x in map(''.join, zip(*[iter(bytes_string)] * 2))]
     # create array literal
-    return Literal(types.ArrayType(types.DataTypes.BYTE, 0), bytes_array)
+    return Literal(types.ArrayType(types.DataTypes.BYTE, Literal(types.DataType(types.DataTypes.INT, 0), '0')), bytes_array)
 
 
 # generate a list literal from list astnode
