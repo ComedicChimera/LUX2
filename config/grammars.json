@@ -410,8 +410,16 @@
   ],
   "atom": [
     "new await base trailer",
-    "( expr ) trailer",
+    "( expr ) distribute trailer",
     "inline_for trailer"
+  ],
+  "distribute": [
+    "| distribute_expr |",
+    "&"
+  ],
+  "distribute_expr": [
+    "inline_function",
+    "lambda"
   ],
   "inline_for": [
     "FOR ( lambda_expr )"
@@ -469,7 +477,18 @@
     "BOOL_LITERAL",
     "byte",
     "atom_types",
-    "VALUE"
+    "VALUE",
+    "lambda"
+  ],
+  "lambda": [
+    "LAMBDA ( lambda_params => expr )"
+  ],
+  "lambda_params": [
+    "IDENTIFIER : types n_lambda_param"
+  ],
+  "n_lambda_param": [
+    ", IDENTIFIER : types n_lambda_param",
+    "&"
   ],
   "byte": [
     "HEX_LITERAL",

@@ -4,8 +4,8 @@ This table documents all the names of the action tree nodes, their functions and
 | Name | Parameters | Function | SyClone Syntax |
 | ---- | -----------| -------- | -------------- |
 | Iterator | Base Atom, Iterator Variable | Generate a list / lambda iterator | collection\[x\] |
-| LambdaIf | Conditional Expression | If part of lambda | if boolean |
-| LambdaExpr | Iterator, Expression, \[Lambda If\] | Generate a lambda expression | *No direct example, expr of lambda* |
+| ForIf | Conditional Expression | If part of lambda | if boolean |
+| ForExpr | Iterator, Expression, \[Lambda If\] | Generate a lambda expression | *No direct example, expr of lambda* |
 | Await | Incomplete Type (result of function call) | Await an async function | await |
 | Malloc | Integer/Data Type | Dynamically allocate a block of memory | new *size/data_type*|
 | CreateObjectInstance | Object | Create an instance of an object | new Constructor() |

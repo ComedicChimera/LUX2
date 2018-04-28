@@ -1,0 +1,16 @@
+include algorithm;
+
+func Main() int {
+	$userInput = input("Enter an array:").split('\n');
+	array_cast(int, &userInput);
+	
+	println(sum(userInput));
+}
+
+func sum($collection: IEnumerable) {
+	return (~collection)|lambda(x: int, y: int => x + y)|
+}
+
+func max($collection: IEnumerable) {
+	return (~collection)|lambda(x: int, y: int => x > y ? x : y);
+}

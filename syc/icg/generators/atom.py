@@ -429,7 +429,7 @@ def generate_list(lst):
 
 
 #########################
-# LAMBDAS AND ITERATORS #
+# INLINE FOR AND ITERATORS #
 #########################
 
 # create a lambda tree from either a lambda expression or lambda statement
@@ -463,10 +463,10 @@ def generate_lambda(lb):
                     # throw error if not a boolean
                     errormodule.throw('semantic_error', 'Lambda if statement expression does not evaluate to a boolean', item)
                 # compile final result and add to args
-                l_args.append(ActionNode('LambdaIf', cond_expr.data_type, cond_expr))
+                l_args.append(ActionNode('ForIf', cond_expr.data_type, cond_expr))
     # exit lambda scope
     util.symbol_table.exit_scope()
-    return ActionNode('LambdaExpr', l_type, *l_args)
+    return ActionNode('ForExpr', l_type, *l_args)
 
 
 # convert lambda atom to an Iterator

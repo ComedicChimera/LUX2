@@ -16,3 +16,5 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Comment expr.py *(syc/icg/generators/expr.py)* 
  
+ - Add lambda and distribution changes *(syc/icg/generators/atom.py)*
+ 
