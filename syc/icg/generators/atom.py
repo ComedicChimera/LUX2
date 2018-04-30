@@ -149,8 +149,28 @@ def add_trailer(root, trailer):
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
     # if is subscript
     elif trailer.content[0].type == '[':
+        # if root.data_type.pointers > 0:
+            # errormodule.throw('semantic_error', 'Unable to subscript/slice a pointer', )
         # handle slicing
-        if isinstance(trailer.content[1].content[0], Token) or len(trailer.content[1].content) > 1:
+        if isinstance(trailer.content[1].content[0], Token):
+            expr = generate_expr(trailer.content[1].content[1])
+            if expr.data_type.pointers != 0:
+                errormodule.throw('semantic_error', 'Subscript cannot be a pointer', trailer)
+            if expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType)
+                                                                    or isinstance(root.data_type, types.ArrayType)):
+                return ActionNode('SliceBegin', root.data_type.element_type, root, expr)
+            elif isinstance(root.data_type, types.CustomType):
+                method = modules.get_method(root.data_type.symbol, '__slice__')
+                if method:
+                    functions.check_parameters(method, [None, expr])
+                    return ActionNode('Call', method.data_type.return_type, method, expr)
+                errormodule.throw('semantic_error', 'Object has no method \'__slice__\'', trailer)
+            elif root.data_type.data_type == types.DataTypes.STRING and expr.data_type.data_type == types.DataTypes.INT:
+                return ActionNode('SliceBegin', types.DataType(types.DataTypes.CHAR, 0), root, expr)
+            # TODO add error message for non-integer slice
+            errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
+        # handle slice till end
+        elif len(trailer.content[1].content) > 1:
             pass
         # handle traditional subscripting
         else:
