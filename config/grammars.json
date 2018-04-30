@@ -414,20 +414,16 @@
     "inline_for trailer"
   ],
   "distribute": [
-    "| distribute_expr |",
+    "| expr |",
     "&"
   ],
-  "distribute_expr": [
-    "inline_function",
-    "lambda"
-  ],
   "inline_for": [
-    "FOR ( lambda_expr )"
+    "FOR ( inline_for_expr )"
   ],
-  "lambda_expr": [
-    "atom => expr lambda_if"
+  "inline_for_expr": [
+    "atom => expr inline_for_if"
   ],
-  "lambda_if": [
+  "inline_for_if": [
     "IF expr",
     "&"
   ],
@@ -484,7 +480,8 @@
     "LAMBDA ( lambda_params => expr )"
   ],
   "lambda_params": [
-    "IDENTIFIER : types n_lambda_param"
+    "IDENTIFIER : types n_lambda_param",
+    "&"
   ],
   "n_lambda_param": [
     ", IDENTIFIER : types n_lambda_param",

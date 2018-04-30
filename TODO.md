@@ -15,6 +15,5 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Update Subscript checking to working with slices and add type checking to subscript *(syc/icg/generators/atom.py)*
  
  - Comment expr.py *(syc/icg/generators/expr.py)* 
- 
- - Add lambda and distribution changes *(syc/icg/generators/atom.py)*
+
  

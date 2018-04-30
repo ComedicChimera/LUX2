@@ -18,8 +18,19 @@ def generate_atom(atom):
     if isinstance(atom.content[0], Token):
         # generate root tree
         expr_tree = generate_expr(atom.content[1])
+
+        # apply distribution operator
+        if len(atom.content) > 3:
+            if atom.content[3].name == 'distribute':
+                distribute_expr = generate_expr(atom.content[3].content[1])
+                if not isinstance(distribute_expr.data_type, types.Function):
+                    if isinstance(distribute_expr.data_type, types.CustomType) and distribute_expr.data_type.callable:
+                        method = modules.get_method(distribute_expr.data_type.symbol, '__call__')
+                        expr_tree = ActionNode('Distribute', method.data_type.return_type, expr_tree, ActionNode('Call', method.data_type.return_type, method))
+                else:
+                    expr_tree = ActionNode('Distribute', distribute_expr.data_type.return_type, expr_tree, distribute_expr)
         # if it has a trailer, add to expr root tree
-        if isinstance(atom.content[-1], ASTNode):
+        if isinstance(atom.content[-1], ASTNode) and atom.content[-1].name == 'trailer':
             expr_tree = add_trailer(expr_tree, atom.content[-1])
         return expr_tree
     else:
@@ -138,26 +149,32 @@ def add_trailer(root, trailer):
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
     # if is subscript
     elif trailer.content[0].type == '[':
+        # handle slicing
+        if isinstance(trailer.content[1].content[0], Token) or len(trailer.content[1].content) > 1:
+            pass
         # handle traditional subscripting
-        # the only subscriptable components are mutable (except for strings)
-        if types.mutable(root.data_type):
-            # if not dict, use element type, not value type
-            dt = root.data_type.value_type if isinstance(root.data_type, types.DictType) else root.data_type.element_type
-            trailer_added = ActionNode('Subscript', dt, generate_expr(trailer.content[1]), root)
-        # if it is a module
-        elif root.data_type == types.DataType(types.DataTypes.MODULE, 0):
-            # if it has subscript method
-            subscript_method = modules.get_method(root.value, '__subscript__')
-            if subscript_method:
-                trailer_added = ActionNode('Call', subscript_method.data_type.return_type, subscript_method)
-            # otherwise it is invalid
-            else:
-                errormodule.throw('semantic_error', 'Object has no method \'__subscript__\'', trailer)
-        # strings members can be subscripted, but they cannot modified
-        elif root.data_type == types.DataType(types.DataTypes.STRING, 0):
-            trailer_added = ActionNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), generate_expr(trailer.content[1]), root)
         else:
-            errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
+            # the only subscriptable components are mutable (except for strings)
+            if types.mutable(root.data_type):
+                # if not dict, use element type, not value type
+                dt = root.data_type.value_type if isinstance(root.data_type, types.DictType) else root.data_type.element_type
+                trailer_added = ActionNode('Subscript', dt, generate_expr(trailer.content[1].content[0]), root)
+            # if it is a module
+            elif root.data_type == types.DataType(types.DataTypes.MODULE, 0):
+                # if it has subscript method
+                subscript_method = modules.get_method(root.value, '__subscript__')
+                if subscript_method:
+                    expr = generate_expr(trailer.content[1].content[0])
+                    functions.check_parameters(subscript_method, [expr])
+                    trailer_added = ActionNode('Call', subscript_method.data_type.return_type, subscript_method, expr)
+                # otherwise it is invalid
+                else:
+                    errormodule.throw('semantic_error', 'Object has no method \'__subscript__\'', trailer)
+            # strings members can be subscripted, but they cannot modified
+            elif root.data_type == types.DataType(types.DataTypes.STRING, 0):
+                trailer_added = ActionNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), generate_expr(trailer.content[1]), root)
+            else:
+                errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
     # if it is a get member
     elif trailer.content[0].type == '.':
         pass
@@ -292,6 +309,28 @@ def generate_base(ast):
         elif base.name == 'atom_types':
             # use types to generate a type result
             return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), types.generate_type(base))
+        # handle lambda generation
+        elif base.name == 'lambda':
+            # parameter holders
+            params = []
+            for item in base.content:
+                if isinstance(item, ASTNode):
+                    # compile parameter from lambda_params
+                    if item.name == 'lambda_params':
+                        param_content = item.content
+                        if param_content[-1].name == 'n_lambda_param':
+                            while param_content[-1].name == 'n_lambda_param':
+                                # synthesize parameter object
+                                params.append(type('Object', (), {'name': item.content[0].value, 'data_type': types.generate_type(item.content[-2])}))
+                                param_content = param_content[-1].content
+                        else:
+                            # handle lambdas with only 1 parameter
+                            params.append(type('Object', (), {'name': item.content[0].value, 'data_type': types.generate_type(item.content[-1])}))
+                    elif item.name == 'expr':
+                        # generate the expr and lambda Literal
+                        expr = generate_expr(item)
+                        dt = types.Function(expr.data_type, 0, False, False, True)
+                        return Literal(dt, (params, expr))
 
 
 ###############
@@ -454,7 +493,7 @@ def generate_lambda(lb):
             elif item.name == 'expr':
                 # add compiled expr to args
                 l_args.append(generate_expr(item))
-            elif item.name == 'lambda_if':
+            elif item.name == 'inline_for_if':
                 # compile internal expr (IF expr)
                 #                           ^^^^
                 cond_expr = generate_expr(item.content[1])

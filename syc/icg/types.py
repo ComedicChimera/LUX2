@@ -87,7 +87,7 @@ class DictType:
 
 # special data type class for functions
 class Function:
-    def __init__(self, rt, pointers, is_async, is_generator):
+    def __init__(self, rt, pointers, is_async, is_generator, is_lambda=False):
         # value returned from functions as data type
         self.return_type = rt
         # allow for function pointers
@@ -96,6 +96,8 @@ class Function:
         self.async = is_async
         # if the function is a generator
         self.generator = is_generator
+        # if the function is a lambda
+        self.is_lambda = is_lambda
 
 
 # class to hold all user defined group types

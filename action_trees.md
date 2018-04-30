@@ -44,3 +44,5 @@ This table documents all the names of the action tree nodes, their functions and
 | InlineCompare | Object, Object, Object | Perform an inline comparison between 2 objects | ? : |
 | StaticCast | Object | Perform a static cast on an object to the return type of the Action Node | *typename*() |
 | DynamicCast | Type, Object | Perform a dynamic cast on an object (warning) | *type yielding expr*() |
+| Return | ~Object | Return a value from a function | return *expr \[, expr\]* |
+| Distribute | Object, Function | Apply the distribution operator | *expr*\|*lambda/inline function*\| |
