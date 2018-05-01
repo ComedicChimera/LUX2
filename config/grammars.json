@@ -172,12 +172,15 @@
     "FOR for_body"
   ],
   "for_body": [
-    "for_expr block",
+    "for_header block",
     "base trailer => iter_body"
   ],
-  "for_expr": [
-    "( expr )",
+  "for_header": [
+    "( for_expr )",
     "&"
+  ],
+  "for_expr": [
+    "$ IDENTIFIER extension = expr ; expr ; assignment ;"
   ],
   "iter_body": [
     "sub_scope",
