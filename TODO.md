@@ -16,4 +16,7 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Comment expr.py *(syc/icg/generators/expr.py)* 
 
- 
+## Tests
+This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.
+
+ - Test: expr.py, atom.py (thoroughly) *TEST THE EXPRESSION PARSER*
