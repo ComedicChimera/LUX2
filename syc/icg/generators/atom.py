@@ -156,22 +156,54 @@ def add_trailer(root, trailer):
             expr = generate_expr(trailer.content[1].content[1])
             if expr.data_type.pointers != 0:
                 errormodule.throw('semantic_error', 'Subscript cannot be a pointer', trailer)
-            if expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType)
+            if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType)
                                                                     or isinstance(root.data_type, types.ArrayType)):
                 return ActionNode('SliceBegin', root.data_type.element_type, root, expr)
             elif isinstance(root.data_type, types.CustomType):
                 method = modules.get_method(root.data_type.symbol, '__slice__')
                 if method:
-                    functions.check_parameters(method, [None, expr])
+                    functions.check_parameters(method, [expr])
                     return ActionNode('Call', method.data_type.return_type, method, expr)
                 errormodule.throw('semantic_error', 'Object has no method \'__slice__\'', trailer)
             elif root.data_type.data_type == types.DataTypes.STRING and expr.data_type.data_type == types.DataTypes.INT:
-                return ActionNode('SliceBegin', types.DataType(types.DataTypes.CHAR, 0), root, expr)
-            # TODO add error message for non-integer slice
+                return ActionNode('SliceBegin', types.DataType(types.DataTypes.STRING, 0), root, expr)
+            if not isinstance(expr.data_type, types.DataType) or expr.data_type.data_type != types.DataTypes.INT:
+                errormodule.throw('semantic_error', 'Index must be an integral value', trailer)
             errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
         # handle slice till end
         elif len(trailer.content[1].content) > 1:
-            pass
+            expr = generate_expr(trailer.content[1].content[0])
+            if expr.pointers > 0:
+                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+            if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type != types.DataTypes.INT:
+                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+            if len(trailer.content[1].content[1].content) > 1:
+                expr2 = generate_expr(trailer.content[1].content[1].content[1])
+                if expr2.pointers > 0:
+                    errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+                if isinstance(expr2.data_type, types.DataType) and expr2.data_type.data_type != types.DataTypes.INT:
+                    errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+                if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
+                    if isinstance(root.data_type, types.CustomType):
+                        slice_method = modules.get_method(root.data_type.symbol, '__slice__')
+                        if slice_method:
+                            functions.check_parameters(slice_method, [expr, expr2])
+                            return ActionNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
+                    errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
+                elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
+                    return ActionNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
+                return ActionNode('Slice', root.data_type.element_type, root, expr, expr2)
+            else:
+                if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
+                    if isinstance(root.data_type, types.CustomType):
+                        slice_method = modules.get_method(root.data_type.symbol, '__slice__')
+                        if slice_method:
+                            functions.check_parameters(slice_method, [None, expr])
+                            return ActionNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
+                    errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
+                elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
+                    return ActionNode('SliceEnd', types.DataType(types.DataTypes.CHAR, 0), root, expr)
+                return ActionNode('SliceEnd', root.data_type.element_type, root, expr)
         # handle traditional subscripting
         else:
             # the only subscriptable components are mutable (except for strings)

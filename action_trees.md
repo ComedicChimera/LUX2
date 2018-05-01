@@ -46,3 +46,6 @@ This table documents all the names of the action tree nodes, their functions and
 | DynamicCast | Type, Object | Perform a dynamic cast on an object (warning) | *type yielding expr*() |
 | Return | ~Object | Return a value from a function | return *expr \[, expr\]* |
 | Distribute | Object, Function | Apply the distribution operator | *expr*\|*lambda/inline function*\| |
+| SliceBegin | Collection, Integer | Perform a slice from beginning to arbitrary index | \[:*integer*\] |
+| SliceEnd | Collection, Integer | Perform a slice from an arbitrary index to the end | \[*integer*:\] |
+| Slice | Collection, Integer, Integer | Slice a collection between 2 arbitrary points | \[*integer*:*integer*\] |
