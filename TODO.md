@@ -8,13 +8,13 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add GetMember trailer checking *(syc/icg/generators/atom.py)*
  
- - Implement Tuples for Collections *(syc/icg/\*)*
- 
  - Remove to_str methods once testing is complete *(everywhere)*
  
  - Update Subscript checking to working with slices and add type checking to subscript *(syc/icg/generators/atom.py)*
  
  - Comment expr.py *(syc/icg/generators/expr.py)* 
+ 
+ - Add function calling to trailer adding *(syc/icg/generators/atom.py)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.

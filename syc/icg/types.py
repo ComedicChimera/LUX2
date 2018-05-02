@@ -38,7 +38,7 @@ class DataTypes(Enum):
     # value type
     VALUE = 17
 
-    # data type for holding tuples
+    # tuple type
     TUPLE = 18
 
 
@@ -138,11 +138,17 @@ class IncompleteType:
 
 # check if type can be coerced
 def coerce(base_type, unknown):
-    # if either is a not a raw data type, it does not work
-    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
-        return False
     # if pointers don't match up, automatically not equal
     if base_type.pointers != unknown.pointers:
+        return False
+    # if neither is object and neither is data type return
+    if not isinstance(base_type, DataType) and not isinstance(unknown, DataType):
+        return False
+    # object
+    if base_type.data_type.data_type == DataTypes.OBJECT or unknown.data_type.data_type == DataTypes.OBJECT:
+        return True
+    # if either is a not a raw data type, it does not work
+    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return False
     # if it is a complex or float or long, ints and bool can be coerced
     elif base_type.data_type in {DataTypes.COMPLEX, DataTypes.FLOAT, DataTypes.LONG} and unknown.data_type in {DataTypes.INT, DataTypes.BOOL}:
@@ -163,11 +169,17 @@ def coerce(base_type, unknown):
 def dominant(base_type, unknown):
     if base_type == unknown:
         return base_type
-    # if either is a not a raw data type, it does not work
-    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
+    # if neither is object and neither is data type return
+    if not isinstance(base_type, DataType) and not isinstance(unknown, DataType):
         return
     # if the types are not equal
     if base_type.pointers != unknown.pointers:
+        return
+    # object type
+    if base_type.data_type.data_type == DataTypes.OBJECT or unknown.data_type.data_type == DataTypes.OBJECT:
+        return unknown if base_type.data_type.data_type != DataTypes.OBJECT else unknown
+    # if either is a not a raw data type, it does not work
+    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return
     # if it is a string, dominant over all others
     elif unknown.data_type == DataTypes.STRING:

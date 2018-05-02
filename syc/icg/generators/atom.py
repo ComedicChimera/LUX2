@@ -29,6 +29,14 @@ def generate_atom(atom):
                         expr_tree = ActionNode('Distribute', method.data_type.return_type, expr_tree, ActionNode('Call', method.data_type.return_type, method))
                 else:
                     expr_tree = ActionNode('Distribute', distribute_expr.data_type.return_type, expr_tree, distribute_expr)
+        # type check expr tree
+        if isinstance(expr_tree.data_type, types.DataType):
+            if expr_tree.data_type.pointers != 0:
+                errormodule.throw('semantic_error', 'Unable to apply distribution to operator to pointer', atom)
+            elif not expr_tree.data_type.data_type != types.DataTypes.TUPLE and not expr_tree.data_type.data_type != types.DataTypes.STRING:
+                errormodule.throw('semantic_error', 'Invalid data type from distribution operator', atom)
+        elif isinstance(expr_tree.data_type, types.CustomType) and not expr_tree.data_type.enumerable:
+            errormodule.throw('semantic_error', 'Module used for distribution is not enumerable', atom)
         # if it has a trailer, add to expr root tree
         if isinstance(atom.content[-1], ASTNode) and atom.content[-1].name == 'trailer':
             expr_tree = add_trailer(expr_tree, atom.content[-1])
@@ -92,6 +100,7 @@ def generate_atom(atom):
 from syc.icg.generators.expr import generate_expr
 import syc.icg.generators.structs as structs
 import syc.icg.casting as casting
+import syc.icg.tuples as tuples
 
 
 def add_trailer(root, trailer):
@@ -132,10 +141,9 @@ def add_trailer(root, trailer):
                     else:
                         errormodule.warn('Dynamic cast performed in place of static cast', trailer)
                         return ActionNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
-                else:
-                    errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
-            else:
-                errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
+                # TODO add function calling
+
+            errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
         # if is module
         elif isinstance(root.data_type, types.CustomType):
             if root.pointers != 0:
@@ -486,14 +494,21 @@ def generate_list(lst):
 
     # recursive function to extract elements from list_builder
     def get_true_list(sub_list):
+        nonlocal true_list
         # iterate through given sub_list
         for item in sub_list.content:
             # if it is an AST
             if isinstance(item, ASTNode):
                 # expr == elem
                 if item.name == 'expr':
-                    # add to internal list
-                    true_list.append(generate_expr(item))
+                    # generate expr
+                    expr = generate_expr(item)
+                    # check for tuples
+                    if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.TUPLE and isinstance(expr, Literal):
+                        true_list += expr.value.items
+                    else:
+                        # else add to internal list
+                        true_list.append(expr)
                 elif item.name == 'n_list':
                     # continue collecting from sub list
                     get_true_list(item)
@@ -505,7 +520,9 @@ def generate_list(lst):
     dt = None
     for elem in true_list:
         if dt:
-            if elem.data_type != dt:
+            if isinstance(elem.data_type, types.DataType) and types.DataTypes.TUPLE == elem.data_type.data_type:
+                dt = types.DataType(types.DataTypes.OBJECT, 0)
+            elif elem.data_type != dt:
                 # check for type coercion
                 if not types.coerce(dt, elem.data_type):
                     ndt = types.dominant(dt, elem.data_type)

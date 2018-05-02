@@ -258,15 +258,13 @@ def generate_unary_atom(u_atom):
                     if not tpl:
                         errormodule.throw('semantic_error', 'Tuple cannot be created from a non enumerable object',
                                           u_atom)
-                    tpl = ActionNode('Unwrap', tpl, root)
+                    tpl = Literal(types.DataType(types.DataTypes.TUPLE, 0), tpl)
                 else:
-                    empty_tuple = tuples.Tuple()
-                    empty_tuple.count = -1  # set to designate it is runtime determined
                     if not isinstance(root.data_type, types.ArrayType) and not isinstance(root.data_type, types.ListType):
                         if not isinstance(root.data_type, types.DictType):
                             if root.data_type.pointers != 0 or root.data_type.data_type != types.DataTypes.STRING:
                                 errormodule.throw('semantic_error', 'Unable to unwrap non-collection', u_atom)
-                    tpl = ActionNode('Unwrap', empty_tuple, root)
+                    tpl = ActionNode('Unwrap', types.DataType(types.DataTypes.TUPLE, 0), root)
                 return tpl
     else:
         return generate_atom(u_atom.content[0])
