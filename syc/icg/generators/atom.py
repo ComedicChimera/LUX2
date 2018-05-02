@@ -141,8 +141,10 @@ def add_trailer(root, trailer):
                     else:
                         errormodule.warn('Dynamic cast performed in place of static cast', trailer)
                         return ActionNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
-                # TODO add function calling
-
+                elif isinstance(root.data_type, types.Function):
+                    params = functions.compile_parameters(trailer.content[1])
+                    functions.check_parameters(root, params)
+                    return ActionNode('Call', root, *params)
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
         # if is module
         elif isinstance(root.data_type, types.CustomType):
@@ -157,8 +159,6 @@ def add_trailer(root, trailer):
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
     # if is subscript
     elif trailer.content[0].type == '[':
-        # if root.data_type.pointers > 0:
-            # errormodule.throw('semantic_error', 'Unable to subscript/slice a pointer', )
         # handle slicing
         if isinstance(trailer.content[1].content[0], Token):
             expr = generate_expr(trailer.content[1].content[1])
@@ -220,7 +220,8 @@ def add_trailer(root, trailer):
                 # if not dict, use element type, not value type
                 if isinstance(root.data_type, types.DictType):
                     if expr.data_type != root.data_type.key_type and not types.dominant(root.data_type.key_type, expr.data_type):
-                        errormodule.throw('semantic_error', 'Type of subscript on dictionary must match data type of dictionary', trailer)
+                        errormodule.throw('semantic_error',
+                                          'Type of subscript on dictionary must match data type of dictionary', trailer)
                     dt = root.data_type.value_type
                 elif isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT:
                     dt = root.data_type.element_type

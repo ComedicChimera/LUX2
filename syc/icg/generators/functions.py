@@ -129,4 +129,8 @@ def get_return_from_type(rt_type):
     return rt_type
 
 
+def compile_parameters(func, param_ast):
+    return []
+
+
 from syc.icg.generators.expr import generate_expr
