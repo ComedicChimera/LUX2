@@ -142,7 +142,7 @@ def add_trailer(root, trailer):
                         errormodule.warn('Dynamic cast performed in place of static cast', trailer)
                         return ActionNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
                 elif isinstance(root.data_type, types.Function):
-                    params = functions.compile_parameters(trailer.content[1])
+                    params = functions.compile_parameters(root.data_type, trailer.content[1])
                     functions.check_parameters(root, params)
                     return ActionNode('Call', root, *params)
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -372,14 +372,15 @@ def generate_base(ast):
                     errormodule.throw('semantic_error', 'Inline functions must declare a body', base.content[-1])
                     # so pycharm won't complain
                     rt_type, gen = None, False
-                dt = types.Function(rt_type, 0, is_async, gen)
+                dt = types.Function(parameters, rt_type, 0, is_async, gen)
                 # in function literals, its value is its parameters
                 # TODO add body parsing to inline functions
                 fbody = base.content[-1].content[0].content[1]
-                return Literal(dt, (parameters, fbody))
+                return Literal(dt, fbody)
             else:
                 return_type = functions.get_return_from_type(base.content[-1].content[1])
-                return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), types.Function(return_type, 0, is_async, False))
+                return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), types.Function(parameters, return_type, 0,
+                                                                                            is_async, False))
         elif base.name == 'atom_types':
             # use types to generate a type result
             return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), types.generate_type(base))
@@ -403,8 +404,8 @@ def generate_base(ast):
                     elif item.name == 'expr':
                         # generate the expr and lambda Literal
                         expr = generate_expr(item)
-                        dt = types.Function(expr.data_type, 0, False, False, True)
-                        return Literal(dt, (params, expr))
+                        dt = types.Function(params, expr.data_type, 0, False, False, True)
+                        return Literal(dt, expr)
 
 
 ###############
