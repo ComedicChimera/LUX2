@@ -216,9 +216,18 @@ def add_trailer(root, trailer):
         else:
             # the only subscriptable components are mutable (except for strings)
             if types.mutable(root.data_type):
+                expr = generate_expr(trailer.content[1].content[0])
                 # if not dict, use element type, not value type
-                dt = root.data_type.value_type if isinstance(root.data_type, types.DictType) else root.data_type.element_type
-                trailer_added = ActionNode('Subscript', dt, generate_expr(trailer.content[1].content[0]), root)
+                if isinstance(root.data_type, types.DictType):
+                    if expr.data_type != root.data_type.key_type and not types.dominant(root.data_type.key_type, expr.data_type):
+                        errormodule.throw('semantic_error', 'Type of subscript on dictionary must match data type of dictionary', trailer)
+                    dt = root.data_type.value_type
+                elif isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT:
+                    dt = root.data_type.element_type
+                else:
+                    errormodule.throw('semantic_error', 'Invalid type for subscript', trailer)
+                    dt = None
+                trailer_added = ActionNode('Subscript', dt, expr, root)
             # if it is a module
             elif root.data_type == types.DataType(types.DataTypes.MODULE, 0):
                 # if it has subscript method
@@ -232,7 +241,11 @@ def add_trailer(root, trailer):
                     errormodule.throw('semantic_error', 'Object has no method \'__subscript__\'', trailer)
             # strings members can be subscripted, but they cannot modified
             elif root.data_type == types.DataType(types.DataTypes.STRING, 0):
-                trailer_added = ActionNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), generate_expr(trailer.content[1]), root)
+                expr = generate_expr(trailer.content[1])
+                if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT:
+                    trailer_added = ActionNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), expr, root)
+                else:
+                    errormodule.throw('semantic_error', 'Strings can only be subscripted using integers', trailer)
             else:
                 errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
     # if it is a get member
