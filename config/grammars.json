@@ -208,7 +208,11 @@
     "WITH ( stmt ) block"
   ],
   "except_block": [
-    "EXCEPT ( id , atom ) handle_block"
+    "EXCEPT ( except_content ) handle_block"
+  ],
+  "except_content": [
+    "expr ( IDENTIFIER ) => { main } except_content",
+    "&"
   ],
   "handle_block": [
     "{ main }",
