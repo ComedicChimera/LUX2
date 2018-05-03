@@ -1,16 +1,38 @@
 module Greeter {
-    $name : str;
+    property $name: str;
 
-    constructor($name : str) {
+    constructor($name: str) {
         this.name = name;
     }
 
-    func greet() => println("Hello, %s!".format(this.name));
+    func property greet() => println("Hello, %s!".format(this.name));
 
-    func __finalize__() => println("Bye, %s!".format(this.name));
+    func property __finalize__() => println("Bye, %s!".format(this.name));
 }
 
 func Main() int {
     $bg = new Greeter("Bob");
     bg.greet();
 }
+
+struct Point2D {
+    $x: int,
+    $y: int
+}
+
+enum Direction {
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST
+}
+
+func sumMinus1(~$lst: int) int {
+    $c = 0;
+    return (a)|func($a: int, $b: int) {
+        a -= c;
+        c++;
+        b -= c;
+        return a + b;
+    }|;
+} 
