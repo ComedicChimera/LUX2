@@ -64,7 +64,7 @@ def generate_logical(logical):
                         root = ActionNode('Bitwise' + op, root.data_type, root, tree)
                 elif isinstance(root.data_type, types.CustomType):
                     method = modules.get_method(tree.data_type.symbol, '__%s__' % op.lower())
-                    functions.check_parameters(method, tree)
+                    functions.check_parameters(method, tree, item)
                     if method:
                         root = ActionNode('Call', method.data_type.return_type, method, tree)
                     else:
@@ -86,7 +86,7 @@ def generate_comparison(comparison):
                 return ActionNode('Not', tree.data_type, tree)
             elif isinstance(tree.data_type, types.CustomType):
                 not_method = modules.get_method(tree.symbol, '__not__')
-                functions.check_parameters(not_method, tree)
+                functions.check_parameters(not_method, tree, comparison)
                 if not_method:
                     return ActionNode('Call', not_method.data_type.return_type, not_method, tree)
                 else:

@@ -461,7 +461,7 @@
     "&"
   ],
   "named_param": [
-    ": expr",
+    "= expr",
     "&"
   ],
   "n_param": [

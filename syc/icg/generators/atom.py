@@ -100,7 +100,6 @@ def generate_atom(atom):
 from syc.icg.generators.expr import generate_expr
 import syc.icg.generators.structs as structs
 import syc.icg.casting as casting
-import syc.icg.tuples as tuples
 
 
 def add_trailer(root, trailer):
@@ -115,7 +114,7 @@ def add_trailer(root, trailer):
             if root.data_type.pointers != 0:
                 errormodule.throw('semantic_error', 'Function pointers are not callable', trailer)
             else:
-                parameters = functions.check_parameters(root, trailer.content[1])
+                parameters = functions.check_parameters(root, trailer.content[1], trailer)
                 trailer_added = ActionNode('Call', root.data_type.return_type, root, parameters)
         elif isinstance(root.data_type, types.DataType):
             if root.data_type.pointers == 0:
@@ -143,7 +142,7 @@ def add_trailer(root, trailer):
                         return ActionNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
                 elif isinstance(root.data_type, types.Function):
                     params = functions.compile_parameters(root.data_type, trailer.content[1])
-                    functions.check_parameters(root, params)
+                    functions.check_parameters(root, params, trailer)
                     return ActionNode('Call', root, *params)
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
         # if is module
@@ -170,7 +169,7 @@ def add_trailer(root, trailer):
             elif isinstance(root.data_type, types.CustomType):
                 method = modules.get_method(root.data_type.symbol, '__slice__')
                 if method:
-                    functions.check_parameters(method, [expr])
+                    functions.check_parameters(method, [expr], trailer)
                     return ActionNode('Call', method.data_type.return_type, method, expr)
                 errormodule.throw('semantic_error', 'Object has no method \'__slice__\'', trailer)
             elif root.data_type.data_type == types.DataTypes.STRING and expr.data_type.data_type == types.DataTypes.INT:
@@ -195,7 +194,7 @@ def add_trailer(root, trailer):
                     if isinstance(root.data_type, types.CustomType):
                         slice_method = modules.get_method(root.data_type.symbol, '__slice__')
                         if slice_method:
-                            functions.check_parameters(slice_method, [expr, expr2])
+                            functions.check_parameters(slice_method, [expr, expr2], trailer)
                             return ActionNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
                     errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
                 elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
@@ -206,7 +205,7 @@ def add_trailer(root, trailer):
                     if isinstance(root.data_type, types.CustomType):
                         slice_method = modules.get_method(root.data_type.symbol, '__slice__')
                         if slice_method:
-                            functions.check_parameters(slice_method, [None, expr])
+                            functions.check_parameters(slice_method, [None, expr], trailer)
                             return ActionNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
                     errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
                 elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
@@ -235,7 +234,7 @@ def add_trailer(root, trailer):
                 subscript_method = modules.get_method(root.value, '__subscript__')
                 if subscript_method:
                     expr = generate_expr(trailer.content[1].content[0])
-                    functions.check_parameters(subscript_method, [expr])
+                    functions.check_parameters(subscript_method, [expr], trailer)
                     trailer_added = ActionNode('Call', subscript_method.data_type.return_type, subscript_method, expr)
                 # otherwise it is invalid
                 else:

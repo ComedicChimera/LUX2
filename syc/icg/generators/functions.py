@@ -121,8 +121,35 @@ def get_return_type(function_body):
     return rt_type, generator
 
 
-def check_parameters(func, params):
-    pass
+def check_parameters(func, params, ast):
+    def required(parameter):
+        return not hasattr(parameter, 'optional') and not hasattr(parameter, 'indefinite')
+
+    base_params = func.data_type.parameters
+    names = []
+    met_count = 0
+    for i in range(len(params)):
+        if i >= len(base_params):
+            errormodule.throw('semantic_error', 'Too many parameters for function', ast)
+        if isinstance(params[i], tuple):
+            elems = [x for x in base_params if x.name == params[i][0]]
+            if len(elems) == 0:
+                errormodule.throw('semantic_error', 'Function has no parameter \'%s\'' % params[i][0], ast)
+            elif params[i][0] in names:
+                errormodule.throw('semantic_error', 'Multiple values specified for parameter \'%s\'' % params[i][0], ast)
+            elif hasattr(elems[0], 'indefinite'):
+                errormodule.throw('semantic_error', 'Unable to explicitly specify value for indefinite parameter', ast)
+            if required(elems[0]):
+                met_count += 1
+        else:
+            if not types.dominant(base_params[i].data_type, params[i].data_type):
+                errormodule.throw('semantic_error', 'Type mismatch: Parameters don\'t match', ast)
+            names.append(base_params[i].name)
+            if required(base_params[i]):
+                met_count += 1
+    if met_count < sum([x for x in base_params if required(x)]):
+        errormodule.throw('semantic_error', 'Too few parameters for function call', ast)
+
 
 
 def get_return_from_type(rt_type):
@@ -134,3 +161,4 @@ def compile_parameters(func, param_ast):
 
 
 from syc.icg.generators.expr import generate_expr
+import syc.icg.types as types
