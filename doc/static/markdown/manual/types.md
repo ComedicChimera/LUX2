@@ -35,15 +35,15 @@ Each data type is designated by its corresponding keyword along with a set of **
 
 There are 3 kinds of numbers in SyClone: integers, floats, and unreal numbers.  Each has its own set of literals associated with it.
 
-    // integers
+    // integers, size: 32b
     int, long // <- keyword  
     0 123 10456 // <- literals
     
-    // floats
+    // floats, size: 64b
     float // <- keyword
     0.2 3.14 1.002 // <- literals
     
-    // unreal
+    // unreal, size: 128b
     complex // <- keyword
     2i 45i 0.5i // <- literals
     
