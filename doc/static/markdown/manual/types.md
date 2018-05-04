@@ -66,3 +66,12 @@ There are only 2 kinds of character based types in SyClone: chars and strings.
 A string represents a set of chars, whereas a char is merely a single character.  Notice that both strings and chars can contain
 special symbols as they are encoded in UTF-8.  In addition to this, there a number of **escape sequences** that designate
 certain special characters such as `\n` (newline), `\t` (tab), and `\b` (backspace).
+
+### Bytes
+
+A byte represents literal binary data in memory.  They are a single byte long.  There are 2 literals that can indicate a byte:
+`hex` and `binary`, however, there is only one byte data type.
+
+    byte // <- keyword
+    0xF 0b101
+
