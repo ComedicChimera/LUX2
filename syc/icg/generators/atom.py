@@ -45,7 +45,7 @@ def generate_atom(atom):
         # all other elements are ASTNodes
         # if the first element is lambda (as in 'lambda trailer')
         if atom.content[0].name == 'inline_for':
-            lb = generate_lambda(atom.content[0])
+            lb = generate_comprehension(atom.content[0])
             # if there is extra content, assume trailer and add to lambda root
             if len(atom.content) > 1:
                 lb = add_trailer(lb, atom.content[-1])
@@ -114,7 +114,8 @@ def add_trailer(root, trailer):
             if root.data_type.pointers != 0:
                 errormodule.throw('semantic_error', 'Function pointers are not callable', trailer)
             else:
-                parameters = functions.check_parameters(root, trailer.content[1], trailer)
+                parameters = functions.compile_parameters(trailer.content[1])
+                functions.check_parameters(root, parameters, trailer)
                 trailer_added = ActionNode('Call', root.data_type.return_type, root, parameters)
         elif isinstance(root.data_type, types.DataType):
             if root.data_type.pointers == 0:
@@ -140,11 +141,8 @@ def add_trailer(root, trailer):
                     else:
                         errormodule.warn('Dynamic cast performed in place of static cast', trailer)
                         return ActionNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
-                elif isinstance(root.data_type, types.Function):
-                    params = functions.compile_parameters(trailer.content[1])
-                    params = functions.compile_parameters(trailer.content[1])
-                    functions.check_parameters(root, params, trailer)
-                    return ActionNode('Call', root, *params)
+                elif root.data_type.data_type == types.DataTypes.VALUE:
+                    return casting.value_cast(generate_expr(trailer.content[1]))
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
         # if is module
         elif isinstance(root.data_type, types.CustomType):
@@ -550,21 +548,21 @@ def generate_list(lst):
 # INLINE FOR AND ITERATORS #
 #########################
 
-# create a lambda tree from either a lambda expression or lambda statement
-def generate_lambda(lb):
-    # descend into new scope for lambda
+# create a comprehension from an inline for
+def generate_comprehension(lb):
+    # descend into new scope for comprehension
     util.symbol_table.add_scope()
     # arguments for action node
     l_args = []
-    # narrow down from FOR ( lambda_expr ) to lambda_expr
+    # narrow down from FOR ( inline_for_expr ) to inline_for_expr
     lb = lb.content[2]
-    # data type of return value from lambda (data_type == typeof lambda_atom)
+    # data type of return value from comprehension
     l_type = None
     for item in lb.content:
         if isinstance(item, ASTNode):
             if item.name == 'atom':
-                # get lambda atom from ASTNode (atom)
-                la = generate_lambda_atom(item)
+                # get iterator from ASTNode (atom)
+                la = generate_iterator(item)
                 # get type for la
                 l_type = la.data_type
                 # add to args
@@ -579,7 +577,7 @@ def generate_lambda(lb):
                 # check to see if it is conditional
                 if cond_expr.data_type != types.DataType(types.DataTypes.BOOL, 0):
                     # throw error if not a boolean
-                    errormodule.throw('semantic_error', 'Lambda if statement expression does not evaluate to a boolean', item)
+                    errormodule.throw('semantic_error', 'Comprehension filter statement expression does not evaluate to a boolean', item)
                 # compile final result and add to args
                 l_args.append(ActionNode('ForIf', cond_expr.data_type, cond_expr))
     # exit lambda scope
@@ -587,13 +585,13 @@ def generate_lambda(lb):
     return ActionNode('ForExpr', l_type, *l_args)
 
 
-# convert lambda atom to an Iterator
-def generate_lambda_atom(lb_atom):
+# convert iter atom to an Iterator
+def generate_iterator(lb_atom):
     # temporary variable to hold the lambda iterator
     iterator = None
     # if the ending of the atom is not a trailer (is token), throw error
     if isinstance(lb_atom.content[-1], Token):
-        errormodule.throw('semantic_error', 'Invalid lambda iterator', lb_atom)
+        errormodule.throw('semantic_error', 'Invalid iterator', lb_atom)
     ending = lb_atom.content[-1]
     while ending.name == 'trailer':
         iterator = lb_atom.content[-1]
@@ -602,10 +600,10 @@ def generate_lambda_atom(lb_atom):
         ending = iterator.content[-1]
     # if the ending of the atom is not a trailer (iterator never assigned), throw error
     if not iterator:
-        errormodule.throw('semantic_error', 'Invalid lambda iterator', lb_atom)
+        errormodule.throw('semantic_error', 'Invalid iterator', lb_atom)
     # if the trailer found is not a subscript trailer
     if not iterator.content[0].type == '[':
-        errormodule.throw('semantic_error', 'Invalid lambda iterator', lb_atom)
+        errormodule.throw('semantic_error', 'Invalid iterator', lb_atom)
     # extract name from trailer
     iter_name = get_iter_name(iterator.content[1])
 
@@ -639,7 +637,7 @@ def generate_lambda_atom(lb_atom):
             iterator_type = modules.get_method(base_atom.data_type, '__subscript__').data_type.return_type
     # if it is not enumerable and is not either a dict or list, it is an invalid iterative base
     else:
-        errormodule.throw('semantic_error', 'Lambda value must be enumerable', lb_atom)
+        errormodule.throw('semantic_error', 'Value must be enumerable', lb_atom)
         return
     sym = Symbol(iter_name, iterator_type, [])
     util.symbol_table.add_variable(sym, lb_atom)
@@ -655,19 +653,19 @@ def get_iter_name(expr):
         if isinstance(item, ASTNode):
             # the expression must contain only one token (an identifier)
             if len(item.content) > 1:
-                errormodule.throw('semantic_error', 'Invalid lambda iterator', expr)
+                errormodule.throw('semantic_error', 'Invalid iterator', expr)
             # if it is a base, and has a length of 1
             elif item.name == 'base':
                 # if it is a token, it is valid (again, only identifier), otherwise error
                 if isinstance(item.content[0], Token):
                     # must be identifier
                     if item.content[0].type != 'IDENTIFIER':
-                        errormodule.throw('semantic_error', 'Invalid lambda iterator', expr)
+                        errormodule.throw('semantic_error', 'Invalid iterator', expr)
                     else:
                         # return value (or name)
                         return item.content[0].value
                 else:
-                    errormodule.throw('semantic_error', 'Invalid lambda iterator', expr)
+                    errormodule.throw('semantic_error', 'Invalid iterator', expr)
             else:
                 # recur if it is right size, but not base
                 return get_iter_name(item)

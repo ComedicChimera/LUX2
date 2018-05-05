@@ -1,6 +1,7 @@
 from enum import Enum
 from util import unparse, symbol_table
 from syc.parser.ASTtools import Token
+import errormodule
 
 
 # enum representing all simple SyClone types
@@ -97,6 +98,12 @@ class Function:
         self.is_lambda = is_lambda
         # add parameters
         self.parameters = parameters
+
+    def __eq__(self, other):
+        if not isinstance(other, Function):
+            return False
+        return other.return_type == self.return_type and other.pointers == self.pointers and other.async == self.async \
+               and other.parameters == self.parameters and other.is_lambda == self.is_lambda
 
 
 # class to hold all user defined group types
@@ -260,6 +267,16 @@ def generate_type(ext):
         elif ext.content[0].value == 'LIST_TYPE':
             # ext.content[1].content[1] == pure_types -> list_modifier -> types
             return ListType(generate_type(ext.content[1].content[1]), pointers)
+        # assume function
+        elif ext.content[0].value in {'FUNC', 'ASYNC'}:
+            params, return_types = None, None
+            for item in ext.content[1].content:
+                if not isinstance(item, Token):
+                    if item.name == 'func_params_decl':
+                        params = functions.generate_parameter_list(item)
+                    elif item.name == 'rt_type':
+                        return_types = functions.get_return_from_type(item)
+            return Function(params, return_types, 0, ext.content[0].value == 'ASYNC', False)
         # assume dict
         else:
             # ext.content[1].content[1] == pure_types -> dict_modifier -> types
@@ -282,7 +299,11 @@ def generate_type(ext):
                 'PACKAGE_TYPE': DataTypes.PACKAGE
                             }[ext.content[0].content[0].type], pointers)
         else:
-            # TODO add member checking
-            # unable to do until structs, interfaces, modules, and other aliases have been implemented
-            # REMEMBER TO ADD THIS
-            pass
+            # TODO add get member symbol checking
+            # invalid code ->
+            sym = symbol_table.look_up(ext.content[0].value)
+            if not sym:
+                errormodule.throw('semantic_error', 'Variable \'%s\' is undefined' % ext.content[0].value, ext.content[0])
+            return CustomType(sym.data_type, sym, sym.inherits if hasattr(sym, 'inherits') else [])
+
+import syc.icg.generators.functions as functions
