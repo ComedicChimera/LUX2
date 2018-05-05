@@ -7,4 +7,12 @@ func Main() int {
         ? x < 5: println("X is less than 5");
         ? whole(x * 1.5): println("X * 1.5 is a whole number");
     }
+
+    print(for("Spaceship"[x] => x if "aeiou".contain(x.lower()));
+
+    @add = lambda(a: int, b: int => a + b);
+
+    except(
+        Error (e) => println(e);
+    );
 }

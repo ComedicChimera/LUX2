@@ -263,10 +263,18 @@
     "CONTINUE"
   ],
   "return_stmt": [
-    "RETURN optional_expr"
+    "RETURN rt_expr"
   ],
   "generator_stmt": [
-    "YIELD expr"
+    "YIELD rt_expr"
+  ],
+  "rt_expr": [
+    "expr n_rt_expr",
+    "&"
+  ],
+  "n_rt_expr": [
+    ", expr n_rt_expr",
+    "&"
   ],
   "throw_stmt": [
     "THROW expr"
@@ -408,8 +416,7 @@
   "prefix": [
     "-",
     "* deref_op",
-    "AMP",
-    "~"
+    "AMP"
   ],
   "deref_op": [
     "* deref_op",

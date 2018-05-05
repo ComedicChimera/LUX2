@@ -141,7 +141,8 @@ def add_trailer(root, trailer):
                         errormodule.warn('Dynamic cast performed in place of static cast', trailer)
                         return ActionNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
                 elif isinstance(root.data_type, types.Function):
-                    params = functions.compile_parameters(root.data_type, trailer.content[1])
+                    params = functions.compile_parameters(trailer.content[1])
+                    params = functions.compile_parameters(trailer.content[1])
                     functions.check_parameters(root, params, trailer)
                     return ActionNode('Call', root, *params)
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -517,12 +518,9 @@ def generate_list(lst):
                 if item.name == 'expr':
                     # generate expr
                     expr = generate_expr(item)
-                    # check for tuples
-                    if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.TUPLE and isinstance(expr, Literal):
-                        true_list += expr.value.items
-                    else:
-                        # else add to internal list
-                        true_list.append(expr)
+                    # add to internal list
+                    true_list.append(expr)
+
                 elif item.name == 'n_list':
                     # continue collecting from sub list
                     get_true_list(item)
@@ -534,9 +532,7 @@ def generate_list(lst):
     dt = None
     for elem in true_list:
         if dt:
-            if isinstance(elem.data_type, types.DataType) and types.DataTypes.TUPLE == elem.data_type.data_type:
-                dt = types.DataType(types.DataTypes.OBJECT, 0)
-            elif elem.data_type != dt:
+            if elem.data_type != dt:
                 # check for type coercion
                 if not types.coerce(dt, elem.data_type):
                     ndt = types.dominant(dt, elem.data_type)

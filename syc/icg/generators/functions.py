@@ -1,6 +1,7 @@
 from syc.parser.ASTtools import ASTNode
 from syc.icg.types import generate_type, coerce
 import errormodule
+from util import unparse
 
 
 # generates the declared list of params for any function (an array of symbols)
@@ -66,8 +67,30 @@ def generate_parameter(decl_params):
 
 
 # get the return type from a function body
-# TODO merge with general block parser (to allow id checking and such)
 def get_return_type(function_body):
+    def generate_returns(rt_expr):
+        # hold return types
+        rt_types = []
+        for elem in rt_expr.content:
+            if isinstance(elem, ASTNode):
+                # if it is an expr, assume it is part of return
+                if elem.name == 'expr':
+                    # add to return types
+                    rt_types.append(generate_expr(elem))
+                # if there are more/multiple return expression, add those to the return type list as well
+                elif elem.name == 'n_rt_expr':
+                    # get a set of return types and decide how to add them to the list
+                    n_types = generate_returns(elem)
+                    if isinstance(n_types, list):
+                        rt_types += n_types
+                    else:
+                        rt_types.append(n_types)
+        # if there are no returns, return None
+        if len(rt_types) == 0:
+            return
+        # return a list if there are multiple or just one if there is only 1
+        return rt_types if len(rt_types) > 1 else rt_types[0]
+
     # return type holder
     rt_type = None
     # if it has encountered a return value
@@ -79,7 +102,7 @@ def get_return_type(function_body):
             if item.name == 'return_stmt':
                 if len(item.content) > 1:
                     # generate new type from return expr
-                    n_type = generate_expr(item.content[1].content[0]).data_type
+                    n_type = generate_returns(item.content[1])
                     # if they are not equal and there is a return type
                     if n_type != rt_type and is_rt_type and not coerce(rt_type, n_type):
                         errormodule.throw('semantic_error', 'Inconsistent return type', item)
@@ -94,7 +117,7 @@ def get_return_type(function_body):
             elif item.name == 'yield_stmt':
                 if len(item.content) > 1:
                     # generate new type from return expr
-                    n_type = generate_expr(item.content[1].content[0]).data_type
+                    n_type = generate_returns(item.content[1])
                     # if they are not equal and there is a return type
                     if n_type != rt_type and is_rt_type and not coerce(rt_type, n_type):
                         errormodule.throw('semantic_error', 'Inconsistent return type', item)
@@ -121,7 +144,9 @@ def get_return_type(function_body):
     return rt_type, generator
 
 
+# check the parameters passed to a function to ensure that they are valid
 def check_parameters(func, params, ast):
+    # check if a given parameter is mandatory
     def required(parameter):
         return not hasattr(parameter, 'optional') and not hasattr(parameter, 'indefinite')
 
@@ -151,13 +176,37 @@ def check_parameters(func, params, ast):
         errormodule.throw('semantic_error', 'Too few parameters for function call', ast)
 
 
-
 def get_return_from_type(rt_type):
-    return rt_type
+    rt_types = []
+    for item in rt_type.content:
+        if isinstance(item, ASTNode):
+            if item.name == 'types':
+                rt_types.append(generate_type(item))
+            elif item.name == 'n_rt_type':
+                n_types = get_return_from_type(item)
+                if isinstance(n_types, list):
+                    rt_types += n_types
+                else:
+                    rt_types.append(n_types)
+    return rt_types if len(rt_types) > 1 else rt_types[0]
 
 
-def compile_parameters(func, param_ast):
-    return []
+def compile_parameters(param_ast):
+    params = []
+    expr = ''
+
+    for item in param_ast.content:
+        if isinstance(item, ASTNode):
+            if item.name == 'expr':
+                expr = item
+            elif item.name == 'named_param':
+                ue = unparse(expr)
+                if len(ue) > 1 or isinstance(ue[0], ASTNode) or ue[0].type != 'IDENTIFIER':
+                    errormodule.throw('semantic_error', 'Invalid parameter name', param_ast.content[0 if isinstance(param_ast.content[0], ASTNode) else 1])
+                expr = (ue[0].value, generate_expr(item.content[1]))
+            elif item.name == 'n_param':
+                params += compile_parameters(item)
+    return [expr] + params
 
 
 from syc.icg.generators.expr import generate_expr

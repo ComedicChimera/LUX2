@@ -2,7 +2,6 @@ from syc.parser.ASTtools import ASTNode
 from syc.icg.action_tree import ActionNode, Literal
 import errormodule
 from util import unparse
-import syc.icg.tuples as tuples
 
 
 def generate_expr(expr):
@@ -250,22 +249,6 @@ def generate_unary_atom(u_atom):
                 pointer.data_type.pointers += 1
                 # reference pointer
                 return ActionNode('Reference', pointer.data_type, pointer)
-            elif prefix.type == '~':
-                # generate tuple
-                root = generate_atom(u_atom.content[1])
-                if isinstance(root, Literal):
-                    tpl = tuples.create_tuple(root)
-                    if not tpl:
-                        errormodule.throw('semantic_error', 'Tuple cannot be created from a non enumerable object',
-                                          u_atom)
-                    tpl = Literal(types.DataType(types.DataTypes.TUPLE, 0), tpl)
-                else:
-                    if not isinstance(root.data_type, types.ArrayType) and not isinstance(root.data_type, types.ListType):
-                        if not isinstance(root.data_type, types.DictType):
-                            if root.data_type.pointers != 0 or root.data_type.data_type != types.DataTypes.STRING:
-                                errormodule.throw('semantic_error', 'Unable to unwrap non-collection', u_atom)
-                    tpl = ActionNode('Unwrap', types.DataType(types.DataTypes.TUPLE, 0), root)
-                return tpl
     else:
         return generate_atom(u_atom.content[0])
 

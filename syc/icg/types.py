@@ -38,9 +38,6 @@ class DataTypes(Enum):
     # value type
     VALUE = 17
 
-    # tuple type
-    TUPLE = 18
-
 
 # parent class for all data type objects
 class DataType:
