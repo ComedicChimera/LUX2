@@ -5,7 +5,7 @@ class Token:
         self.value = value
         self.ndx = ndx
 
-    def to_str(self):
+    def __str__(self):
         return "Token('%s', '%s')" % (self.type, self.value)
 
 
@@ -15,9 +15,9 @@ class ASTNode:
         self.name = name
         self.content = []
 
-    def to_str(self):
+    def __str__(self):
         str_string = self.name + ":["
         for item in self.content:
-            str_string += item.to_str()
+            str_string += str(item)
         return str_string + "]"
 

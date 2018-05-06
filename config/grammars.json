@@ -328,11 +328,8 @@
   ],
   "n_expr": [
     "?? or n_expr",
-    "ternary_operator",
+    "? or : or",
     "&"
-  ],
-  "ternary_operator": [
-    "? or : or"
   ],
   "or": [
     "xor n_or"

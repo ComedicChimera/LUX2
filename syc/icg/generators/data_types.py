@@ -1,7 +1,6 @@
-from util import unparse, symbol_table
+import util
 from syc.parser.ASTtools import Token
 import syc.icg.types as types
-import errormodule
 
 
 # generate type from ast (extension or atom types)
@@ -11,9 +10,9 @@ def generate_type(ext):
     if ext.name == 'types':
         if ext.content[0].name == 'deref_op':
             # extract data type pointers
-            pointers = len(unparse(ext.content[0]))
+            pointers = len(util.unparse(ext.content[0]))
         # update ext to simple types
-            ext = ext.content[-1]  # selects last element (always simple types)
+        ext = ext.content[-1]  # selects last element (always simple types)
     # if it is token, assume array, list or dict
     if isinstance(ext.content[0], Token):
         # assume array
@@ -59,9 +58,9 @@ def generate_type(ext):
         else:
             # TODO add get member symbol checking
             # invalid code ->
-            sym = symbol_table.look_up(ext.content[0].value)
+            """sym = util.symbol_table.look_up(ext.content[0].value)
             if not sym:
                 errormodule.throw('semantic_error', 'Variable \'%s\' is undefined' % ext.content[0].value, ext.content[0])
-            return types.CustomType(sym.data_type, sym, sym.inherits if hasattr(sym, 'inherits') else [])
+            return types.CustomType(sym.data_type, sym, sym.inherits if hasattr(sym, 'inherits') else [])"""
 
 from syc.icg.generators.functions import generate_parameter_list, get_return_from_type

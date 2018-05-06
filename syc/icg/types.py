@@ -1,7 +1,4 @@
 from enum import Enum
-from util import unparse, symbol_table
-from syc.parser.ASTtools import Token
-import errormodule
 
 
 # enum representing all simple SyClone types
@@ -182,29 +179,29 @@ def dominant(base_type, unknown):
     if base_type.pointers != unknown.pointers:
         return
     # object type
-    if base_type.data_type.data_type == DataTypes.OBJECT or unknown.data_type.data_type == DataTypes.OBJECT:
+    if base_type.data_type == DataTypes.OBJECT or unknown.data_type == DataTypes.OBJECT:
         return unknown if base_type.data_type.data_type != DataTypes.OBJECT else unknown
     # if either is a not a raw data type, it does not work
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return
-    # if it is a string, dominant over all others
-    elif unknown.data_type == DataTypes.STRING:
-        return unknown
+    # check string and char data type
+    elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
+        return base_type
     # int overriding
-    elif unknown.data_type in {DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG} and base_type.data_type == DataTypes.INT:
-        return unknown
+    elif base_type.data_type in {DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG} and unknown.data_type == DataTypes.INT:
+        return base_type
     # bool overriding
-    elif unknown.data_type in {DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG, DataTypes.INT} and base_type.data_type == DataTypes.BOOL:
-        return unknown
-    # byte gets overrun by everything
-    elif base_type.data_type == DataTypes.BYTE:
-        return unknown
+    elif base_type.data_type in {DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG, DataTypes.INT} and unknown.data_type == DataTypes.BOOL:
+        return base_type
+    # char overriding
+    elif base_type.data_type == DataTypes.INT and unknown.data_type == DataTypes.CHAR:
+        return base_type
 
 
 # check if element is mutable
-def mutable(element):
+def mutable(dt):
     # if it is a list, dict, or array
-    if isinstance(element.data_type, ListType) or isinstance(element.data_type, DictType) or isinstance(element.data_type, ArrayType):
+    if isinstance(dt, ListType) or isinstance(dt, DictType) or isinstance(dt, ArrayType):
         return True
     # return false if not mutable
     return False

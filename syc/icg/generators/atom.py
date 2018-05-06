@@ -62,10 +62,12 @@ def generate_atom(atom):
                 # set new to true if object is dynamically allocated / object
                 new = True if item.name == 'new' else False
                 # create base from atom parts
-                # always occurs
-                base = generate_base(item) if item.name == 'base' else None
                 # add trailer to base
-                base = add_trailer(base, item) if item.name == 'trailer' else base
+                if item.name == 'trailer':
+                    base = add_trailer(base, item)
+                    break
+                # otherwise compile base
+                base = generate_base(item) if item.name == 'base' else None
             # if awaited and not an async function, throw an error
             if await and not isinstance(base.data_type, types.IncompleteType):
                 errormodule.throw('semantic_error', 'Unable to await anything that is not an asynchronous function', atom)
@@ -277,7 +279,7 @@ def generate_base(ast):
             if not sym:
                 errormodule.throw('semantic_error', 'Variable used without declaration', ast)
             # otherwise return the raw symbol
-            return sym
+            return Literal(sym.data_type, sym)
         # if it is an instance pointer
         elif base.type == 'THIS':
             # get the group instance (typeof Instance)
@@ -401,8 +403,12 @@ def generate_base(ast):
                             # handle lambdas with only 1 parameter
                             params.append(type('Object', (), {'name': item.content[0].value, 'data_type': generate_type(item.content[-1])}))
                     elif item.name == 'expr':
+                        util.symbol_table.add_scope()
+                        for param in params:
+                            util.symbol_table.add_variable(Symbol(param.name, param.data_type, []), item)
                         # generate the expr and lambda Literal
                         expr = generate_expr(item)
+                        util.symbol_table.exit_scope()
                         dt = types.Function(params, expr.data_type, 0, False, False, True)
                         return Literal(dt, expr)
 

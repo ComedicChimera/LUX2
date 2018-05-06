@@ -49,7 +49,7 @@ def _print_semantic_error(message, params):
         raw_tokens = unparse(params)
     else:
         raw_tokens = [params]
-    len_carrots = raw_tokens[-1].ndx - raw_tokens[0].ndx if len(raw_tokens) > 1 else len(raw_tokens[0].value)
+    len_carrots = (raw_tokens[-1].ndx + len(raw_tokens[-1].value)) - raw_tokens[0].ndx if len(raw_tokens) > 1 else len(raw_tokens[0].value)
     line, ndx = get_position(raw_tokens[0].ndx)
     message += ' [line:%d position:%d]' % (line, ndx)
     message += '\n\n%s' % getln(line, ndx, len_carrots)

@@ -15,13 +15,12 @@ def generate_expr(expr):
                     val1 = generate_logical(item.content[1])
                     val2 = generate_logical(item.content[3])
                     dt = root.data_type
-                    if not (root.data_type == val1.data_type == val2.data_type):
-                        dt = types.dominant(root.data_type, val1.data_type)
+                    if not (val1.data_type == val2.data_type):
+                        dt = types.dominant(val1.data_type, val2.data_type)
                         if not dt:
-                            errormodule.throw('semantic_error', 'Types of inline comparison must be similar', expr)
-                        dt = types.dominant(dt, val2.data_type)
-                        if not dt:
-                            errormodule.throw('semantic_error', 'Types of inline comparison must be similar', expr)
+                            dt = types.dominant(val2.data_type, val1.data_type)
+                            if not dt:
+                                errormodule.throw('semantic_error', 'Types of inline comparison must be similar', item)
                     return ActionNode('InlineCompare', dt, root, val1, val2)
                 else:
                     n_expr = item
@@ -104,11 +103,13 @@ def generate_comparison(comparison):
                 if item.name == 'not':
                     n_tree = generate_comparison(item)
                     if op in {'<=', '>=', '<', '>'}:
-                        if types.numeric(n_tree) and types.numeric(root):
+                        if types.numeric(n_tree.data_type) and types.numeric(root.data_type):
                             root = ActionNode(op, types.DataType(types.DataTypes.BOOL, 0), root, n_tree)
                         else:
                             errormodule.throw('semantic_error', 'Unable to use numeric comparison with non-numeric type'
                                               , comparison)
+                    elif op in {'==', '!=', '===', '!=='}:
+                        root = ActionNode(op, types.DataType(types.DataTypes.BOOL, 0), root, n_tree)
                 elif item.name == 'comparison_op':
                     op = item.content[0].value
             return root
@@ -162,7 +163,7 @@ def generate_arithmetic(ari):
                         tree = ActionNode(op, dt, tree, val2)
                 else:
                     tree = ActionNode(op, dt, root, val2)
-                op, root, = None, None
+                op, root, = None, tree
             else:
                 root = generate_unary_atom(item) if item.name == 'unary_atom' else generate_arithmetic(item)
         else:

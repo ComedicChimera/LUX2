@@ -168,11 +168,11 @@ def check_parameters(func, params, ast):
                 met_count += 1
         else:
             if not dominant(base_params[i].data_type, params[i].data_type):
-                errormodule.throw('semantic_error', 'Type mismatch: Parameters don\'t match', ast)
+                errormodule.throw('semantic_error', 'Parameter data types don\'t match', ast)
             names.append(base_params[i].name)
             if required(base_params[i]):
                 met_count += 1
-    if met_count < sum([x for x in base_params if required(x)]):
+    if met_count < len([x for x in base_params if required(x)]):
         errormodule.throw('semantic_error', 'Too few parameters for function call', ast)
 
 
@@ -195,6 +195,9 @@ def compile_parameters(param_ast):
     params = []
     expr = ''
 
+    if not isinstance(param_ast, ASTNode):
+        return params
+
     for item in param_ast.content:
         if isinstance(item, ASTNode):
             if item.name == 'expr':
@@ -206,7 +209,7 @@ def compile_parameters(param_ast):
                 expr = (ue[0].value, generate_expr(item.content[1]))
             elif item.name == 'n_param':
                 params += compile_parameters(item)
-    return [expr] + params
+    return [generate_expr(expr) if isinstance(expr, ASTNode) else expr] + params
 
 
 import syc.icg.generators.data_types as data_types
