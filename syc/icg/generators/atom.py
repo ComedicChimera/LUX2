@@ -6,6 +6,7 @@ import util
 from syc.icg.action_tree import ActionNode, Identifier, Literal
 import syc.icg.types as types
 import syc.icg.generators.functions as functions
+from syc.icg.generators.data_types import generate_type
 
 
 #########
@@ -381,7 +382,7 @@ def generate_base(ast):
                                                                                             is_async, False))
         elif base.name == 'atom_types':
             # use types to generate a type result
-            return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), types.generate_type(base))
+            return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), generate_type(base))
         # handle lambda generation
         elif base.name == 'lambda':
             # parameter holders
@@ -394,11 +395,11 @@ def generate_base(ast):
                         if param_content[-1].name == 'n_lambda_param':
                             while param_content[-1].name == 'n_lambda_param':
                                 # synthesize parameter object
-                                params.append(type('Object', (), {'name': item.content[0].value, 'data_type': types.generate_type(item.content[-2])}))
+                                params.append(type('Object', (), {'name': item.content[0].value, 'data_type': generate_type(item.content[-2])}))
                                 param_content = param_content[-1].content
                         else:
                             # handle lambdas with only 1 parameter
-                            params.append(type('Object', (), {'name': item.content[0].value, 'data_type': types.generate_type(item.content[-1])}))
+                            params.append(type('Object', (), {'name': item.content[0].value, 'data_type': generate_type(item.content[-1])}))
                     elif item.name == 'expr':
                         # generate the expr and lambda Literal
                         expr = generate_expr(item)

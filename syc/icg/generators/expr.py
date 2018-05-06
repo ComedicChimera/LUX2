@@ -1,5 +1,5 @@
 from syc.parser.ASTtools import ASTNode
-from syc.icg.action_tree import ActionNode, Literal
+from syc.icg.action_tree import ActionNode
 import errormodule
 from util import unparse
 
@@ -44,6 +44,8 @@ import syc.icg.generators.functions as functions
 
 
 def generate_logical(logical):
+    if logical.name == 'comparison':
+        return generate_comparison(logical)
     if len(logical.content) > 1:
         unpacked_tree = logical.content
         for item in unpacked_tree:

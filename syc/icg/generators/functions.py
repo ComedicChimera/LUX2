@@ -1,7 +1,7 @@
 from syc.parser.ASTtools import ASTNode
-from syc.icg.types import generate_type, coerce
 import errormodule
 from util import unparse
+from syc.icg.types import coerce, dominant
 
 
 # generates the declared list of params for any function (an array of symbols)
@@ -51,7 +51,7 @@ def generate_parameter(decl_params):
                     param['const'] = True
             # specify type
             elif item.name == 'extension':
-                param['data_type'] = generate_type(item.content[-1])
+                param['data_type'] = data_types.generate_type(item.content[-1])
             # handle initializer
             elif item.name == 'initializer':
                 param['default_value'] = generate_expr(item.content[-1])
@@ -167,7 +167,7 @@ def check_parameters(func, params, ast):
             if required(elems[0]):
                 met_count += 1
         else:
-            if not types.dominant(base_params[i].data_type, params[i].data_type):
+            if not dominant(base_params[i].data_type, params[i].data_type):
                 errormodule.throw('semantic_error', 'Type mismatch: Parameters don\'t match', ast)
             names.append(base_params[i].name)
             if required(base_params[i]):
@@ -181,7 +181,7 @@ def get_return_from_type(rt_type):
     for item in rt_type.content:
         if isinstance(item, ASTNode):
             if item.name == 'types':
-                rt_types.append(generate_type(item))
+                rt_types.append(data_types.generate_type(item))
             elif item.name == 'n_rt_type':
                 n_types = get_return_from_type(item)
                 if isinstance(n_types, list):
@@ -209,5 +209,5 @@ def compile_parameters(param_ast):
     return [expr] + params
 
 
+import syc.icg.generators.data_types as data_types
 from syc.icg.generators.expr import generate_expr
-import syc.icg.types as types

@@ -180,7 +180,8 @@
     "&"
   ],
   "for_expr": [
-    "$ IDENTIFIER extension = expr ; expr ; assignment ;"
+    "$ IDENTIFIER extension = expr ; expr ; assignment ;",
+    "expr"
   ],
   "iter_body": [
     "sub_scope",
@@ -428,8 +429,12 @@
     "inline_for trailer"
   ],
   "distribute": [
-    "| expr |",
+    "| distribute_expr |",
     "&"
+  ],
+  "distribute_expr": [
+    "inline_function",
+    "lambda"
   ],
   "inline_for": [
     "FOR ( inline_for_expr )"

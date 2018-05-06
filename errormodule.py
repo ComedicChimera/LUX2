@@ -61,6 +61,5 @@ def _print_syntax_error(message, params):
     line, ndx = get_position(params[0].ndx)
     message += ' [line:%d position:%d]' % (line, ndx)
     message += '\n\n%s' % getln(line, ndx, len_carrots)
-    if len(params[1]) > 1:
-        message += '\n\nExpected ' + ', '.join(params[1])
+    message += '\n\nExpected ' + (', '.join(params[1]) if len(params[1]) > 1 else params[1])
     print(message)
