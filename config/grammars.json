@@ -171,7 +171,7 @@
   "for_block": [
     "FOR for_body"
   ],
-  "for_body": [
+ "for_body": [
     "for_header block",
     "base trailer => iter_body"
   ],
@@ -180,8 +180,7 @@
     "&"
   ],
   "for_expr": [
-    "$ IDENTIFIER extension = expr ; expr ; assignment ;",
-    "expr"
+    "$ IDENTIFIER extension = expr ; expr ; assignment ;"
   ],
   "iter_body": [
     "sub_scope",
@@ -212,7 +211,7 @@
     "EXCEPT ( except_content ) handle_block"
   ],
   "except_content": [
-    "expr ( IDENTIFIER ) => { main } except_content",
+    "expr : ( IDENTIFIER ) => { main } except_content",
     "&"
   ],
   "handle_block": [
@@ -417,7 +416,8 @@
   "prefix": [
     "-",
     "* deref_op",
-    "AMP"
+    "AMP",
+    "~"
   ],
   "deref_op": [
     "* deref_op",
@@ -429,12 +429,8 @@
     "inline_for trailer"
   ],
   "distribute": [
-    "| distribute_expr |",
+    "|> expr |",
     "&"
-  ],
-  "distribute_expr": [
-    "inline_function",
-    "lambda"
   ],
   "inline_for": [
     "FOR ( inline_for_expr )"
