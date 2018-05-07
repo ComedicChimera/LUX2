@@ -148,7 +148,7 @@ def coerce(base_type, unknown):
     if not isinstance(base_type, DataType) and not isinstance(unknown, DataType):
         return False
     # object
-    if base_type.data_type.data_type == DataTypes.OBJECT or unknown.data_type.data_type == DataTypes.OBJECT:
+    if base_type.data_type == DataTypes.OBJECT or unknown.data_type == DataTypes.OBJECT:
         return True
     # if either is a not a raw data type, it does not work
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):

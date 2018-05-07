@@ -74,6 +74,7 @@ def generate_logical(logical):
             else:
                 name = item.type.lower()
                 op = name[0].upper() + name[1:]
+        return root
     else:
         return generate_comparison(logical) if logical.name == 'comparison' else generate_logical(logical.content[0])
 
