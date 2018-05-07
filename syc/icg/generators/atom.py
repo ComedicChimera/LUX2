@@ -467,7 +467,7 @@ def generate_array_dict(array_dict):
                         return base_type
                     elif types.coerce(base_type, nt):
                         return base_type
-                    nnt = types.dominant(base_type, nt)
+                    nnt = types.dominant(nt, base_type)
                     if nnt:
                         return nnt
                     else:
@@ -540,7 +540,7 @@ def generate_list(lst):
             if elem.data_type != dt:
                 # check for type coercion
                 if not types.coerce(dt, elem.data_type):
-                    ndt = types.dominant(dt, elem.data_type)
+                    ndt = types.dominant(elem.data_type, dt)
                     # if it is None
                     if not ndt:
                         errormodule.throw('semantic_error', 'All elements of a list/array must be of the same type', lst)
