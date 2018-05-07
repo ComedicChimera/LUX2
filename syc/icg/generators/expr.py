@@ -82,7 +82,7 @@ def generate_logical(logical):
 def generate_comparison(comparison):
     if len(comparison.content) > 1:
         if comparison.name == 'not':
-            tree = generate_shift(comparison)
+            tree = generate_shift(comparison.content[1])
             if isinstance(tree.data_type, types.DataType):
                 return ActionNode('Not', tree.data_type, tree)
             elif isinstance(tree.data_type, types.CustomType):
@@ -115,7 +115,8 @@ def generate_comparison(comparison):
                     op = item.content[0].value
             return root
     else:
-        return generate_shift(comparison) if comparison.name == 'shift' else generate_comparison(comparison.content[0])
+        return generate_shift(comparison) if comparison.name == 'shift' else \
+            generate_comparison(comparison.content[0])
 
 
 def generate_shift(shift):
