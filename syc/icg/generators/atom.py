@@ -137,7 +137,7 @@ def add_trailer(root, trailer):
                             errormodule.throw('semantic_error', 'Unable to perform type cast on multiple objects',
                                               trailer.content[1])
                     obj = generate_expr(parameters[0])
-                    if isinstance(root, Literal):
+                    if isinstance(obj, Literal):
                         tp = root.value
                         casting.static_cast(tp, obj)
                         return ActionNode('StaticCast', tp, obj)
