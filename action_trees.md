@@ -44,7 +44,7 @@ This table documents all the names of the action tree nodes, their functions and
 | StaticCast | Object | Perform a static cast on an object to the return type of the Action Node | *typename*() |
 | DynamicCast | Type, Object | Perform a dynamic cast on an object (warning) | *type yielding expr*() |
 | Return | ~Object | Return a value from a function | return *expr \[, expr\]* |
-| Aggregate | Object, Function | Apply an aggregator | *expr*\|*lambda/inline function*\| |
+| Aggregate | Object, Function | Apply an aggregator | *expr*\|>*lambda/inline function*\| |
 | SliceBegin | Collection, Integer | Perform a slice from beginning to arbitrary index | \[:*integer*\] |
 | SliceEnd | Collection, Integer | Perform a slice from an arbitrary index to the end | \[*integer*:\] |
 | Slice | Collection, Integer, Integer | Slice a collection between 2 arbitrary points | \[*integer*:*integer*\] |
