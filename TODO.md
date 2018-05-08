@@ -13,6 +13,10 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add static cast checking *(syc/icg/casting.py)*
  
  - Add value cast checking *(syc/icg/casting.py)*
+ 
+ - Add cast checking for non-default types *(syc/icg/generators/atom.py)*
+ 
+ - Add type coercion to aggregate functions *(syc/icg/generators/atom.py)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.

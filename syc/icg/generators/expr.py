@@ -34,6 +34,7 @@ def generate_expr(expr):
                                 root = ActionNode('NullCoalesce', dom_type, root, logical)
                             else:
                                 errormodule.throw('semantic_error', 'Types of null coalescing must be similar', expr)
+                        n_expr = n_expr.content[-1]
     return root
 
 
@@ -61,7 +62,11 @@ def generate_logical(logical):
                         root = ActionNode(op, types.DataType(types.DataTypes.BOOL, 0), root, tree)
                         continue
                     else:
-                        root = ActionNode('Bitwise' + op, root.data_type, root, tree)
+                        dom = types.dominant(root.data_type, tree.data_type)
+                        if dom:
+                            root = ActionNode('Bitwise' + op, dom, root, tree)
+                        else:
+                            root = ActionNode('Bitwise' + op, tree.data_type, root, tree)
                 elif isinstance(root.data_type, types.CustomType):
                     method = modules.get_method(tree.data_type.symbol, '__%s__' % op.lower())
                     functions.check_parameters(method, tree, item)
@@ -76,10 +81,12 @@ def generate_logical(logical):
                 op = name[0].upper() + name[1:]
         return root
     else:
-        return generate_comparison(logical) if logical.name == 'comparison' else generate_logical(logical.content[0])
+        return generate_logical(logical.content[0])
 
 
 def generate_comparison(comparison):
+    if comparison.name == 'shift':
+        return generate_shift(comparison)
     if len(comparison.content) > 1:
         if comparison.name == 'not':
             tree = generate_shift(comparison.content[1])
@@ -115,8 +122,7 @@ def generate_comparison(comparison):
                     op = item.content[0].value
             return root
     else:
-        return generate_shift(comparison) if comparison.name == 'shift' else \
-            generate_comparison(comparison.content[0])
+        return generate_comparison(comparison.content[0])
 
 
 def generate_shift(shift):
@@ -135,14 +141,14 @@ def generate_shift(shift):
                     if tree.data_type.data_type == types.DataTypes.INT and tree.data_type.pointers == 0:
                         root = ActionNode(op, root.data_type, root, tree)
                         continue
-                errormodule.throw('semantic_error', 'Invalid type for right operand of binary shift', shift)
+                errormodule.throw('semantic_error', 'Invalid type for right operand of binary shift', item)
             else:
-                if item.name == '<<':
-                    op = 'Alshift'
-                elif item.name == '>>':
-                    op = 'Rshift'
+                if item.type == '<<':
+                    op = 'Lshift'
+                elif item.type == '>>':
+                    op = 'ARshift'
                 else:
-                    op = 'Llshift'
+                    op = 'LRshift'
         return root
     else:
         return generate_arithmetic(shift.content[0])
@@ -214,46 +220,47 @@ def check_operands(val1, val2, operator, ast):
 def generate_unary_atom(u_atom):
     if len(u_atom.content) > 1:
         prefix = u_atom.content[0].content[0]
-        # only possibility for ASTNode is "deref_op"
-        if isinstance(prefix, ASTNode):
-            do = len(unparse(prefix))
+        # handle sine change
+        if prefix.type == '-':
+            # get root atom
+            atom = generate_atom(u_atom.content[1])
+            # test for numericality
+            if types.numeric(atom.data_type):
+                # handle modules
+                if isinstance(atom.data_type, types.CustomType):
+                    invert_method = modules.get_method(atom.data_type.symbol, '__invert__')
+                    return ActionNode('Call', invert_method.data_type.return_type, invert_method)
+                # change the sine of an element
+                else:
+                    return ActionNode('ChangeSine', atom.data_type, atom)
+            else:
+                # throw error
+                errormodule.throw('semantic_error', 'Unable to change sine on non-numeric type.', u_atom)
+        elif prefix.type == 'AMP':
+            # get generated atom
+            pointer = generate_atom(u_atom.content[1])
+            # get pointer
+            pointer.data_type.pointers += 1
+            # reference pointer
+            return ActionNode('Reference', pointer.data_type, pointer)
+        # handle deref op
+        elif prefix.type == '*':
+            do = len(unparse(u_atom.content[0].content[1])) + 1 if len(u_atom.content[0].content) > 1 else 1
             # handle pointer error
-            # < because that means there is more derefenceing than there are references to dereference
-            if u_atom.content[-1].pointers < do:
+            # generate hold atom
+            atom = generate_atom(u_atom.content[-1])
+            # < because that means there is more dereferencing than there are references to dereference
+            if atom.data_type.pointers < do:
                 errormodule.throw('semantic_error', 'Dereferencing of non-pointer', u_atom)
             else:
                 # extract tree
                 tree = None
-                atom = generate_atom(u_atom.content[-1])
                 # apply dereference
                 for _ in range(0, do + 1):
                     atom.data_type.pointers -= 1
                     tree = ActionNode('Dereference', atom.data_type, atom)
                 return tree
-        else:
-            # handle sine change
-            if prefix.type == '-':
-                # get root atom
-                atom = u_atom.content[1]
-                # test for numericality
-                if types.numeric(atom):
-                    # handle modules
-                    if isinstance(atom.data_type, types.CustomType):
-                        invert_method = modules.get_method(atom.data_type.symbol, '__invert__')
-                        return ActionNode('Call', invert_method.data_type.return_type, invert_method)
-                    # change the sine of an element
-                    else:
-                        return ActionNode('ChangeSine', atom.data_type, atom)
-                else:
-                    # throw error
-                    errormodule.throw('semantic_error', 'Unable to change sine on non-numeric type.', u_atom)
-            elif prefix.type == 'AMP':
-                # get generated atom
-                pointer = generate_atom(u_atom.content[1])
-                # get pointer
-                pointer.data_type.pointers += 1
-                # reference pointer
-                return ActionNode('Reference', pointer.data_type, pointer)
+
     else:
         return generate_atom(u_atom.content[0])
 

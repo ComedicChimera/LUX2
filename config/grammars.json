@@ -422,12 +422,8 @@
   ],
   "atom": [
     "new await base trailer",
-    "( expr ) distribute trailer",
+    "( expr ) trailer",
     "inline_for trailer"
-  ],
-  "distribute": [
-    "|> expr |",
-    "&"
   ],
   "inline_for": [
     "FOR ( inline_for_expr )"
@@ -447,6 +443,7 @@
     "[ subscript ] trailer",
     "( func_params ) trailer",
     ". base trailer",
+    "|> expr | trailer",
     "&"
   ],
   "subscript": [

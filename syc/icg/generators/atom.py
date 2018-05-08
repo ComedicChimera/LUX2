@@ -30,14 +30,14 @@ def generate_atom(atom):
                         expr_tree = ActionNode('Distribute', method.data_type.return_type, expr_tree, ActionNode('Call', method.data_type.return_type, method))
                 else:
                     expr_tree = ActionNode('Distribute', distribute_expr.data_type.return_type, expr_tree, distribute_expr)
-        # type check expr tree
-        if isinstance(expr_tree.data_type, types.DataType):
-            if expr_tree.data_type.pointers != 0:
-                errormodule.throw('semantic_error', 'Unable to apply distribution to operator to pointer', atom)
-            elif not expr_tree.data_type.data_type != types.DataTypes.TUPLE and not expr_tree.data_type.data_type != types.DataTypes.STRING:
-                errormodule.throw('semantic_error', 'Invalid data type from distribution operator', atom)
-        elif isinstance(expr_tree.data_type, types.CustomType) and not expr_tree.data_type.enumerable:
-            errormodule.throw('semantic_error', 'Module used for distribution is not enumerable', atom)
+            # type check expr tree
+            if isinstance(expr_tree.data_type, types.DataType):
+                if expr_tree.data_type.pointers != 0:
+                    errormodule.throw('semantic_error', 'Unable to apply distribution to operator to pointer', atom)
+                elif not expr_tree.data_type.data_type != types.DataTypes.TUPLE and not expr_tree.data_type.data_type != types.DataTypes.STRING:
+                    errormodule.throw('semantic_error', 'Invalid data type from distribution operator', atom)
+            elif isinstance(expr_tree.data_type, types.CustomType) and not expr_tree.data_type.enumerable:
+                errormodule.throw('semantic_error', 'Module used for distribution is not enumerable', atom)
         # if it has a trailer, add to expr root tree
         if isinstance(atom.content[-1], ASTNode) and atom.content[-1].name == 'trailer':
             expr_tree = add_trailer(expr_tree, atom.content[-1])
@@ -253,6 +253,44 @@ def add_trailer(root, trailer):
     # if it is a get member
     elif trailer.content[0].type == '.':
         pass
+    # handle distribute
+    elif trailer.content[0].type == "|>":
+        dt = None
+        # type check root
+        if isinstance(root.data_type, types.DataType):
+            if root.data_type.pointers != 0:
+                errormodule.throw('semantic_error', 'Unable to apply aggregation to operator to pointer', trailer)
+            elif not root.data_type.data_type != types.DataTypes.STRING:
+                errormodule.throw('semantic_error', 'Invalid data type from aggregation operator', trailer)
+            dt = types.DataType(types.DataTypes.CHAR, 0)
+        elif isinstance(root.data_type, types.CustomType):
+            if not root.data_type.enumerable:
+                errormodule.throw('semantic_error', 'Module used for aggregation is not enumerable', trailer)
+            dt = modules.get_method(root.data_type.symbol, '__next__').data_type.return_type
+        elif isinstance(root.data_type, types.ListType) or isinstance(root.data_type, types.ArrayType):
+            dt = root.data_type.element_type
+        elif isinstance(root.data_type, types.DictType):
+            dt = (root.data_type.key_type, root.data_type.value_type)
+        # check the distribution expr
+        aggregate_expr = generate_expr(trailer.content[1])
+        # if it isn't a function
+        if not isinstance(aggregate_expr.data_type, types.Function):
+            errormodule.throw('semantic_error', 'Aggregator must be a function', trailer.content[1])
+        # otherwise add
+        else:
+            # check parameters
+            if len(aggregate_expr.data_type.parameters) != 2:
+                errormodule.throw('semantic_error', 'Aggregator can only take two parameters', trailer.content[1])
+            # check dictionary
+            if isinstance(dt, tuple):
+                params = aggregate_expr.data_type.parameters
+                if params[0].data_type != dt[0] or params[1].data_type != dt[1]:
+                    errormodule.throw('semantic_error', 'Aggregator function parameters must match the key and value types of the dictionary', trailer.content[1])
+            # check all others
+            else:
+                if any(x.data_type != dt for x in aggregate_expr.data_type.parameters):
+                    errormodule.throw('semantic_error', 'Aggregator function parameters must match the element type of the aggregate set', trailer.content[1])
+            trailer_added = ActionNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
     # continue adding trailer
     if isinstance(trailer.content[-1], ASTNode):
         if trailer.content[-1].name == 'trailer':
@@ -395,9 +433,16 @@ def generate_base(ast):
                     if item.name == 'lambda_params':
                         param_content = item.content
                         if param_content[-1].name == 'n_lambda_param':
-                            while param_content[-1].name == 'n_lambda_param':
+                            while True:
                                 # synthesize parameter object
-                                params.append(type('Object', (), {'name': item.content[0].value, 'data_type': generate_type(item.content[-2])}))
+                                params.append(type('Object', (), {
+                                    'name': param_content[1].value if param_content[0].type == ',' else param_content[0].value,
+                                    'data_type': generate_type(param_content[-2] if param_content[-1].name == 'n_lambda_param' else param_content[-1])
+                                }))
+                                # check end condition
+                                if param_content[-1].name != 'n_lambda_param':
+                                    break
+                                # update condition
                                 param_content = param_content[-1].content
                         else:
                             # handle lambdas with only 1 parameter
@@ -405,6 +450,7 @@ def generate_base(ast):
                     elif item.name == 'expr':
                         util.symbol_table.add_scope()
                         for param in params:
+                            print(param.name)
                             util.symbol_table.add_variable(Symbol(param.name, param.data_type, []), item)
                         # generate the expr and lambda Literal
                         expr = generate_expr(item)
@@ -471,7 +517,7 @@ def generate_array_dict(array_dict):
                     if nnt:
                         return nnt
                     else:
-                        errormodule.throw('semantic_error', 'All keys/values of a dictionary must be of the same type', sub_dict)
+                        return types.DataType(types.DataTypes.OBJECT, 0)
 
                 kt = match(kt, kv1t)
                 vt = match(vt, kv2t)
@@ -543,7 +589,8 @@ def generate_list(lst):
                     ndt = types.dominant(elem.data_type, dt)
                     # if it is None
                     if not ndt:
-                        errormodule.throw('semantic_error', 'All elements of a list/array must be of the same type', lst)
+                        dt = types.DataType(types.DataTypes.OBJECT, 0)
+                        break
                     dt = ndt
         else:
             # get root element type (assumed from first element)

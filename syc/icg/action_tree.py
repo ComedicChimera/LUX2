@@ -8,7 +8,7 @@ class ActionNode:
     # args = list[sub trees / arguments] (can be Literals, Identifiers or other Action Nodes)
     def __init__(self, func, rt_type, *args):
         self.name = func
-        self.arguments = args
+        self.arguments = [*args]
         # return type of sub function
         self.data_type = rt_type
 
