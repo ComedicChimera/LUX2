@@ -55,11 +55,21 @@ class DataType:
 
 # adapted data type class for arrays
 class ArrayType:
-    def __init__(self, et, pointers):
+    def __init__(self, et, count, pointers):
         # data type of array elements
         self.element_type = et
+        # array element count
+        self.count = count
         # pointers
         self.pointers = pointers
+
+    # equality override to ignore count
+    def __eq__(self, other):
+        if not isinstance(other, ArrayType):
+            return False
+        if other.element_type == self.element_type and other.pointers == self.pointers:
+            return True
+        return False
 
 
 # adapted data type class for lists
@@ -173,7 +183,7 @@ def dominant(base_type, unknown):
     if base_type == unknown:
         return base_type
     # if neither is object and neither is data type return
-    if not isinstance(base_type, DataType) and not isinstance(unknown, DataType):
+    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return
     # if the types are not equal
     if base_type.pointers != unknown.pointers:
@@ -200,8 +210,11 @@ def dominant(base_type, unknown):
 
 # check if element is mutable
 def mutable(dt):
+    # check pointers
+    if dt.pointers != 0:
+        return False
     # if it is a list, dict, or array
-    if isinstance(dt, ListType) or isinstance(dt, DictType) or isinstance(dt, ArrayType):
+    if isinstance(dt, ListType) or isinstance(dt, DictType):
         return True
     # return false if not mutable
     return False

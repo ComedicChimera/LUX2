@@ -547,7 +547,8 @@
   ],
   "array_dict_branch": [
     ": expr n_dict",
-    "n_list"
+    ", expr n_list",
+    "&"
   ],
   "n_dict": [
     ", expr : expr n_dict",
@@ -582,17 +583,10 @@
     "( func_params_decl ) ( rt_type )"
   ],
   "list_modifier": [
-    "[ e_types ]"
-  ],
-  "e_types": [
-    "types",
-    "&"
+    "[ types ]"
   ],
   "dict_modifier": [
-    "[ d_types ]"
-  ],
-  "d_types": [
-    "types , types"
+    "[ types , types ]"
   ],
   "array_modifier": [
     "[ types , expr ]"
@@ -615,6 +609,7 @@
     "COMPLEX_TYPE",
     "LONG_TYPE",
     "OBJECT_TYPE",
-    "PACKAGE_TYPE"
+    "PACKAGE_TYPE",
+    "DATA_TYPE"
   ]
 }

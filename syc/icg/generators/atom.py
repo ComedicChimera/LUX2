@@ -271,7 +271,7 @@ def add_trailer(root, trailer):
             dt = root.data_type.element_type
         elif isinstance(root.data_type, types.DictType):
             dt = (root.data_type.key_type, root.data_type.value_type)
-        # check the distribution expr
+        # check the aggregator expr
         aggregate_expr = generate_expr(trailer.content[1])
         # if it isn't a function
         if not isinstance(aggregate_expr.data_type, types.Function):
@@ -284,11 +284,11 @@ def add_trailer(root, trailer):
             # check dictionary
             if isinstance(dt, tuple):
                 params = aggregate_expr.data_type.parameters
-                if params[0].data_type != dt[0] or params[1].data_type != dt[1]:
+                if not types.dominant(params[0].data_type, dt[0]) or not types.dominant(params[1].data_type, dt[1]):
                     errormodule.throw('semantic_error', 'Aggregator function parameters must match the key and value types of the dictionary', trailer.content[1])
             # check all others
             else:
-                if any(x.data_type != dt for x in aggregate_expr.data_type.parameters):
+                if any(not types.dominant(x.data_type, dt) for x in aggregate_expr.data_type.parameters):
                     errormodule.throw('semantic_error', 'Aggregator function parameters must match the element type of the aggregate set', trailer.content[1])
             trailer_added = ActionNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
     # continue adding trailer
@@ -379,7 +379,7 @@ def generate_base(ast):
                     return generate_byte_array(val)
                 else:
                     # return raw byte literal (converted to hex literal)
-                    return Literal(types.DataTypes.BYTE, hex(int(val[2:])))
+                    return Literal(types.DataType(types.DataTypes.BYTE, 0), hex(int(val[2:])))
             else:
                 # if it has more than 2 digits (4 because prefix)
                 # MAX 0xFF
@@ -388,7 +388,7 @@ def generate_base(ast):
                     return generate_byte_array(val)
                 else:
                     # return raw byte array
-                    return Literal(types.DataTypes.BYTE, val)
+                    return Literal(types.DataType(types.DataTypes.BYTE, 0), val)
         # create array or dictionary
         elif base.name == 'array_dict':
             # return generated literal
@@ -450,7 +450,6 @@ def generate_base(ast):
                     elif item.name == 'expr':
                         util.symbol_table.add_scope()
                         for param in params:
-                            print(param.name)
                             util.symbol_table.add_variable(Symbol(param.name, param.data_type, []), item)
                         # generate the expr and lambda Literal
                         expr = generate_expr(item)
@@ -472,7 +471,7 @@ def generate_array_dict(array_dict):
         # get the element
         elem = generate_expr(array_dict_builder.content[0])
         # et = elem data_type
-        return Literal(types.ArrayType(elem.data_type, 0), [elem])
+        return Literal(types.ArrayType(elem.data_type, 1, 0), [elem])
     # if the last element's (array_dict_branch) first element is a token (:) assume dict
     elif isinstance(array_dict_builder.content[-1].content[0], Token):
         # raw dict == expr : expr n_dict (as a list)
@@ -480,7 +479,7 @@ def generate_array_dict(array_dict):
         # f_key == first key
         f_key = generate_expr(raw_dict[0])
         # make sure f key can be added to dictionary (not mutable
-        if types.mutable(f_key):
+        if types.mutable(f_key.data_type):
             errormodule.throw('semantic_error', 'Dictionary keys cannot be mutable', raw_dict[0])
         # true dict is made up of the action tree values of the first and third element (expr1, and expr2)
         true_dict = {
@@ -536,7 +535,7 @@ def generate_array_dict(array_dict):
         # reuse list generator
         lst = generate_list(array_dict)
         # reformed list classified as array
-        return Literal(types.ArrayType(lst.data_type.element_type,  0), lst.value)
+        return Literal(types.ArrayType(lst.data_type.element_type, len(lst.value), 0), lst.value)
 
 
 # generate a byte array from value of byte token
@@ -548,7 +547,7 @@ def generate_byte_array(bytes_string):
     # get each hexadecimal element organized into pairs (and re-add prefix)
     bytes_array = ['0x' + x for x in map(''.join, zip(*[iter(bytes_string)] * 2))]
     # create array literal
-    return Literal(types.ArrayType(types.DataTypes.BYTE, Literal(types.DataType(types.DataTypes.INT, 0), '0')), bytes_array)
+    return Literal(types.ArrayType(types.DataTypes.BYTE, len(bytes_array), 0), bytes_array)
 
 
 # generate a list literal from list astnode

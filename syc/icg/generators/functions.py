@@ -167,6 +167,8 @@ def check_parameters(func, params, ast):
             if required(elems[0]):
                 met_count += 1
         else:
+            print(params[i].data_type.element_type.data_type)
+            print(base_params[i].data_type.element_type.data_type)
             if not dominant(base_params[i].data_type, params[i].data_type):
                 errormodule.throw('semantic_error', 'Parameter data types don\'t match', ast)
             names.append(base_params[i].name)

@@ -47,7 +47,7 @@ def generate_logical(logical):
     if logical.name == 'comparison':
         return generate_comparison(logical)
     if len(logical.content) > 1:
-        unpacked_tree = logical.content
+        unpacked_tree = logical.content[:]
         for item in unpacked_tree:
             if isinstance(item, ASTNode):
                 if item.name in {'n_or', 'n_xor', 'n_and'}:
@@ -102,7 +102,7 @@ def generate_comparison(comparison):
             else:
                 errormodule.throw('semantic_error', 'The \'!\' operator is not applicable to object', comparison)
         else:
-            unpacked_tree = comparison.content
+            unpacked_tree = comparison.content[:]
             for item in unpacked_tree:
                 if item.name == 'n_comparison':
                     unpacked_tree += unpacked_tree.pop().content
@@ -127,12 +127,12 @@ def generate_comparison(comparison):
 
 def generate_shift(shift):
     if len(shift.content) > 1:
-        unpacked_tree = shift.content
+        unpacked_tree = shift.content[:]
         while unpacked_tree[-1].name == 'n_shift':
             unpacked_tree += unpacked_tree.pop().content
         root = generate_arithmetic(unpacked_tree.pop(0))
         if not isinstance(root.data_type, types.DataType):
-            errormodule.throw('semantic_error', 'Invalid type for left operand of binary shift', shift)
+            errormodule.throw('semantic_error', 'Invalid type for left operand of binary shift', shift.content[0])
         op = ''
         for item in unpacked_tree:
             if isinstance(item, ASTNode):
@@ -155,7 +155,7 @@ def generate_shift(shift):
 
 
 def generate_arithmetic(ari):
-    unpacked_tree = ari.content
+    unpacked_tree = ari.content[:]
     while unpacked_tree[-1].name in {'add_sub_op', 'mul_div_mod_op', 'exp_op'}:
         unpacked_tree += unpacked_tree.pop().content
     root, op, tree = None, None, None
