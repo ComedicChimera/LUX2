@@ -236,11 +236,7 @@
     "generator_stmt",
     "external_stmt",
     "volatile_stmt",
-    "value_stmt",
     "&"
-  ],
-  "value_stmt": [
-    "VALUE ( expr ) trailer initializer"
   ],
   "volatile_stmt": [
     "VOLATILE variable_declaration"
