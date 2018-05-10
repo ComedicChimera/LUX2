@@ -1,5 +1,5 @@
 import re
-from util import unparse
+from util import unparse, SyCloneRecoverableError
 from syc.parser.ASTtools import ASTNode
 
 code = ""
@@ -32,7 +32,6 @@ def throw(error_type, error, params):
         _print_semantic_error(error, params)
     elif error_type == 'syntax_error':
         _print_syntax_error(error, params)
-    exit(1)
 
 
 def warn(message, params):
@@ -53,7 +52,7 @@ def _print_semantic_error(message, params):
     line, ndx = get_position(raw_tokens[0].ndx)
     message += ' [line:%d position:%d]' % (line, ndx)
     message += '\n\n%s' % getln(line, ndx, len_carrots)
-    print(message)
+    raise SyCloneRecoverableError(message)
 
 
 def _print_syntax_error(message, params):
@@ -63,3 +62,4 @@ def _print_syntax_error(message, params):
     message += '\n\n%s' % getln(line, ndx, len_carrots)
     message += '\n\nExpected ' + (', '.join(params[1]) if len(params[1]) > 1 else params[1])
     print(message)
+    exit(1)

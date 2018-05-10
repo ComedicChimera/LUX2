@@ -10,7 +10,10 @@ def generate_tree(ast):
         if isinstance(item, ASTNode):
             # test code for expr compiler
             if item.name == 'expr':
-                print(generate_expr(item))
+                try:
+                    print(generate_expr(item))
+                except util.SyCloneRecoverableError as e:
+                    print(str(e) + '\n')
             else:
                 generate_tree(item)
         elif isinstance(item, util.Package):

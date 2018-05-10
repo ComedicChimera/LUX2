@@ -6,7 +6,7 @@ from syc.parser.ASTtools import Token
 
 
 # main SyClone error class thrown by the error module and others parts of the compiler
-class SyCloneError(Exception):
+class SyCloneRecoverableError(Exception):
     pass
 
 
