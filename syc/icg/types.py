@@ -63,14 +63,6 @@ class ArrayType:
         # pointers
         self.pointers = pointers
 
-    # equality override to ignore count
-    def __eq__(self, other):
-        if not isinstance(other, ArrayType):
-            return False
-        if other.element_type == self.element_type and other.pointers == self.pointers:
-            return True
-        return False
-
 
 # adapted data type class for lists
 class ListType:

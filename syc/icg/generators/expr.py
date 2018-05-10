@@ -195,6 +195,9 @@ def check_operands(val1, val2, operator, ast):
         elif types.enumerable(val1.data_type) and types.enumerable(val2.data_type):
             if val1.data_type == val2.data_type:
                 return val1.data_type
+            elif isinstance(val1.data_type, types.ArrayType) and isinstance(val2.data_type, types.ArrayType):
+                if val1.data_type.element_type == val2.data_type.element_type:
+                    return val1.data_type
             errormodule.throw('semantic_error', 'Unable to apply operator to dissimilar enumerable types', ast)
         errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
     elif operator == '*':

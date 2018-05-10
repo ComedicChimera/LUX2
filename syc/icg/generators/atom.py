@@ -472,70 +472,90 @@ def generate_array_dict(array_dict):
         elem = generate_expr(array_dict_builder.content[0])
         # et = elem data_type
         return Literal(types.ArrayType(elem.data_type, 1, 0), [elem])
-    # if the last element's (array_dict_branch) first element is a token (:) assume dict
+    # if the last element's (array_dict_branch) first element is a token
     elif isinstance(array_dict_builder.content[-1].content[0], Token):
-        # raw dict == expr : expr n_dict (as a list)
-        raw_dict = [array_dict_builder.content[0]] + array_dict_builder.content[-1].content
-        # f_key == first key
-        f_key = generate_expr(raw_dict[0])
-        # make sure f key can be added to dictionary (not mutable
-        if types.mutable(f_key.data_type):
-            errormodule.throw('semantic_error', 'Dictionary keys cannot be mutable', raw_dict[0])
-        # true dict is made up of the action tree values of the first and third element (expr1, and expr2)
-        true_dict = {
-            f_key: generate_expr(raw_dict[2])
-        }
-        kt, vt = f_key.data_type, true_dict[f_key].data_type
-        # add any extra elements
-        if len(raw_dict) == 4:
-            def get_true_dict(sub_dict):
-                nonlocal kt, vt
-                # key-value pair
-                kv_pair = []
-                # iterate through dictionary
-                for item in sub_dict.content:
-                    # check for ast nodes
-                    if isinstance(item, ASTNode):
-                        # extract expr
-                        if item.name == 'expr':
-                            kv_pair.append(generate_expr(item))
-                        # continue adding elements
-                        elif item.name == 'n_dict':
-                            get_true_dict(item)
-                # type checking
-                # kv1t/kv2t == key-value (pos) type
-                kv1t, kv2t = kv_pair[0].data_type, kv_pair[1].data_type
+        if array_dict_builder.content[-1].content[0].type == ':':
+            # raw dict == expr : expr n_dict (as a list)
+            raw_dict = [array_dict_builder.content[0]] + array_dict_builder.content[-1].content
+            # f_key == first key
+            f_key = generate_expr(raw_dict[0])
+            # make sure f key can be added to dictionary (not mutable
+            if types.mutable(f_key.data_type):
+                errormodule.throw('semantic_error', 'Dictionary keys cannot be mutable', raw_dict[0])
+            # true dict is made up of the action tree values of the first and third element (expr1, and expr2)
+            true_dict = {
+                f_key: generate_expr(raw_dict[2])
+            }
+            kt, vt = f_key.data_type, true_dict[f_key].data_type
+            # add any extra elements
+            if len(raw_dict) == 4:
+                def get_true_dict(sub_dict):
+                    nonlocal kt, vt
+                    # key-value pair
+                    kv_pair = []
+                    # iterate through dictionary
+                    for item in sub_dict.content:
+                        # check for ast nodes
+                        if isinstance(item, ASTNode):
+                            # extract expr
+                            if item.name == 'expr':
+                                kv_pair.append(generate_expr(item))
+                            # continue adding elements
+                            elif item.name == 'n_dict':
+                                get_true_dict(item)
+                    # type checking
+                    # kv1t/kv2t == key-value (pos) type
+                    kv1t, kv2t = kv_pair[0].data_type, kv_pair[1].data_type
 
-                # used to check whether or not the two types can be matches
-                def match(base_type, nt):
-                    if base_type == nt:
-                        return base_type
-                    elif types.coerce(base_type, nt):
-                        return base_type
-                    nnt = types.dominant(nt, base_type)
-                    if nnt:
-                        return nnt
-                    else:
-                        return types.DataType(types.DataTypes.OBJECT, 0)
+                    # used to check whether or not the two types can be matches
+                    def match(base_type, nt):
+                        if base_type == nt:
+                            return base_type
+                        elif types.coerce(base_type, nt):
+                            return base_type
+                        nnt = types.dominant(nt, base_type)
+                        if nnt:
+                            return nnt
+                        else:
+                            return types.DataType(types.DataTypes.OBJECT, 0)
 
-                kt = match(kt, kv1t)
-                vt = match(vt, kv2t)
-                # add to true dictionary
-                true_dict[kv_pair[0]] = kv_pair[1]
+                    kt = match(kt, kv1t)
+                    vt = match(vt, kv2t)
+                    # add to true dictionary
+                    true_dict[kv_pair[0]] = kv_pair[1]
 
-            # create dictionary
-            get_true_dict(raw_dict[-1])
-        # return dictionary literal
-        return Literal(types.DictType(kt, vt, 0), true_dict)
+                # create dictionary
+                get_true_dict(raw_dict[-1])
+            # return dictionary literal
+            return Literal(types.DictType(kt, vt, 0), true_dict)
 
-    # else assume it is an array and use the list generator
-    else:
-        # extract n_list
-        array_dict.content[1].content[-1] = array_dict.content[1].content[-1].content[0]
-        # reuse list generator
-        lst = generate_list(array_dict)
-        # reformed list classified as array
-        return Literal(types.ArrayType(lst.data_type.element_type, len(lst.value), 0), lst.value)
+        # else assume it is an array and use the list generator
+        else:
+            if array_dict_builder.content[-1].content[-1].name == 'expr':
+                # generate array base
+                lst = [generate_expr(array_dict_builder.content[0]), generate_expr(array_dict_builder.content[-1].content[-1])]
+                # type check array
+                dt = types.dominant(lst[0].data_type, lst[1].data_type)
+                if not dt:
+                    dt = lst[1].data_type if types.coerce(lst[1].data_type, lst[0].data_type) else types.DataType(types.DataTypes.OBJECT, 0)
+                # return compiled literal
+                return Literal(types.ArrayType(dt, 2, 0), lst)
+            else:
+                # get the first element
+                f_elem = generate_expr(array_dict_builder.content[0])
+                # reform list
+                array_dict.content[1] = type('Object', (), dict(name='list_builder', content=array_dict_builder.content[-1].content[1:]))
+                # reuse list generator
+                lst = generate_list(array_dict)
+                # check data types
+                if types.coerce(f_elem.data_type, lst.data_type.element_type):
+                    dt = f_elem.data_type
+                elif types.coerce(lst.data_type.element_type, f_elem.data_type):
+                    dt = lst.data_type.element_type
+                else:
+                    dt = types.DataType(types.DataTypes.OBJECT, 0)
+                # reformed list classified as array
+                return Literal(types.ArrayType(dt, len(lst.value) + 1, 0), [f_elem] + lst.value)
 
 
 # generate a byte array from value of byte token
@@ -547,7 +567,7 @@ def generate_byte_array(bytes_string):
     # get each hexadecimal element organized into pairs (and re-add prefix)
     bytes_array = ['0x' + x for x in map(''.join, zip(*[iter(bytes_string)] * 2))]
     # create array literal
-    return Literal(types.ArrayType(types.DataTypes.BYTE, len(bytes_array), 0), bytes_array)
+    return Literal(types.ArrayType(types.DataType(types.DataTypes.BYTE, 0), len(bytes_array), 0), bytes_array)
 
 
 # generate a list literal from list astnode
