@@ -4,6 +4,7 @@
     "variable_declaration ; syclone",
     "include_stmt ; syclone",
     "sub_scope syclone",
+    "external_stmt ; syclone",
     "&"
   ],
   "main": [
@@ -233,7 +234,7 @@
     "return_stmt",
     "assignment",
     "include_stmt",
-    "generator_stmt",
+    "yield_stmt",
     "external_stmt",
     "volatile_stmt",
     "&"
@@ -261,7 +262,7 @@
   "return_stmt": [
     "RETURN rt_expr"
   ],
-  "generator_stmt": [
+  "yield_stmt": [
     "YIELD rt_expr"
   ],
   "rt_expr": [

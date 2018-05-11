@@ -48,3 +48,8 @@ This table documents all the names of the action tree nodes, their functions and
 | SliceBegin | Collection, Integer | Perform a slice from beginning to arbitrary index | \[:*integer*\] |
 | SliceEnd | Collection, Integer | Perform a slice from an arbitrary index to the end | \[*integer*:\] |
 | Slice | Collection, Integer, Integer | Slice a collection between 2 arbitrary points | \[*integer*:*integer*\] |
+| Return | Object | Return an object | return *value* |
+| Yield | Object | Return an object and yield function back to spawn process, but retain state | yield *value* |
+| Break | - | Break statement | break |
+| Continue | - | Continue statement | continue |
+| Throw | Error | Throw an error | throw *error* |
