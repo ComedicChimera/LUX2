@@ -34,6 +34,8 @@ def generate_parameter_list(decl_params):
         # if there has been an optional param, and this param is not optional, throw param order exception
         elif optional:
             errormodule.throw('semantic_error', 'Normal parameter preceded by optional parameter', decl_params)
+    # return complete parameter
+    return params
 
 
 def generate_parameter(decl_params):
@@ -141,7 +143,7 @@ def get_return_type(function_body):
                     rt_type = temp_type
     # since rt_type will be evaluated on the basis of not being a direct data type
     # return None is ok
-    return rt_type, generator
+    return rt_type[0].data_type if isinstance(rt_type, tuple) else rt_type, generator
 
 
 # check the parameters passed to a function to ensure that they are valid

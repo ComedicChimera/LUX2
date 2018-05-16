@@ -278,14 +278,14 @@
   ],
   "variable_declaration": [
     "DOLLAR var extension initializer",
-    "@ var extension = expr"
+    "@ var extension initializer"
   ],
   "var": [
-    "( IDENTIFIER initializer multi_var )",
+    "( IDENTIFIER extension initializer multi_var )",
     "IDENTIFIER"
   ],
   "multi_var": [
-    ", IDENTIFIER initializer multi_var",
+    ", IDENTIFIER extension initializer multi_var",
     "&"
   ],
   "initializer": [

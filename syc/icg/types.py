@@ -13,7 +13,6 @@ class DataTypes(Enum):
 
     # extended type set
     STRUCT = 7
-    GROUP = 8
     MODULE = 9
     ENUM = 10
     INTERFACE = 11

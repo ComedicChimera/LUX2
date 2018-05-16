@@ -30,6 +30,6 @@ class Literal:
 
 # class representing in-expr identifier
 class Identifier:
-    def __init__(self, name, instance):
+    def __init__(self, name, data_type):
         self.name = name
-        self.instance = instance
+        self.data_type = data_type

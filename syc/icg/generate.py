@@ -1,7 +1,7 @@
 from syc.icg.table import SymbolTable
 from syc.parser.ASTtools import ASTNode
 import util
-from syc.icg.generators.expr import generate_expr
+from syc.icg.generators.stmt import generate_statement, Context
 
 
 def generate_tree(ast):
@@ -9,9 +9,9 @@ def generate_tree(ast):
     for item in ast.content:
         if isinstance(item, ASTNode):
             # test code for expr compiler
-            if item.name == 'expr':
+            if item.name == 'stmt':
                 try:
-                    print(generate_expr(item))
+                    print(generate_statement(item.content[0], Context(False, False, False)))
                 except util.SyCloneRecoverableError as e:
                     print(str(e) + '\n')
             else:

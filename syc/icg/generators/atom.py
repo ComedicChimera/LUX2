@@ -58,9 +58,9 @@ def generate_atom(atom):
             # iterate through atom collect components
             for item in atom.content:
                 # set await to true if element is awaited
-                await = True if item.name == 'await' else False
+                await = True if item.name == 'await' else await
                 # set new to true if object is dynamically allocated / object
-                new = True if item.name == 'new' else False
+                new = True if item.name == 'new' else new
                 # create base from atom parts
                 # add trailer to base
                 if item.name == 'trailer':
@@ -70,19 +70,19 @@ def generate_atom(atom):
                 base = generate_base(item) if item.name == 'base' else None
             # if awaited and not an async function, throw an error
             if await and not isinstance(base.data_type, types.IncompleteType):
-                errormodule.throw('semantic_error', 'Unable to await anything that is not an asynchronous function', atom)
+                errormodule.throw('semantic_error', 'Unable to await object', atom)
             elif await:
                 base = ActionNode('Await', base.data_type.data_type, base)
             # if instance type is a custom Type or normal data type
-            if new and isinstance(base, types.CustomType) | isinstance(base, types.DataType):
+            if new and isinstance(base.data_type, types.CustomType) | isinstance(base.data_type, types.DataType):
                 # if it is not a structure of a group
-                if base.data_type not in [types.DataType(types.DataTypes.STRUCT, 0), types.DataType(types.DataTypes.GROUP, 0)]:
+                if base.data_type not in [types.DataType(types.DataTypes.STRUCT, 0), types.DataType(types.DataTypes.MODULE, 0)]:
                     # if it is not a data type
                     if base.data_type != types.DataType(types.DataTypes.DATA_TYPE, 0):
                         # if it is not an integer
                         if base.data_type != types.DataType(types.DataTypes.INT, 0):
                             # all tests failed, not allocatable
-                            errormodule.throw('semantic_error', 'Unable to allocate memory for object', atom)
+                            errormodule.throw('semantic_error', 'Unable to dynamically allocate memory for object', atom)
                         else:
                             # malloc for just int size
                             base = ActionNode('Malloc', types.DataType(types.DataTypes.OBJECT, 1), base)
@@ -119,7 +119,8 @@ def add_trailer(root, trailer):
             else:
                 parameters = functions.compile_parameters(trailer.content[1])
                 functions.check_parameters(root, parameters, trailer)
-                trailer_added = ActionNode('Call', root.data_type.return_type, root, parameters)
+                trailer_added = ActionNode('Call', types.IncompleteType(root.data_type) if root.data_type.async else root.data_type.return_type,
+                                           root, parameters)
         elif isinstance(root.data_type, types.DataType):
             if root.data_type.pointers == 0:
                 # call (struct) constructor
@@ -128,6 +129,8 @@ def add_trailer(root, trailer):
                     parameters = structs.check_constructor(root.data_type, trailer.content[1])
                     trailer_added = ActionNode('Constructor', root.data_type, root, parameters)
                 elif root.data_type.data_type == types.DataTypes.DATA_TYPE:
+                    if isinstance(trailer.content[1], Token):
+                        return root
                     parameters = trailer.content[1].content
                     if len(parameters) > 1:
                         if parameters[1].name == 'named_params':
@@ -317,7 +320,7 @@ def generate_base(ast):
             if not sym:
                 errormodule.throw('semantic_error', 'Variable used without declaration', ast)
             # otherwise return the raw symbol
-            return Literal(sym.data_type, sym)
+            return Literal(sym.data_type, Identifier(sym.name, sym.data_type))
         # if it is an instance pointer
         elif base.type == 'THIS':
             # get the group instance (typeof Instance)
@@ -399,22 +402,28 @@ def generate_base(ast):
             is_async = False
             if base.content[0].type == 'ASYNC':
                 is_async = True
-            # generate the parameters (decl_params is 3rd item inward)
-            parameters = functions.generate_parameter_list(base.content[2])
+            if isinstance(base.content[2], Token):
+                parameters = []
+            else:
+                # generate the parameters (decl_params is 3rd item inward)
+                parameters = functions.generate_parameter_list(base.content[2])
             if isinstance(base.content[-1].content[0], ASTNode):
+                # ensure function declares a body
                 if base.content[-1].content[0].content[0].type != ';':
-                    # if it is not an empty function
                     # generate a return type from center (either { main } or => stmt ;)
                     # gen = is generator
-                    rt_type, gen = functions.get_return_type(base.content[-1].content[0].content[1])
+                    # if is is not an empty function
+                    if isinstance(base.content[-1].content[0].content[1], ASTNode):
+                        rt_type, gen = functions.get_return_type(base.content[-1].content[0].content[1])
+                    else:
+                        rt_type, gen = types.DataType(types.DataTypes.NULL, 0), False
                 else:
                     errormodule.throw('semantic_error', 'Inline functions must declare a body', base.content[-1])
-                    # so pycharm won't complain
-                    rt_type, gen = None, False
+                    return
                 dt = types.Function(parameters, rt_type, 0, is_async, gen)
                 # in function literals, its value is its parameters
                 # TODO add body parsing to inline functions
-                fbody = base.content[-1].content[0].content[1]
+                fbody = base.content[-1].content[0].content[1] if isinstance(base.content[-1].content[0].content[1], ASTNode) else []
                 return Literal(dt, fbody)
             else:
                 return_type = functions.get_return_from_type(base.content[-1].content[1])
