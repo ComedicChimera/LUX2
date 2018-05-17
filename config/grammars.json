@@ -240,7 +240,11 @@
     "&"
   ],
   "volatile_stmt": [
-    "VOLATILE variable_declaration"
+    "VOLATILE extern variable_declaration"
+  ],
+  "extern": [
+    "EXTERN",
+    "&"
   ],
   "external_stmt": [
     "EXTERN external_variants"
@@ -248,10 +252,6 @@
   "external_variants": [
     "variable_declaration",
     "include_stmt"
-  ],
-  "rename": [
-    "STRING_LITERAL",
-    "&"
   ],
   "break_stmt": [
     "BREAK"
@@ -318,6 +318,10 @@
   ],
   "use": [
     "USE",
+    "&"
+  ],
+  "rename": [
+    "STRING_LITERAL",
     "&"
   ],
   "expr": [
