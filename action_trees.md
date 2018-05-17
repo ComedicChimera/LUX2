@@ -56,4 +56,4 @@ This table documents all the names of the action tree nodes, their functions and
 | DeclareVariable | Name, Initializer | Declare a single variable (variable type in return type) | $*var* = *initializer* |
 | DeclareConstant | Name, Initializer | Declare a single constant (constant type in return type) | @*var* = *initializer* |
 | DeclareVariables | Variables | Declare multiple variables (overall type in return type) | $(*var*, *var2*): *type* |
-| DeclareConstants | Constants | Declare multiple constants (overall type in return type) | $(*var*, *var2*): *type* |
+| DeclareConstants | Constants | Declare multiple constants (overall type in return type) | @(*var*, *var2*): *type* |
