@@ -17,9 +17,6 @@ class Context:
 
 # statement generator function
 def generate_statement(stmt, context: Context):
-    # remove includes from generation (already evaluated)
-    if stmt.name == 'include':
-        return
     return {
         'return_stmt': generate_return,
         'yield_stmt': generate_return,
@@ -28,7 +25,11 @@ def generate_statement(stmt, context: Context):
         'continue_stmt': lambda s, a: ActionNode('Continue', None) if context.continue_context else errormodule.throw('semantic_error', 'Invalid context for continue statement',
                                                                                                                       stmt),
         'throw_stmt': lambda s: ActionNode('Throw', None, generate_expr(s.content[1])),
-        'variable_declaration': generate_variable_declaration
+        'variable_declaration': lambda s: generate_variable_declaration(s, []),
+        'external_stmt': lambda s: generate_variable_declaration(s.content[1].content[0], [Modifiers.EXTERNAL]),
+        'volatile_stmt': lambda s: generate_variable_declaration(s.content[-1], [Modifiers.VOLATILE] if s.content[1].name != 'extern' else [Modifiers.VOLATILE,
+                                                                                                                                            Modifiers.EXTERNAL]),
+        'assignment': generate_assignment
     }[stmt.name](*([stmt, context] if stmt.name in {'yield_stmt', 'return_stmt', 'break_stmt', 'continue_stmt'} else [stmt]))
 
 
@@ -41,7 +42,7 @@ def generate_return(stmt, context):
 
 
 # create and evaluate a variable declaration
-def generate_variable_declaration(stmt):
+def generate_variable_declaration(stmt, modifiers):
     constant = False
     variables = {}
     overall_type = None
@@ -59,20 +60,20 @@ def generate_variable_declaration(stmt):
             constant = True
     if isinstance(variables, dict):
         for k, v in variables.items():
-            sym = Symbol(k.value, v.data_type if hasattr(v, 'data_type') else overall_type, [Modifiers.CONSTANT] if constant else [])
+            sym = Symbol(k.value, v.data_type if hasattr(v, 'data_type') else overall_type, [Modifiers.CONSTANT] + modifiers if constant else modifiers)
             if not sym.data_type:
                 errormodule.throw('semantic_error', 'Unable to infer data type of variable', k)
             util.symbol_table.add_variable(sym, k)
         if initializer:
             errormodule.throw('semantic_error', 'Multi-%s declaration cannot have global initializer' % ('constant' if constant else 'variable'), stmt)
-        return ActionNode('DeclareConstants' if constant else 'DeclareVariables', overall_type, dict(zip([k.value for k in variables.keys()], variables.values())))
+        return ActionNode('DeclareConstants' if constant else 'DeclareVariables', overall_type, dict(zip([k.value for k in variables.keys()], variables.values())), modifiers)
     else:
         if not overall_type and not initializer:
             errormodule.throw('semantic_error', 'Unable to infer data type of variable', stmt)
         if not types.dominant(overall_type, initializer.data_type):
             errormodule.throw('semantic_error', 'Variable type extension and initializer data types do not match', stmt)
-        util.symbol_table.add_variable(Symbol(variables.value, overall_type, [Modifiers.CONSTANT] if constant else []), stmt)
-        return ActionNode('DeclareConstant' if constant else 'DeclareVariable', overall_type, variables.value, initializer)
+        util.symbol_table.add_variable(Symbol(variables.value, overall_type, [Modifiers.CONSTANT] + modifiers if constant else modifiers), stmt)
+        return ActionNode('DeclareConstant' if constant else 'DeclareVariable', overall_type, variables.value, initializer, modifiers)
 
 
 # generate var (from AST in variable declaration)
@@ -115,3 +116,5 @@ def generate_var(var_ast):
         return variables
 
 
+def generate_assignment(assignment):
+    pass

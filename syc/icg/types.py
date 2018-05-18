@@ -147,6 +147,11 @@ def coerce(base_type, unknown):
         return False
     # if neither is object and neither is data type return
     if not isinstance(base_type, DataType) and not isinstance(unknown, DataType):
+        if type(base_type) == type(unknown):
+            if isinstance(base_type, ListType) or isinstance(base_type, ArrayType):
+                return coerce(base_type.element_type, unknown.element_type)
+            elif isinstance(base_type, DictType):
+                return coerce(base_type.key_type, unknown.key_type) and coerce(base_type.value_type, unknown.value_type)
         return False
     # object
     if base_type.data_type == DataTypes.OBJECT or unknown.data_type == DataTypes.OBJECT:
@@ -175,6 +180,11 @@ def dominant(base_type, unknown):
         return base_type
     # if neither is object and neither is data type return
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
+        if type(base_type) == type(unknown):
+            if isinstance(base_type, ListType) or isinstance(base_type, ArrayType):
+                return dominant(base_type.element_type, unknown.element_type)
+            elif isinstance(base_type, DictType):
+                return dominant(base_type.key_type, unknown.key_type) and coerce(base_type.value_type, unknown.value_type)
         return
     # if the types are not equal
     if base_type.pointers != unknown.pointers:
