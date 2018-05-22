@@ -2,10 +2,11 @@ from syc.icg.generators.expr import generate_expr
 from syc.icg.generators.data_types import generate_type
 from syc.parser.ASTtools import ASTNode
 import errormodule
-from syc.icg.action_tree import ActionNode
+from syc.icg.action_tree import ActionNode, Identifier
 import util
 from syc.icg.table import Symbol, Modifiers
 import syc.icg.types as types
+from syc.icg.modules import get_instance
 
 
 class Context:
@@ -31,6 +32,10 @@ def generate_statement(stmt, context: Context):
                                                                                                                                             Modifiers.EXTERNAL]),
         'assignment': generate_assignment
     }[stmt.name](*([stmt, context] if stmt.name in {'yield_stmt', 'return_stmt', 'break_stmt', 'continue_stmt'} else [stmt]))
+
+
+# prevent recursive imports
+from syc.icg.generators.atom import add_trailer
 
 
 # generate a return value for both returns and generators
@@ -117,4 +122,40 @@ def generate_var(var_ast):
 
 
 def generate_assignment(assignment):
-    pass
+    await, new, root = False, False, None
+    for item in assignment.content:
+        if item.name == 'await':
+            await = True
+        elif item.name == 'new':
+            new = True
+        elif item.name == 'id_types':
+            if item.content[0].type == 'THIS':
+                root = get_instance()
+            else:
+                sym = util.symbol_table.look_up(item.content[0].value)
+                root = Identifier(sym.name, sym.data_type)
+        elif item.name == 'trailer':
+            root = add_trailer(root, item)
+        elif item.name == 'assignment_expr':
+            if await or new:
+                errormodule.throw('semantic_error', 'Invalid operands for %s operator' % 'await' if await else 'new', item)
+            root = generate_assignment_expr(root, item)
+    if await:
+        if not isinstance(root.data_type, types.IncompleteType):
+            errormodule.throw('semantic_error', 'Unable to await object', assignment)
+        root = ActionNode('Await', root.data_type.data_type, root)
+    if new:
+        pass
+    return root
+
+
+def generate_assignment_expr(root, assign_expr):
+    if isinstance(assign_expr.content[0], ASTNode):
+        pass
+    else:
+        # TODO add type checking to increments
+        if assign_expr.content[0].type == '+':
+            root = ActionNode('Increment', None, root)
+        else:
+            root = ActionNode('Decrement', None, root)
+    return root

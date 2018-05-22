@@ -100,8 +100,7 @@ class Function:
     def __eq__(self, other):
         if not isinstance(other, Function):
             return False
-        return other.return_type == self.return_type and other.pointers == self.pointers and other.async == self.async \
-               and other.parameters == self.parameters and other.is_lambda == self.is_lambda
+        return other.return_type == self.return_type and other.pointers == self.pointers and other.async == self.async and other.parameters == self.parameters
 
 
 # class to hold all user defined group types
