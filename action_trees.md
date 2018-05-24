@@ -1,6 +1,8 @@
 # Action Tree Documentation
 This table documents all the names of the action tree nodes, their functions and their parameters.
 
+## Expression Nodes
+
 | Name | Parameters | Function | SyClone Syntax |
 | ---- | -----------| -------- | -------------- |
 | Iterator | Base Atom, Iterator Variable | Generate a list / lambda iterator | collection\[x\] |
@@ -12,7 +14,7 @@ This table documents all the names of the action tree nodes, their functions and
 | Call | Function, Parameters | Call a function | () |
 | Constructor | Constructor, Parameters | Call a constructor for a struct | *constructor*() |
 | Subscript | Index, Collection | Get a value from a collection | \[ndx\] |
-| Dereference | Object | Dereference an Object | * |
+| Dereference | Count, Object | Dereference an Object | * |
 | ChangeSine | Numeric Object | Change the sine of a numeric object | - |
 | Reference | Object | Create a pointer to an object | & |
 | + | ~Object | Add / Concat | + |
@@ -48,14 +50,20 @@ This table documents all the names of the action tree nodes, their functions and
 | SliceBegin | Collection, Integer | Perform a slice from beginning to arbitrary index | \[:*integer*\] |
 | SliceEnd | Collection, Integer | Perform a slice from an arbitrary index to the end | \[*integer*:\] |
 | Slice | Collection, Integer, Integer | Slice a collection between 2 arbitrary points | \[*integer*:*integer*\] |
+
+## Statement Nodes
+
+| Name | Parameters | Statement | SyClone Syntax |
+| ---- | -----------| -------- | -------------- |
 | Return | Object | Return an object | return *value* |
 | Yield | Object | Return an object and yield function back to spawn process, but retain state | yield *value* |
 | Break | - | Break statement | break |
 | Continue | - | Continue statement | continue |
 | Throw | Error | Throw an error | throw *error* |
-| DeclareVariable | Name, Initializer, Modifiers | Declare a single variable (variable type in return type) | $*var* = *initializer* |
-| DeclareConstant | Name, Initializer, Modifiers | Declare a single constant (constant type in return type) | @*var* = *initializer* |
-| DeclareVariables | Variables, Modifiers | Declare multiple variables (overall type in return type) | $(*var*, *var2*): *type* |
-| DeclareConstants | Constants, Modifiers | Declare multiple constants (overall type in return type) | @(*var*, *var2*): *type* |
+| DeclareVariable | Type, Name, Initializer, Modifiers | Declare a single variable | $*var* = *initializer* |
+| DeclareConstant | Type, Name, Initializer, Modifiers | Declare a single constant | @*var* = *initializer* |
+| DeclareVariables | Overall Type, Variables, Modifiers | Declare multiple variables | $(*var*, *var2*): *type* |
+| DeclareConstants | Overall Type, Constants, Modifiers | Declare multiple constants | @(*var*, *var2*): *type* |
 | Increment | Numeric | Increment a value | *var*++ |
 | Decrement | Numeric | Decrement a value | *var*-- |
+| Expr | Expr | Invoke an expression as a statement | *expr* |

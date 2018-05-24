@@ -3,7 +3,7 @@ import re
 
 import errormodule as er
 import util
-from syc.parser.ASTtools import Token
+from syc.ast.ast import Token
 
 
 class Lexer:

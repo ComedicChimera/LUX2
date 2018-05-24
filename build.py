@@ -1,11 +1,11 @@
 import os
 
-import syc.parser.syc_parser as parser
-from syc.parser.ASTtools import ASTNode
+import syc.ast.parser as parser
+from syc.ast.ast import ASTNode
 import syc.icg.generate as generate
 
 import errormodule
-import syc.parser.lexer as lexer
+import syc.ast.lexer as lexer
 import util
 from lib.package_manager import get
 

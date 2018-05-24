@@ -8,7 +8,9 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Remove to_str methods once testing is complete *(everywhere)*
  
- - Comment expr.py *(syc/icg/generators/expr.py)* 
+ - Comment expr.py *(syc/icg/generators/expr.py)*
+ 
+ - Comment statement.py *(syc/icg/generators/stmt.py)*
 
  - Add static cast checking *(syc/icg/casting.py)*
  

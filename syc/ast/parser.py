@@ -1,8 +1,8 @@
-import syc.parser.gramtools as gramtools
+import syc.ast.grammar as gramtools
 
 import errormodule as er
-from syc.parser.ASTtools import ASTNode
-from syc.parser.ASTtools import Token
+from syc.ast.ast import ASTNode
+from syc.ast.ast import Token
 
 
 class Parser:

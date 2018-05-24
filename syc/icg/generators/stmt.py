@@ -1,8 +1,8 @@
 from syc.icg.generators.expr import generate_expr
 from syc.icg.generators.data_types import generate_type
-from syc.parser.ASTtools import ASTNode
+from syc.ast.ast import ASTNode
 import errormodule
-from syc.icg.action_tree import ActionNode, Identifier
+from syc.icg.action_tree import ExprNode, Identifier, StatementNode
 import util
 from syc.icg.table import Symbol, Modifiers
 import syc.icg.types as types
@@ -21,11 +21,11 @@ def generate_statement(stmt, context: Context):
     return {
         'return_stmt': generate_return,
         'yield_stmt': generate_return,
-        'break_stmt': lambda s, a: ActionNode('Break', None) if context.break_context else errormodule.throw('semantic_error', 'Invalid context for break statement',
-                                                                                                             stmt),
-        'continue_stmt': lambda s, a: ActionNode('Continue', None) if context.continue_context else errormodule.throw('semantic_error', 'Invalid context for continue statement',
-                                                                                                                      stmt),
-        'throw_stmt': lambda s: ActionNode('Throw', None, generate_expr(s.content[1])),
+        'break_stmt': lambda s, a: StatementNode('Break') if context.break_context else errormodule.throw('semantic_error', 'Invalid context for break statement',
+                                                                                                           stmt),
+        'continue_stmt': lambda s, a: StatementNode('Continue') if context.continue_context else errormodule.throw('semantic_error', 'Invalid context for continue statement',
+                                                                                                                    stmt),
+        'throw_stmt': lambda s: StatementNode('Throw', generate_expr(s.content[1])),
         'variable_declaration': lambda s: generate_variable_declaration(s, []),
         'external_stmt': lambda s: generate_variable_declaration(s.content[1].content[0], [Modifiers.EXTERNAL]),
         'volatile_stmt': lambda s: generate_variable_declaration(s.content[-1], [Modifiers.VOLATILE] if s.content[1].name != 'extern' else [Modifiers.VOLATILE,
@@ -41,7 +41,7 @@ from syc.icg.generators.atom import add_trailer
 # generate a return value for both returns and generators
 def generate_return(stmt, context):
     if context.return_context:
-        return ActionNode('Return' if stmt.name == 'return_stmt' else 'Yield', None, generate_expr(stmt.content[1]))
+        return StatementNode('Return' if stmt.name == 'return_stmt' else 'Yield', generate_expr(stmt.content[1]))
     else:
         errormodule.throw('semantic_error', 'Invalid context for ' + ('yield statement' if stmt.name == 'yield_stmt' else 'return statement'), stmt)
 
@@ -71,14 +71,14 @@ def generate_variable_declaration(stmt, modifiers):
             util.symbol_table.add_variable(sym, k)
         if initializer:
             errormodule.throw('semantic_error', 'Multi-%s declaration cannot have global initializer' % ('constant' if constant else 'variable'), stmt)
-        return ActionNode('DeclareConstants' if constant else 'DeclareVariables', overall_type, dict(zip([k.value for k in variables.keys()], variables.values())), modifiers)
+        return StatementNode('DeclareConstants' if constant else 'DeclareVariables', overall_type, dict(zip([k.value for k in variables.keys()], variables.values())), modifiers)
     else:
         if not overall_type and not initializer:
             errormodule.throw('semantic_error', 'Unable to infer data type of variable', stmt)
         if not types.dominant(overall_type, initializer.data_type):
             errormodule.throw('semantic_error', 'Variable type extension and initializer data types do not match', stmt)
         util.symbol_table.add_variable(Symbol(variables.value, overall_type, [Modifiers.CONSTANT] + modifiers if constant else modifiers), stmt)
-        return ActionNode('DeclareConstant' if constant else 'DeclareVariable', overall_type, variables.value, initializer, modifiers)
+        return StatementNode('DeclareConstant' if constant else 'DeclareVariable', overall_type, variables.value, initializer, modifiers)
 
 
 # generate var (from AST in variable declaration)
@@ -128,12 +128,8 @@ def generate_assignment(assignment):
             await = True
         elif item.name == 'new':
             new = True
-        elif item.name == 'id_types':
-            if item.content[0].type == 'THIS':
-                root = get_instance()
-            else:
-                sym = util.symbol_table.look_up(item.content[0].value)
-                root = Identifier(sym.name, sym.data_type)
+        elif item.name == 'assign_var':
+            root = generate_assign_var(item)
         elif item.name == 'trailer':
             root = add_trailer(root, item)
         elif item.name == 'assignment_expr':
@@ -143,19 +139,53 @@ def generate_assignment(assignment):
     if await:
         if not isinstance(root.data_type, types.IncompleteType):
             errormodule.throw('semantic_error', 'Unable to await object', assignment)
-        root = ActionNode('Await', root.data_type.data_type, root)
+        root = StatementNode('Expr', ExprNode('Await', root.data_type.data_type, root))
     if new:
         pass
     return root
+
+
+def generate_assign_var(assign_var):
+    def generate_id_type(id_type):
+        if id_type.content[0].type == 'THIS':
+            return get_instance()
+        else:
+            sym = util.symbol_table.look_up(id_type.content[0].value)
+            if not sym:
+                errormodule.throw('semantic_error', 'Variable \'%s\' not defined' % id_type.content[0], id_type)
+            return Identifier(sym.name, sym.data_type)
+
+    if isinstance(assign_var.content[0], ASTNode):
+        return generate_id_type(assign_var.content[0])
+    else:
+        if isinstance(assign_var.content[-1].content[0], ASTNode):
+            root = generate_id_type(assign_var.content[-1].content[0])
+        else:
+            root = generate_assign_var(assign_var.content[-1].content[1])
+            if len(assign_var.content[-1].content) > 3:
+                root = add_trailer(root, assign_var.content[-1].content[2])
+        deref_count = 1 if len(assign_var.content) == 2 else len(util.unparse(assign_var.content[1])) + 1
+        if deref_count != root.data_type.pointers:
+            errormodule.throw('semantic_error', 'Unable to dereference a non-pointers', assign_var)
+        return ExprNode('Dereference', None, deref_count, root)
 
 
 def generate_assignment_expr(root, assign_expr):
     if isinstance(assign_expr.content[0], ASTNode):
         pass
     else:
-        # TODO add type checking to increments
+        if not modifiable(root):
+            errormodule.throw('semantic_error', 'Unable to modify unmodifiable l-value', assign_expr)
+        if not types.numeric(root.data_type):
+            errormodule.throw('semantic_error', 'Unable to increment/decrement non numeric value', assign_expr)
         if assign_expr.content[0].type == '+':
-            root = ActionNode('Increment', None, root)
+            root = StatementNode('Increment', root)
         else:
-            root = ActionNode('Decrement', None, root)
+            root = StatementNode('Decrement', root)
     return root
+
+
+def modifiable(root):
+    for item in root.arguments:
+        pass
+    return True

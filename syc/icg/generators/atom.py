@@ -1,9 +1,9 @@
 import errormodule
 import syc.icg.modules as modules
 from syc.icg.table import Symbol
-from syc.parser.ASTtools import ASTNode, Token
+from syc.ast.ast import ASTNode, Token
 import util
-from syc.icg.action_tree import ActionNode, Identifier, Literal
+from syc.icg.action_tree import ExprNode, Identifier, Literal
 import syc.icg.types as types
 import syc.icg.generators.functions as functions
 from syc.icg.generators.data_types import generate_type
@@ -27,9 +27,9 @@ def generate_atom(atom):
                 if not isinstance(distribute_expr.data_type, types.Function):
                     if isinstance(distribute_expr.data_type, types.CustomType) and distribute_expr.data_type.callable:
                         method = modules.get_method(distribute_expr.data_type.symbol, '__call__')
-                        expr_tree = ActionNode('Distribute', method.data_type.return_type, expr_tree, ActionNode('Call', method.data_type.return_type, method))
+                        expr_tree = ExprNode('Distribute', method.data_type.return_type, expr_tree, ExprNode('Call', method.data_type.return_type, method))
                 else:
-                    expr_tree = ActionNode('Distribute', distribute_expr.data_type.return_type, expr_tree, distribute_expr)
+                    expr_tree = ExprNode('Distribute', distribute_expr.data_type.return_type, expr_tree, distribute_expr)
             # type check expr tree
             if isinstance(expr_tree.data_type, types.DataType):
                 if expr_tree.data_type.pointers != 0:
@@ -72,7 +72,7 @@ def generate_atom(atom):
             if await and not isinstance(base.data_type, types.IncompleteType):
                 errormodule.throw('semantic_error', 'Unable to await object', atom)
             elif await:
-                base = ActionNode('Await', base.data_type.data_type, base)
+                base = ExprNode('Await', base.data_type.data_type, base)
             # if instance type is a custom Type or normal data type
             if new and isinstance(base.data_type, types.CustomType) | isinstance(base.data_type, types.DataType):
                 # if it is not a structure of a group
@@ -85,14 +85,14 @@ def generate_atom(atom):
                             errormodule.throw('semantic_error', 'Unable to dynamically allocate memory for object', atom)
                         else:
                             # malloc for just int size
-                            base = ActionNode('Malloc', types.DataType(types.DataTypes.OBJECT, 1), base)
+                            base = ExprNode('Malloc', types.DataType(types.DataTypes.OBJECT, 1), base)
                     else:
                         # return memory allocation with size of type
                         base.data_type.pointers += 1
-                        base = ActionNode('Malloc', base.data_type, ActionNode('SizeOf', types.DataType(types.DataTypes.INT, 1), base))
+                        base = ExprNode('Malloc', base.data_type, ExprNode('SizeOf', types.DataType(types.DataTypes.INT, 1), base))
                 else:
                     # return object instance
-                    base = ActionNode('CreateObjectInstance', types.Instance(base.data_type), base)
+                    base = ExprNode('CreateObjectInstance', types.Instance(base.data_type), base)
             elif new:
                 # throw error if list, instance, or dict
                 errormodule.throw('semantic_error', 'Unable to dynamically allocate memory for object', atom)
@@ -119,15 +119,15 @@ def add_trailer(root, trailer):
             else:
                 parameters = functions.compile_parameters(trailer.content[1])
                 functions.check_parameters(root, parameters, trailer)
-                trailer_added = ActionNode('Call', types.IncompleteType(root.data_type) if root.data_type.async else root.data_type.return_type,
-                                           root, parameters)
+                trailer_added = ExprNode('Call', types.IncompleteType(root.data_type) if root.data_type.async else root.data_type.return_type,
+                                         root, parameters)
         elif isinstance(root.data_type, types.DataType):
             if root.data_type.pointers == 0:
                 # call (struct) constructor
                 if root.data_type.data_type == types.DataTypes.STRUCT:
                     # check struct generator
                     parameters = structs.check_constructor(root.data_type, trailer.content[1])
-                    trailer_added = ActionNode('Constructor', root.data_type, root, parameters)
+                    trailer_added = ExprNode('Constructor', root.data_type, root, parameters)
                 elif root.data_type.data_type == types.DataTypes.DATA_TYPE:
                     if isinstance(trailer.content[1], Token):
                         return root
@@ -143,10 +143,10 @@ def add_trailer(root, trailer):
                     if isinstance(obj, Literal):
                         tp = root.value
                         casting.static_cast(tp, obj)
-                        return ActionNode('StaticCast', tp, obj)
+                        return ExprNode('StaticCast', tp, obj)
                     else:
                         errormodule.warn('Dynamic cast performed in place of static cast', trailer)
-                        return ActionNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
+                        return ExprNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
                 elif root.data_type.data_type == types.DataTypes.VALUE:
                     return casting.value_cast(generate_expr(trailer.content[1]))
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -157,7 +157,7 @@ def add_trailer(root, trailer):
             else:
                 constructor = modules.get_constructor(root.data_type.symbol)
                 parameters = modules.check_constructor_parameters(constructor, trailer.content[1])
-                return ActionNode('Call', root.data_type, constructor, parameters)
+                return ExprNode('Call', root.data_type, constructor, parameters)
         # throw invalid call error
         else:
             errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -170,15 +170,15 @@ def add_trailer(root, trailer):
                 errormodule.throw('semantic_error', 'Subscript cannot be a pointer', trailer)
             if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType)
                                                                     or isinstance(root.data_type, types.ArrayType)):
-                return ActionNode('SliceBegin', root.data_type.element_type, root, expr)
+                return ExprNode('SliceBegin', root.data_type.element_type, root, expr)
             elif isinstance(root.data_type, types.CustomType):
                 method = modules.get_method(root.data_type.symbol, '__slice__')
                 if method:
                     functions.check_parameters(method, [expr], trailer)
-                    return ActionNode('Call', method.data_type.return_type, method, expr)
+                    return ExprNode('Call', method.data_type.return_type, method, expr)
                 errormodule.throw('semantic_error', 'Object has no method \'__slice__\'', trailer)
             elif root.data_type.data_type == types.DataTypes.STRING and expr.data_type.data_type == types.DataTypes.INT:
-                return ActionNode('SliceBegin', types.DataType(types.DataTypes.STRING, 0), root, expr)
+                return ExprNode('SliceBegin', types.DataType(types.DataTypes.STRING, 0), root, expr)
             if not isinstance(expr.data_type, types.DataType) or expr.data_type.data_type != types.DataTypes.INT:
                 errormodule.throw('semantic_error', 'Index must be an integral value', trailer)
             errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
@@ -200,22 +200,22 @@ def add_trailer(root, trailer):
                         slice_method = modules.get_method(root.data_type.symbol, '__slice__')
                         if slice_method:
                             functions.check_parameters(slice_method, [expr, expr2], trailer)
-                            return ActionNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
+                            return ExprNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
                     errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
                 elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                    return ActionNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
-                return ActionNode('Slice', root.data_type.element_type, root, expr, expr2)
+                    return ExprNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
+                return ExprNode('Slice', root.data_type.element_type, root, expr, expr2)
             else:
                 if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
                     if isinstance(root.data_type, types.CustomType):
                         slice_method = modules.get_method(root.data_type.symbol, '__slice__')
                         if slice_method:
                             functions.check_parameters(slice_method, [None, expr], trailer)
-                            return ActionNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
+                            return ExprNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
                     errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
                 elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                    return ActionNode('SliceEnd', types.DataType(types.DataTypes.CHAR, 0), root, expr)
-                return ActionNode('SliceEnd', root.data_type.element_type, root, expr)
+                    return ExprNode('SliceEnd', types.DataType(types.DataTypes.CHAR, 0), root, expr)
+                return ExprNode('SliceEnd', root.data_type.element_type, root, expr)
         # handle traditional subscripting
         else:
             # the only subscriptable components are mutable (except for strings)
@@ -232,7 +232,7 @@ def add_trailer(root, trailer):
                 else:
                     errormodule.throw('semantic_error', 'Invalid type for subscript', trailer)
                     dt = None
-                trailer_added = ActionNode('Subscript', dt, expr, root)
+                trailer_added = ExprNode('Subscript', dt, expr, root)
             # if it is a module
             elif root.data_type == types.DataType(types.DataTypes.MODULE, 0):
                 # if it has subscript method
@@ -240,7 +240,7 @@ def add_trailer(root, trailer):
                 if subscript_method:
                     expr = generate_expr(trailer.content[1].content[0])
                     functions.check_parameters(subscript_method, [expr], trailer)
-                    trailer_added = ActionNode('Call', subscript_method.data_type.return_type, subscript_method, expr)
+                    trailer_added = ExprNode('Call', subscript_method.data_type.return_type, subscript_method, expr)
                 # otherwise it is invalid
                 else:
                     errormodule.throw('semantic_error', 'Object has no method \'__subscript__\'', trailer)
@@ -248,7 +248,7 @@ def add_trailer(root, trailer):
             elif root.data_type == types.DataType(types.DataTypes.STRING, 0):
                 expr = generate_expr(trailer.content[1])
                 if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT:
-                    trailer_added = ActionNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), expr, root)
+                    trailer_added = ExprNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), expr, root)
                 else:
                     errormodule.throw('semantic_error', 'Strings can only be subscripted using integers', trailer)
             else:
@@ -293,7 +293,7 @@ def add_trailer(root, trailer):
             else:
                 if any(not types.dominant(x.data_type, dt) for x in aggregate_expr.data_type.parameters):
                     errormodule.throw('semantic_error', 'Aggregator function parameters must match the element type of the aggregate set', trailer.content[1])
-            trailer_added = ActionNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
+            trailer_added = ExprNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
     # continue adding trailer
     if isinstance(trailer.content[-1], ASTNode):
         if trailer.content[-1].name == 'trailer':
@@ -661,10 +661,10 @@ def generate_comprehension(lb):
                     # throw error if not a boolean
                     errormodule.throw('semantic_error', 'Comprehension filter statement expression does not evaluate to a boolean', item)
                 # compile final result and add to args
-                l_args.append(ActionNode('ForIf', cond_expr.data_type, cond_expr))
+                l_args.append(ExprNode('ForIf', cond_expr.data_type, cond_expr))
     # exit lambda scope
     util.symbol_table.exit_scope()
-    return ActionNode('ForExpr', l_type, *l_args)
+    return ExprNode('ForExpr', l_type, *l_args)
 
 
 # convert iter atom to an Iterator
@@ -726,7 +726,7 @@ def generate_iterator(lb_atom):
     # arguments: [compiled root atom, Iterator]
     args = [base_atom, sym]
     # return generated iterator
-    return ActionNode('Iterator', base_atom.data_type, *args)
+    return ExprNode('Iterator', base_atom.data_type, *args)
 
 
 # gets the name of the new iterator

@@ -2,7 +2,7 @@ import os
 import sys
 
 # used for unparse
-from syc.parser.ASTtools import Token
+from syc.ast.ast import Token
 
 
 # main SyClone error class thrown by the error module and others parts of the compiler

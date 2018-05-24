@@ -1,9 +1,9 @@
 # all Action Tree related classes
 
 
-# branch nodes that make up the action tree
+# branch nodes that make up expressions in Action Tree
 # similar to AST Nodes
-class ActionNode:
+class ExprNode:
     # func = str (name of function / operation)
     # args = list[sub trees / arguments] (can be Literals, Identifiers or other Action Nodes)
     def __init__(self, func, rt_type, *args):
@@ -14,6 +14,18 @@ class ActionNode:
 
     def __str__(self):
         return '(%s, %s){%s}' % (self.name, self.data_type, ', '.join(map(lambda x: str(x), self.arguments)))
+
+
+# single nodes used to represent statements in Action Tree, like ExprNodes, but without return type
+class StatementNode:
+    # statement = type of statement
+    # args = arguments / components of statement
+    def __init__(self, stmt, *args):
+        self.statement = stmt
+        self.arguments = [*args]
+
+    def __str__(self):
+        return self.statement + ' {%s}\n' % ', '.join(map(lambda x: str(x), self.arguments))
 
 
 # class representing literal value

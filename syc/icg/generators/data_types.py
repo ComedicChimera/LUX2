@@ -1,5 +1,5 @@
 import util
-from syc.parser.ASTtools import Token
+from syc.ast.ast import Token
 import syc.icg.types as types
 import errormodule
 

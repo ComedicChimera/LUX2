@@ -1,5 +1,5 @@
 from syc.icg.table import SymbolTable
-from syc.parser.ASTtools import ASTNode
+from syc.ast.ast import ASTNode
 import util
 from syc.icg.generators.stmt import generate_statement, Context
 

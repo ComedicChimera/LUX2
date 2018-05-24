@@ -1,4 +1,4 @@
-from syc.parser.ASTtools import ASTNode
+from syc.ast.ast import ASTNode
 import errormodule
 from util import unparse
 from syc.icg.types import coerce, dominant

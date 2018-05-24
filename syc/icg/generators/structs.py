@@ -1,4 +1,4 @@
-from syc.parser.ASTtools import ASTNode
+from syc.ast.ast import ASTNode
 from syc.icg.table import Symbol, Modifiers
 import syc.icg.types as types
 import syc.icg.modules as modules
