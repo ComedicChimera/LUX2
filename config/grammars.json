@@ -30,8 +30,7 @@
     "func_block",
     "enum_block",
     "interface_block",
-    "struct_block",
-    "macro_block"
+    "struct_block"
   ],
   "block_stmt": [
     "if_block",
@@ -144,16 +143,6 @@
   ],
   "n_var": [
     ", DOLLAR IDENTIFIER extension n_var",
-    "&"
-  ],
-  "macro_block": [
-    "MACRO IDENTIFIER ( macro_params ) => expr ;"
-  ],
-  "macro_params": [
-    "IDENTIFIER extension n_macro_param"
-  ],
-  "n_macro_param": [
-    ", IDENTIFIER extension n_macro_param",
     "&"
   ],
   "if_block": [

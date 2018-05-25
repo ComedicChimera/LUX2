@@ -1,6 +1,6 @@
 import errormodule
 import syc.icg.modules as modules
-from syc.icg.table import Symbol
+from syc.icg.table import Symbol, Modifiers
 from syc.ast.ast import ASTNode, Token
 import util
 from syc.icg.action_tree import ExprNode, Identifier, Literal
@@ -26,7 +26,7 @@ def generate_atom(atom):
                 distribute_expr = generate_expr(atom.content[3].content[1])
                 if not isinstance(distribute_expr.data_type, types.Function):
                     if isinstance(distribute_expr.data_type, types.CustomType) and distribute_expr.data_type.callable:
-                        method = modules.get_method(distribute_expr.data_type.symbol, '__call__')
+                        method = modules.get_property(distribute_expr.data_type.members, '__call__')
                         expr_tree = ExprNode('Distribute', method.data_type.return_type, expr_tree, ExprNode('Call', method.data_type.return_type, method))
                 else:
                     expr_tree = ExprNode('Distribute', distribute_expr.data_type.return_type, expr_tree, distribute_expr)
@@ -155,7 +155,7 @@ def add_trailer(root, trailer):
             if root.pointers != 0:
                 errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
             else:
-                constructor = modules.get_constructor(root.data_type.symbol)
+                constructor = modules.get_constructor(root.data_type.members)
                 parameters = modules.check_constructor_parameters(constructor, trailer.content[1])
                 return ExprNode('Call', root.data_type, constructor, parameters)
         # throw invalid call error
@@ -172,7 +172,7 @@ def add_trailer(root, trailer):
                                                                     or isinstance(root.data_type, types.ArrayType)):
                 return ExprNode('SliceBegin', root.data_type.element_type, root, expr)
             elif isinstance(root.data_type, types.CustomType):
-                method = modules.get_method(root.data_type.symbol, '__slice__')
+                method = modules.get_property(root.data_type.members, '__slice__')
                 if method:
                     functions.check_parameters(method, [expr], trailer)
                     return ExprNode('Call', method.data_type.return_type, method, expr)
@@ -197,7 +197,7 @@ def add_trailer(root, trailer):
                     errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
                 if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
                     if isinstance(root.data_type, types.CustomType):
-                        slice_method = modules.get_method(root.data_type.symbol, '__slice__')
+                        slice_method = modules.get_property(root.data_type.members, '__slice__')
                         if slice_method:
                             functions.check_parameters(slice_method, [expr, expr2], trailer)
                             return ExprNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
@@ -208,7 +208,7 @@ def add_trailer(root, trailer):
             else:
                 if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
                     if isinstance(root.data_type, types.CustomType):
-                        slice_method = modules.get_method(root.data_type.symbol, '__slice__')
+                        slice_method = modules.get_property(root.data_type.members, '__slice__')
                         if slice_method:
                             functions.check_parameters(slice_method, [None, expr], trailer)
                             return ExprNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
@@ -234,9 +234,9 @@ def add_trailer(root, trailer):
                     dt = None
                 trailer_added = ExprNode('Subscript', dt, expr, root)
             # if it is a module
-            elif root.data_type == types.DataType(types.DataTypes.MODULE, 0):
+            elif isinstance(root.data_type, types.CustomType) and root.data_type.data_type == types.DataType(types.DataTypes.MODULE, 0):
                 # if it has subscript method
-                subscript_method = modules.get_method(root.value, '__subscript__')
+                subscript_method = modules.get_property(root.data_type.members, '__subscript__')
                 if subscript_method:
                     expr = generate_expr(trailer.content[1].content[0])
                     functions.check_parameters(subscript_method, [expr], trailer)
@@ -255,9 +255,23 @@ def add_trailer(root, trailer):
                 errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
     # if it is a get member
     elif trailer.content[0].type == '.':
-        pass
+        if isinstance(root.data_type, types.CustomType):
+            if root.data_type.data_type.data_type == types.DataTypes.INTERFACE:
+                errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
+            elif root.data_type.data_type.data_type == types.DataTypes.MODULE:
+                prop = modules.get_property(root.data_type.members, trailer.content[1].value)
+                if not prop:
+                    return Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers)
+                errormodule.throw('semantic_error', 'Object has no member \'%s\'' % prop, trailer.content[1])
+            else:
+                identifier = trailer.content[1].value
+                if identifier in root.data_type.members:
+                    return root.data_type.members[identifier]
+                errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, trailer.content[1])
+        else:
+            errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
     # handle distribute
-    elif trailer.content[0].type == "|>":
+    elif trailer.content[0].type == '|>':
         dt = None
         # type check root
         if isinstance(root.data_type, types.DataType):
@@ -269,7 +283,7 @@ def add_trailer(root, trailer):
         elif isinstance(root.data_type, types.CustomType):
             if not root.data_type.enumerable:
                 errormodule.throw('semantic_error', 'Module used for aggregation is not enumerable', trailer)
-            dt = modules.get_method(root.data_type.symbol, '__next__').data_type.return_type
+            dt = modules.get_property(root.data_type.members, '__next__').data_type.return_type
         elif isinstance(root.data_type, types.ListType) or isinstance(root.data_type, types.ArrayType):
             dt = root.data_type.element_type
         elif isinstance(root.data_type, types.DictType):
@@ -315,12 +329,12 @@ def generate_base(ast):
         # if it is an identifier
         if base.type == 'IDENTIFIER':
             # look it up in the s-table
-            sym = util.symbol_table.look_up(Identifier(base.value, False))
+            sym = util.symbol_table.look_up(base.value)
             # if it is not able to found in the table, throw an error
             if not sym:
                 errormodule.throw('semantic_error', 'Variable used without declaration', ast)
             # otherwise return the raw symbol
-            return Literal(sym.data_type, Identifier(sym.name, sym.data_type))
+            return Literal(sym.data_type, Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers))
         # if it is an instance pointer
         elif base.type == 'THIS':
             # get the group instance (typeof Instance)
@@ -716,7 +730,7 @@ def generate_iterator(lb_atom):
         # assume custom type
         else:
             # get return value of its subscript method
-            iterator_type = modules.get_method(base_atom.data_type, '__subscript__').data_type.return_type
+            iterator_type = modules.get_property(base_atom.data_type, '__subscript__').data_type.return_type
     # if it is not enumerable and is not either a dict or list, it is an invalid iterative base
     else:
         errormodule.throw('semantic_error', 'Value must be enumerable', lb_atom)

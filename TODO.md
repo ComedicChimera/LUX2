@@ -1,10 +1,6 @@
 # TODO
 This is a file annotating all the current tasks that are unable to be completed until another component is finished.
 This file exists to prevent potential debug hell and to ensure that all features get implemented properly and are not forgotten.
-
- - Add Identifier based data type checking *(syc/icg/types.py)*
- 
- - Add GetMember trailer checking *(syc/icg/generators/atom.py)*
  
  - Remove to_str methods once testing is complete *(everywhere)*
  
@@ -16,7 +12,11 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add value cast checking *(syc/icg/casting.py)*
  
- - Add macro data type and call checking *(syc/icg/generators/atom.py & syc/icg/types.py)*
+ - Prevent indefinite parameters from causing a parameter count mismatch *(syc/icg/generators/functions.py)*
+ 
+ - Redo function checking to check for permanent type paths and allow for type coercion *(syc/icg/generators/functions.py)*
+ 
+ - Add constexpr checking to arrays and constants *(syc/icg/...)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.

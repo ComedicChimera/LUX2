@@ -13,27 +13,27 @@ class DataTypes(Enum):
 
     # extended type set
     STRUCT = 7
-    MODULE = 9
-    ENUM = 10
-    INTERFACE = 11
+    MODULE = 8
+    ENUM = 9
+    INTERFACE = 10
 
     # object type (parent type for all types)
-    OBJECT = 12
+    OBJECT = 11
 
     # imported package
-    PACKAGE = 13
+    PACKAGE = 12
 
     # type for holding data type
-    DATA_TYPE = 14
+    DATA_TYPE = 13
 
     # general data type for byte types
-    BYTE = 15
+    BYTE = 14
 
     # null type
-    NULL = 16
+    NULL = 15
 
     # value type
-    VALUE = 17
+    VALUE = 16
 
 
 # parent class for all data type objects
@@ -105,11 +105,11 @@ class Function:
 
 # class to hold all user defined group types
 class CustomType:
-    def __init__(self, dt, symbol, interfaces):
-        # data type (struct, type, group)
+    def __init__(self, dt, members, interfaces):
+        # data type (struct, type, module)
         self.data_type = dt
         # the internal symbol of the custom type
-        self.symbol = symbol
+        self.members = members
         # if it can be iterated through by a for loop & subscripted (list based)
         self.enumerable = True if 'IEnumerable' in interfaces else False
         # if it can be called with parameters (function based)

@@ -37,7 +37,7 @@ class Symbol:
 
     # used to compare self to another symbol
     def compare(self, var):
-        if var.name == self.name and var.instance == self.instance:
+        if var == self.name:
             return True
         return False
 

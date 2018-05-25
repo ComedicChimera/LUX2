@@ -5,7 +5,8 @@ from syc.icg.generators.stmt import generate_statement, Context
 
 
 def generate_tree(ast):
-    util.symbol_table = SymbolTable()
+    if not util.symbol_table:
+        util.symbol_table = SymbolTable()
     for item in ast.content:
         if isinstance(item, ASTNode):
             # test code for expr compiler

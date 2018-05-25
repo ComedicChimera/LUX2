@@ -152,8 +152,8 @@ def generate_assign_var(assign_var):
         else:
             sym = util.symbol_table.look_up(id_type.content[0].value)
             if not sym:
-                errormodule.throw('semantic_error', 'Variable \'%s\' not defined' % id_type.content[0], id_type)
-            return Identifier(sym.name, sym.data_type)
+                errormodule.throw('semantic_error', 'Variable \'%s\' not defined' % id_type.content[0].value, id_type)
+            return Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers)
 
     if isinstance(assign_var.content[0], ASTNode):
         return generate_id_type(assign_var.content[0])
@@ -186,6 +186,8 @@ def generate_assignment_expr(root, assign_expr):
 
 
 def modifiable(root):
+    if isinstance(root, Identifier):
+        return not root.constant
     for item in root.arguments:
         pass
     return True
