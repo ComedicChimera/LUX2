@@ -1,4 +1,5 @@
 from enum import Enum
+from syc.icg.table import Package
 
 
 # enum representing all simple SyClone types
@@ -19,9 +20,6 @@ class DataTypes(Enum):
 
     # object type (parent type for all types)
     OBJECT = 11
-
-    # imported package
-    PACKAGE = 12
 
     # type for holding data type
     DATA_TYPE = 13
@@ -141,6 +139,10 @@ class IncompleteType:
 
 # check if type can be coerced
 def coerce(base_type, unknown):
+    if isinstance(base_type, Package) or isinstance(unknown, Package):
+        if type(base_type) == type(unknown):
+            return True
+        return False
     # if pointers don't match up, automatically not equal
     if base_type.pointers != unknown.pointers:
         return False
@@ -175,6 +177,10 @@ def coerce(base_type, unknown):
 
 # check to see if type will be able to change the data type of a collection or expression
 def dominant(base_type, unknown):
+    if isinstance(base_type, Package) or isinstance(unknown, Package):
+        if type(base_type) == type(unknown):
+            return base_type
+        return
     if base_type == unknown:
         return base_type
     # if neither is object and neither is data type return

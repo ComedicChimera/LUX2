@@ -1,4 +1,3 @@
-import syc.icg.types as types
 from enum import Enum
 import errormodule
 
@@ -40,6 +39,17 @@ class Symbol:
         if var == self.name:
             return True
         return False
+
+
+class Package:
+    def __init__(self, name, symbol_table, action_tree):
+        self.name = name
+
+    def get_property(self, name):
+        pass
+
+    def open(self):
+        pass
 
 
 class SymbolTable:
@@ -123,17 +133,18 @@ class SymbolTable:
     # NOTE packages content is expected to be IR Object
     def add_package(self, pkg):
         # if the package is used, add raw include table to it
-        if pkg.used:
-            self.scope += self.remove_externals(pkg.content.symbol_table.table)
-        else:
-            # neither symbol has groups, name is name, data_type is PACKAGE with no pointers, and members is package IR Object
-
-            # if it is external, give symbol external modifier
-            if pkg.is_external:
-                sym = Symbol(pkg.name, [], types.DataType(types.DataTypes.PACKAGE, []), [Modifiers.EXTERNAL], pkg.content)
-            else:
-                sym = Symbol(pkg.name, [], types.DataType(types.DataTypes.PACKAGE, []), [], pkg.content)
-            self.scope.append(sym)
+        # if pkg.used:
+        #     self.scope += self.remove_externals(pkg.content.symbol_table.table)
+        # else:
+        #     # neither symbol has groups, name is name, data_type is PACKAGE with no pointers, and members is package IR Object
+        #
+        #     # if it is external, give symbol external modifier
+        #     if pkg.is_external:
+        #         sym = Symbol(pkg.name, [], types.DataType(types.DataTypes.PACKAGE, []), [Modifiers.EXTERNAL], pkg.content)
+        #     else:
+        #         sym = Symbol(pkg.name, [], types.DataType(types.DataTypes.PACKAGE, []), [], pkg.content)
+        #     self.scope.append(sym)
+        pass
 
     # find symbol in table
     def look_up(self, var):
@@ -157,7 +168,7 @@ class SymbolTable:
                         return item
         # return nothing if unable to match
 
-    # remove externals from imported symbol table
+    # remove external modifiers from imported symbol table
     def remove_externals(self, table):
         # iterate through upper table
         for i in range(len(table)):

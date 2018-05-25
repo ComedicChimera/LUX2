@@ -2,6 +2,7 @@ from syc.ast.ast import ASTNode
 from syc.icg.action_tree import ExprNode
 import errormodule
 from util import unparse
+from syc.icg.table import Package
 
 
 def generate_expr(expr):
@@ -221,12 +222,16 @@ def check_operands(val1, val2, operator, ast):
 
 
 def generate_unary_atom(u_atom):
+    # generate hold atom
+    atom = generate_atom(u_atom.content[-1])
     if len(u_atom.content) > 1:
+        # check for packages
+        if isinstance(atom.data_type, Package):
+            errormodule.throw('semantic_error', 'Unable to apply operator to package', u_atom)
+            return
         prefix = u_atom.content[0].content[0]
         # handle sine change
         if prefix.type == '-':
-            # get root atom
-            atom = generate_atom(u_atom.content[1])
             # test for numericality
             if types.numeric(atom.data_type):
                 # handle modules
@@ -240,18 +245,14 @@ def generate_unary_atom(u_atom):
                 # throw error
                 errormodule.throw('semantic_error', 'Unable to change sine on non-numeric type.', u_atom)
         elif prefix.type == 'AMP':
-            # get generated atom
-            pointer = generate_atom(u_atom.content[1])
-            # get pointer
-            pointer.data_type.pointers += 1
+            # create pointer
+            atom.data_type.pointers += 1
             # reference pointer
-            return ExprNode('Reference', pointer.data_type, pointer)
+            return ExprNode('Reference', atom.data_type, atom)
         # handle deref op
         elif prefix.type == '*':
             do = len(unparse(u_atom.content[0].content[1])) + 1 if len(u_atom.content[0].content) > 1 else 1
             # handle pointer error
-            # generate hold atom
-            atom = generate_atom(u_atom.content[-1])
             # < because that means there is more dereferencing than there are references to dereference
             if atom.data_type.pointers < do:
                 errormodule.throw('semantic_error', 'Dereferencing of non-pointer', u_atom)
@@ -260,7 +261,7 @@ def generate_unary_atom(u_atom):
                 return ExprNode('Dereference', atom.data_type, do, atom)
 
     else:
-        return generate_atom(u_atom.content[0])
+        return atom
 
 
 from syc.icg.generators.atom import generate_atom
