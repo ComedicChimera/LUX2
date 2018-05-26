@@ -162,12 +162,15 @@ def coerce(base_type, unknown):
             elif isinstance(base_type, DictType):
                 return coerce(base_type.key_type, unknown.key_type) and coerce(base_type.value_type, unknown.value_type)
         return False
-    # object
-    if base_type.data_type == DataTypes.OBJECT or unknown.data_type == DataTypes.OBJECT:
-        return True
     # if either is a not a raw data type, it does not work
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return False
+    # object
+    if base_type.data_type == DataTypes.OBJECT or unknown.data_type == DataTypes.OBJECT:
+        return True
+    # null
+    if unknown.data_type == DataTypes.NULL:
+        return True
     # if it is a complex or float or long, ints and bool can be coerced
     elif base_type.data_type in {DataTypes.COMPLEX, DataTypes.FLOAT, DataTypes.LONG} and unknown.data_type == DataTypes.INT:
         return True
@@ -176,9 +179,6 @@ def coerce(base_type, unknown):
         return True
     # chars can be coerced to strings
     elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
-        return True
-    # check if is null
-    elif not unknown.data_type:
         return True
     return False
 

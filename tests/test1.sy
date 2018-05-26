@@ -1,5 +1,13 @@
-include strconv;
+func fib() int {
+    $(a = 0, b = 1);
+    for {
+        yield a;
+        a, b = b, a + b;
+    }
+}
 
 func Main() int {
-    print(for(input().split(", ")[x] => strconv.ParseFloat(x)) |> lambda(acc: int, n: int => intdiv(acc, n)) |);
+    for ($i = 0; i < 10; i++)
+        println(fib());
+    return 0;
 }
