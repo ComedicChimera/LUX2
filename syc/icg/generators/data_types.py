@@ -1,7 +1,7 @@
-import util
-from syc.ast.ast import Token
+from syc.ast.ast import Token, unparse
 import syc.icg.types as types
 import errormodule
+from syc.icg.constexpr import get_array_bound
 
 
 # generate type from ast (extension or atom types)
@@ -11,7 +11,7 @@ def generate_type(ext):
     if ext.name == 'types':
         if ext.content[0].name == 'deref_op':
             # extract data type pointers
-            pointers = len(util.unparse(ext.content[0]))
+            pointers = len(unparse(ext.content[0]))
         # update ext to simple types
         ext = ext.content[-1]  # selects last element (always simple types)
     # if it is token, assume array, list or dict
@@ -22,13 +22,14 @@ def generate_type(ext):
             et = generate_type(ext.content[1].content[1])
             # extract count value
             # ext.content[1].content[1] == pure_types -> array_modifiers -> expr
-            count = generate_expr(ext.content[1].content[3])
+            count = get_array_bound(generate_expr(ext.content[1].content[3]))
+            if not count:
+                errormodule.throw('semantic_error', 'Non-constexpr array bound', ext.content[1].content[3])
             # check to ensure count is integer
             if not isinstance(count.data_type, types.DataType):
                 errormodule.throw('semantic_error', 'Invalid type for array initializer', ext.content[1].content[3])
             if count.data_type.data_type != types.DataTypes.INT or count.data_type.pointers != 0:
                 errormodule.throw('semantic_error', 'Invalid type for array initializer', ext.content[1].content[3])
-            # TODO check for constexpr and update count to reflect
             return types.ArrayType(et, count, pointers)
         # assume list
         elif ext.content[0].type == 'LIST_TYPE':

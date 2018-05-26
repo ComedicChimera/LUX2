@@ -25,17 +25,6 @@ PLATFORM = sys.platform
 build_file = ''
 
 
-# used to convert AST node back to list of tokens
-def unparse(ast):
-    unparse_list = []
-    for item in ast.content:
-        if isinstance(item, Token):
-            unparse_list.append(item)
-        else:
-            unparse_list += unparse(item)
-    return unparse_list
-
-
 # main package class
 class Package:
     def __init__(self, name, extern, used, ast):

@@ -1,6 +1,6 @@
 import re
-from util import unparse, SyCloneRecoverableError
-from syc.ast.ast import ASTNode
+from util import SyCloneRecoverableError
+from syc.ast.ast import ASTNode, unparse
 
 code = ""
 

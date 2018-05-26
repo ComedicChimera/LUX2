@@ -42,7 +42,8 @@ class Literal:
 
 # class representing in-expr identifier
 class Identifier:
-    def __init__(self, name, data_type, constant):
+    def __init__(self, name, data_type, constant, constexpr=False):
         self.name = name
         self.data_type = data_type
         self.constant = constant
+        self.constexpr = constexpr

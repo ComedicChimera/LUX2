@@ -28,7 +28,8 @@ class Symbol:
         self.name = name
         self.data_type = data_type
         # modifiers [private, volatile, ect.]
-        self.modifiers = modifiers
+        # unwrap to fix weird bug (not sure why it was broken)
+        self.modifiers = [*modifiers]
         if members:
             # members is used for things like structs and modules
             self.members = members
@@ -192,6 +193,7 @@ class SymbolTable:
                     if isinstance(layer[i], Symbol) and layer[i].compare(var):
                         layer[i].modifiers.append(Modifiers.DELETED)
                         deleted = True
+                        return layer
             return layer
         # attempt to delete symbol
         self.table = delete(self.table)

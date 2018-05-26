@@ -1,12 +1,13 @@
 from syc.icg.generators.expr import generate_expr
 from syc.icg.generators.data_types import generate_type
-from syc.ast.ast import ASTNode
+from syc.ast.ast import ASTNode, unparse
 import errormodule
 from syc.icg.action_tree import ExprNode, Identifier, StatementNode
 import util
 from syc.icg.table import Symbol, Modifiers
 import syc.icg.types as types
 from syc.icg.modules import get_instance
+from syc.icg.constexpr import check as check_constexpr
 
 
 class Context:
@@ -48,10 +49,18 @@ def generate_return(stmt, context):
 
 
 def generate_delete(stmt):
-    sym = util.symbol_table.look_up(stmt.content[1].value)
-    if not util.symbol_table.delete(stmt.content[1].value):
-        errormodule.throw('semantic_error', 'Unable to delete non-existent symbol', stmt.content[1])
-    return StatementNode('Delete', Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers))
+    identifiers = []
+    variables = [stmt.content[1]]
+    if isinstance(stmt.content[-1], ASTNode):
+        for item in unparse(stmt.content[-1]):
+            if item.type == 'IDENTIFIER':
+                variables.append(item)
+    for item in variables:
+        sym = util.symbol_table.look_up(item.value)
+        if not util.symbol_table.delete(item.value):
+            errormodule.throw('semantic_error', 'Unable to delete non-existent symbol', item)
+        identifiers.append(Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers))
+    return StatementNode('Delete', *identifiers)
 
 
 # create and evaluate a variable declaration
@@ -60,6 +69,7 @@ def generate_variable_declaration(stmt, modifiers):
     variables = {}
     overall_type = None
     initializer = None
+    constexpr = False
     # iterate to generate statement components
     for item in stmt.content:
         if isinstance(item, ASTNode):
@@ -69,12 +79,19 @@ def generate_variable_declaration(stmt, modifiers):
                 overall_type = generate_type(item.content[1])
             elif item.name == 'initializer':
                 initializer = generate_expr(item.content[1])
+                constexpr = item.content[0].type == ':='
                 overall_type = initializer.data_type
         elif item.type == '@':
             constant = True
+    if constant:
+        modifiers.append(Modifiers.CONSTANT)
+    if constexpr and not constant:
+        errormodule.throw('semantic_error', 'Declaration of constexpr on non-constant', stmt)
     if isinstance(variables, dict):
         for k, v in variables.items():
-            sym = Symbol(k.value, v.data_type if hasattr(v, 'data_type') else overall_type, [Modifiers.CONSTANT] + modifiers if constant else modifiers)
+            if v.constexpr and not constant:
+                errormodule.throw('semantic_error', 'Declaration of constexpr on non-constant', stmt)
+            sym = Symbol(k.value, v.data_type if hasattr(v, 'data_type') else overall_type, modifiers + [Modifiers.CONSTEXPR] if v.constexpr else modifiers)
             if not sym.data_type:
                 errormodule.throw('semantic_error', 'Unable to infer data type of variable', k)
             util.symbol_table.add_variable(sym, k)
@@ -86,7 +103,11 @@ def generate_variable_declaration(stmt, modifiers):
             errormodule.throw('semantic_error', 'Unable to infer data type of variable', stmt)
         if not types.coerce(overall_type, initializer.data_type) and overall_type:
             errormodule.throw('semantic_error', 'Variable type extension and initializer data types do not match', stmt)
-        util.symbol_table.add_variable(Symbol(variables.value, overall_type, [Modifiers.CONSTANT] + modifiers if constant else modifiers), stmt)
+        if constexpr:
+            modifiers.append(Modifiers.CONSTEXPR)
+            # assume initializer exists
+            check_constexpr(initializer, stmt)
+        util.symbol_table.add_variable(Symbol(variables.value, overall_type, modifiers), stmt)
         return StatementNode('DeclareConstant' if constant else 'DeclareVariable', overall_type, variables.value, initializer, modifiers)
 
 
@@ -106,6 +127,7 @@ def generate_var(var_ast):
                 else:
                     final_variable['data_type'] = variable['initializer'].data_type
                 final_variable['initializer'] = variable['initializer']
+                final_variable['constexpr'] = variable['constexpr']
             variables[variable['name']] = type('Object', (), final_variable)
 
         variables = {}
@@ -118,6 +140,9 @@ def generate_var(var_ast):
                         variable['extension'] = generate_type(item.content[-1])
                     elif item.name == 'initializer':
                         variable['initializer'] = generate_expr(item.content[-1])
+                        variable['constexpr'] = item.content[0].type == ':='
+                        if variable['constexpr']:
+                            check_constexpr(variable['initializer'], item.content[-1])
                     elif item.name == 'multi_var':
                         add_final_variable()
                         generate_variable_dict(item)
@@ -173,7 +198,7 @@ def generate_assign_var(assign_var):
             root = generate_assign_var(assign_var.content[-1].content[1])
             if len(assign_var.content[-1].content) > 3:
                 root = add_trailer(root, assign_var.content[-1].content[2])
-        deref_count = 1 if len(assign_var.content) == 2 else len(util.unparse(assign_var.content[1])) + 1
+        deref_count = 1 if len(assign_var.content) == 2 else len(unparse(assign_var.content[1])) + 1
         if deref_count != root.data_type.pointers:
             errormodule.throw('semantic_error', 'Unable to dereference a non-pointers', assign_var)
         return ExprNode('Dereference', None, deref_count, root)

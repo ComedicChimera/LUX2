@@ -278,7 +278,11 @@
     "THROW expr"
   ],
   "delete_stmt": [
-    "DELETE IDENTIFIER"
+    "DELETE IDENTIFIER n_delete"
+  ],
+  "n_delete": [
+    ", IDENTIFIER n_delete",
+    "&"
   ],
   "variable_declaration": [
     "DOLLAR var extension initializer",

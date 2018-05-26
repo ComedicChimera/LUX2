@@ -261,7 +261,7 @@ def add_trailer(root, trailer):
             elif root.data_type.data_type.data_type == types.DataTypes.MODULE:
                 prop = modules.get_property(root.data_type.members, trailer.content[1].value)
                 if not prop:
-                    return Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers)
+                    return Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers, Modifiers.CONSTEXPR in prop.modifiers)
                 errormodule.throw('semantic_error', 'Object has no member \'%s\'' % prop, trailer.content[1])
             else:
                 identifier = trailer.content[1].value
@@ -334,7 +334,7 @@ def generate_base(ast):
             if not sym:
                 errormodule.throw('semantic_error', 'Variable used without declaration', ast)
             # otherwise return the raw symbol
-            return Literal(sym.data_type, Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers))
+            return Literal(sym.data_type, Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers, Modifiers.CONSTEXPR in sym.modifiers))
         # if it is an instance pointer
         elif base.type == 'THIS':
             # get the group instance (typeof Instance)

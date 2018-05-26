@@ -21,3 +21,14 @@ class ASTNode:
             str_string += str(item)
         return str_string + "]"
 
+
+# used to convert AST node back to list of tokens
+def unparse(ast):
+    unparse_list = []
+    for item in ast.content:
+        if isinstance(item, Token):
+            unparse_list.append(item)
+        else:
+            unparse_list += unparse(item)
+    return unparse_list
+

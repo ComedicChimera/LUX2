@@ -1,7 +1,6 @@
-from syc.ast.ast import ASTNode
+from syc.ast.ast import ASTNode, unparse
 from syc.icg.action_tree import ExprNode
 import errormodule
-from util import unparse
 from syc.icg.table import Package
 
 
