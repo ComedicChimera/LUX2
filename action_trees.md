@@ -67,3 +67,4 @@ This table documents all the names of the action tree nodes, their functions and
 | Increment | Numeric | Increment a value | *var*++ |
 | Decrement | Numeric | Decrement a value | *var*-- |
 | Expr | Expr | Invoke an expression as a statement | *expr* |
+| Assign | Operator, Variable-Initializer Dict | Perform an assignment | *var*= *expr* |

@@ -12,13 +12,13 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add value cast checking *(syc/icg/casting.py)*
  
- - Prevent indefinite parameters from causing a parameter count mismatch *(syc/icg/generators/functions.py)*
- 
  - Redo function checking to check for permanent type paths and allow for type coercion *(syc/icg/generators/functions.py)*
  
  - Add constexpr checking to arrays and constants *(syc/icg/...)*
  
  - Add packages to get members checking *(syc/icg/generators/atom.py)*
+ 
+ - Make constant modules have constant properties
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.
@@ -30,3 +30,5 @@ This is a separate section regarding notes for things that need to be taken into
 
  - Statement parser should ignore `return` and `yield`.  They will be parsed by the return type parser.  However, ensure that
  they are checked for context. (along with break and continue)
+ 
+ - Functions that return multiple values actually return tuples

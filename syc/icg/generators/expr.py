@@ -190,7 +190,7 @@ def check_operands(val1, val2, operator, ast):
         errormodule.throw('semantic_error', 'Pointer arithmetic can only be performed between an integer and a pointer', ast)
     if operator == '+':
         if types.numeric(val1.data_type) and types.numeric(val2.data_type):
-            if types.dominant(val1.data_type, val2.data_type):
+            if types.coerce(val1.data_type, val2.data_type):
                 return val2.data_type
             return val1.data_type
         elif types.enumerable(val1.data_type) and types.enumerable(val2.data_type):
@@ -203,7 +203,7 @@ def check_operands(val1, val2, operator, ast):
         errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
     elif operator == '*':
         if types.numeric(val1.data_type) and types.numeric(val2.data_type):
-            if types.dominant(val1.data_type, val2.data_type):
+            if types.coerce(val1.data_type, val2.data_type):
                 return val2.data_type
             return val1.data_type
         if isinstance(val1.data_type, types.DataType) and isinstance(val2.data_type, types.DataType):
@@ -214,7 +214,7 @@ def check_operands(val1, val2, operator, ast):
         errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
     elif operator in {'-', '%', '^'}:
         if types.numeric(val1.data_type) and types.numeric(val2.data_type):
-            if types.dominant(val1.data_type, val2.data_type):
+            if types.coerce(val1.data_type, val2.data_type):
                 return val2.data_type
             return val1.data_type
         errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
@@ -226,8 +226,12 @@ def generate_unary_atom(u_atom):
     atom = generate_atom(u_atom.content[-1])
     if len(u_atom.content) > 1:
         # check for packages
-        if isinstance(atom.data_type, Package):
+        if isinstance(atom, Package):
             errormodule.throw('semantic_error', 'Unable to apply operator to package', u_atom)
+            return
+        # check for tuples
+        if isinstance(atom.data_type, types.Tuple):
+            errormodule.throw('semantic_error', 'Unable to apply operator to multiple values', u_atom)
             return
         prefix = u_atom.content[0].content[0]
         # handle sine change

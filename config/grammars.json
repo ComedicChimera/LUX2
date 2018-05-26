@@ -39,6 +39,7 @@
     "with_block",
     "except_block",
     "for_block",
+    "for_block",
     "match_stmt"
   ],
   "module_block": [
@@ -84,7 +85,7 @@
   ],
   "func_params_decl": [
     "func_param_prefix IDENTIFIER extension initializer n_func_params",
-    "* * func_param_prefix IDENTIFIER extension",
+    "... func_param_prefix IDENTIFIER extension",
     "&"
   ],
   "func_param_prefix": [
@@ -237,7 +238,7 @@
     "yield_stmt",
     "external_stmt",
     "volatile_stmt",
-    "&"
+    "delete_stmt"
   ],
   "volatile_stmt": [
     "VOLATILE extern variable_declaration"
@@ -276,6 +277,9 @@
   "throw_stmt": [
     "THROW expr"
   ],
+  "delete_stmt": [
+    "DELETE IDENTIFIER"
+  ],
   "variable_declaration": [
     "DOLLAR var extension initializer",
     "@ var extension initializer"
@@ -290,6 +294,7 @@
   ],
   "initializer": [
     "= expr",
+    ":= expr",
     "&"
   ],
   "assignment": [
@@ -319,7 +324,12 @@
   ],
   "assignment_op": [
     "=",
-    "assignment_ops"
+    "+=",
+    "-=",
+    "/=",
+    "*=",
+    "^=",
+    "%="
   ],
   "include_stmt": [
     "use INCLUDE IDENTIFIER dot_id rename"
@@ -563,15 +573,6 @@
     ", expr : expr n_dict",
     "&"
   ],
-  "assignment_ops": [
-    "+=",
-    "-=",
-    "/=",
-    "*=",
-    "^=",
-    "%=",
-    "="
-  ],
   "extension": [
     ": types",
     "&"
@@ -618,7 +619,6 @@
     "COMPLEX_TYPE",
     "LONG_TYPE",
     "OBJECT_TYPE",
-    "PACKAGE_TYPE",
     "DATA_TYPE"
   ]
 }

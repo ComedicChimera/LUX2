@@ -57,9 +57,11 @@ def generate_parameter(decl_params):
             # handle initializer
             elif item.name == 'initializer':
                 param['default_value'] = generate_expr(item.content[-1])
+                param['data_type'] = param['default_value'].data_type
+                param['optional'] = True
         else:
             # handle indefinite params
-            if item.type == '~':
+            if item.type == '...':
                 param['indefinite'] = True
             # add name
             elif item.type == 'IDENTIFIER':
@@ -154,9 +156,9 @@ def check_parameters(func, params, ast):
 
     base_params = func.data_type.parameters
     names = []
-    met_count = 0
+    met_count = 1
     for i in range(len(params)):
-        if i >= len(base_params):
+        if met_count > len(base_params):
             errormodule.throw('semantic_error', 'Too many parameters for function', ast)
         if isinstance(params[i], tuple):
             elems = [x for x in base_params if x.name == params[i][0]]
@@ -166,15 +168,19 @@ def check_parameters(func, params, ast):
                 errormodule.throw('semantic_error', 'Multiple values specified for parameter \'%s\'' % params[i][0], ast)
             elif hasattr(elems[0], 'indefinite'):
                 errormodule.throw('semantic_error', 'Unable to explicitly specify value for indefinite parameter', ast)
+            elif not dominant(elems[0].data_type, params[i][1].data_type):
+                errormodule.throw('semantic_error', 'Parameter data types don\'t match', ast)
             if required(elems[0]):
                 met_count += 1
+            names.append(elems[0].name)
         else:
-            if base_params[i].data_type != params[i].data_type and not dominant(base_params[i].data_type, params[i].data_type):
+            met_ndx = met_count - 1
+            if not dominant(base_params[met_ndx].data_type, params[i].data_type):
                 errormodule.throw('semantic_error', 'Parameter data types don\'t match', ast)
-            names.append(base_params[i].name)
-            if required(base_params[i]):
+            names.append(base_params[met_ndx].name)
+            if required(base_params[met_ndx]):
                 met_count += 1
-    if met_count < len([x for x in base_params if required(x)]):
+    if met_count - 1 < len([x for x in base_params if required(x)]):
         errormodule.throw('semantic_error', 'Too few parameters for function call', ast)
 
 

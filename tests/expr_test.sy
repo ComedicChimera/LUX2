@@ -1,3 +1,5 @@
 func Main() int {
-    @z = func(** $x: int) { return 3 + 3; }(2, 3, 4);
+    $(x = 3, y = 2);
+    delete z;
+    x = 2;
 }

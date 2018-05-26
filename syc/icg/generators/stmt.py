@@ -30,7 +30,8 @@ def generate_statement(stmt, context: Context):
         'external_stmt': lambda s: generate_variable_declaration(s.content[1].content[0], [Modifiers.EXTERNAL]),
         'volatile_stmt': lambda s: generate_variable_declaration(s.content[-1], [Modifiers.VOLATILE] if s.content[1].name != 'extern' else [Modifiers.VOLATILE,
                                                                                                                                             Modifiers.EXTERNAL]),
-        'assignment': generate_assignment
+        'assignment': generate_assignment,
+        'delete_stmt': generate_delete
     }[stmt.name](*([stmt, context] if stmt.name in {'yield_stmt', 'return_stmt', 'break_stmt', 'continue_stmt'} else [stmt]))
 
 
@@ -44,6 +45,13 @@ def generate_return(stmt, context):
         return StatementNode('Return' if stmt.name == 'return_stmt' else 'Yield', generate_expr(stmt.content[1]))
     else:
         errormodule.throw('semantic_error', 'Invalid context for ' + ('yield statement' if stmt.name == 'yield_stmt' else 'return statement'), stmt)
+
+
+def generate_delete(stmt):
+    sym = util.symbol_table.look_up(stmt.content[1].value)
+    if not util.symbol_table.delete(stmt.content[1].value):
+        errormodule.throw('semantic_error', 'Unable to delete non-existent symbol', stmt.content[1])
+    return StatementNode('Delete', Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers))
 
 
 # create and evaluate a variable declaration
@@ -61,6 +69,7 @@ def generate_variable_declaration(stmt, modifiers):
                 overall_type = generate_type(item.content[1])
             elif item.name == 'initializer':
                 initializer = generate_expr(item.content[1])
+                overall_type = initializer.data_type
         elif item.type == '@':
             constant = True
     if isinstance(variables, dict):
@@ -75,7 +84,7 @@ def generate_variable_declaration(stmt, modifiers):
     else:
         if not overall_type and not initializer:
             errormodule.throw('semantic_error', 'Unable to infer data type of variable', stmt)
-        if not types.dominant(overall_type, initializer.data_type):
+        if not types.coerce(overall_type, initializer.data_type) and overall_type:
             errormodule.throw('semantic_error', 'Variable type extension and initializer data types do not match', stmt)
         util.symbol_table.add_variable(Symbol(variables.value, overall_type, [Modifiers.CONSTANT] + modifiers if constant else modifiers), stmt)
         return StatementNode('DeclareConstant' if constant else 'DeclareVariable', overall_type, variables.value, initializer, modifiers)
@@ -92,7 +101,7 @@ def generate_var(var_ast):
                 final_variable['data_type'] = variable['extension']
             if 'initializer' in variable:
                 if 'data_type' in final_variable:
-                    if not types.dominant(final_variable['data_type'], variable['initializer'].data_type):
+                    if not types.coerce(final_variable['data_type'], variable['initializer'].data_type):
                         errormodule.throw('semantic_error', 'Variable type extension and initializer data types do not match', variable['name'])
                 else:
                     final_variable['data_type'] = variable['initializer'].data_type
@@ -172,7 +181,41 @@ def generate_assign_var(assign_var):
 
 def generate_assignment_expr(root, assign_expr):
     if isinstance(assign_expr.content[0], ASTNode):
-        pass
+        is_n_assign = int(assign_expr.content[0].name != 'n_assignment')
+        variables, initializers = [root], [generate_expr(assign_expr.content[2 - is_n_assign])]
+        if assign_expr.content[0].name == 'n_assignment':
+            assign_content = assign_expr.content[0].content
+            for item in assign_content:
+                if isinstance(item, ASTNode):
+                    if item.name == 'assign_var':
+                        variables.append(generate_assign_var(item))
+                    elif item.name == 'n_assignment':
+                        assign_content = item.content
+        if assign_expr.content[-1].name == 'n_list':
+            expressions = assign_expr.content[-1].content
+            for item in expressions:
+                if isinstance(item, ASTNode):
+                    if item.name == 'expr':
+                        expr = generate_expr(item)
+                        if isinstance(expr.data_type, types.Tuple):
+                            for elem in expr.data_type.values:
+                                initializers.append(elem)
+                        else:
+                            initializers.append(expr)
+                    elif item.name == 'n_list':
+                        expressions = item.content
+        if len(variables) != len(initializers):
+            errormodule.throw('semantic_error', 'Assignment value counts don\'t match', assign_expr)
+        op = assign_expr.content[1 - is_n_assign].content[0]
+        for var, expr in zip(variables, initializers):
+            if not modifiable(var):
+                errormodule.throw('semantic_error', 'Unable to modify unmodifiable l-value', assign_expr)
+            if not types.coerce(var.data_type, expr.data_type):
+                errormodule.throw('semantic_error', 'Variable type and reassignment type do not match', assign_expr)
+            if op.type != '=':
+                if not types.numeric(var.data_type):
+                    errormodule.throw('semantic_error', 'Compound assignment operator invalid for non-numeric type', op)
+        return StatementNode('Assign', op.type, dict(zip(variables, initializers)))
     else:
         if not modifiable(root):
             errormodule.throw('semantic_error', 'Unable to modify unmodifiable l-value', assign_expr)

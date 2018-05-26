@@ -223,7 +223,7 @@ def add_trailer(root, trailer):
                 expr = generate_expr(trailer.content[1].content[0])
                 # if not dict, use element type, not value type
                 if isinstance(root.data_type, types.DictType):
-                    if expr.data_type != root.data_type.key_type and not types.dominant(root.data_type.key_type, expr.data_type):
+                    if expr.data_type != root.data_type.key_type and not types.coerce(root.data_type.key_type, expr.data_type):
                         errormodule.throw('semantic_error',
                                           'Type of subscript on dictionary must match data type of dictionary', trailer)
                     dt = root.data_type.value_type
@@ -301,11 +301,11 @@ def add_trailer(root, trailer):
             # check dictionary
             if isinstance(dt, tuple):
                 params = aggregate_expr.data_type.parameters
-                if not types.dominant(params[0].data_type, dt[0]) or not types.dominant(params[1].data_type, dt[1]):
+                if not types.coerce(params[0].data_type, dt[0]) or not types.coerce(params[1].data_type, dt[1]):
                     errormodule.throw('semantic_error', 'Aggregator function parameters must match the key and value types of the dictionary', trailer.content[1])
             # check all others
             else:
-                if any(not types.dominant(x.data_type, dt) for x in aggregate_expr.data_type.parameters):
+                if any(not types.coerce(x.data_type, dt) for x in aggregate_expr.data_type.parameters):
                     errormodule.throw('semantic_error', 'Aggregator function parameters must match the element type of the aggregate set', trailer.content[1])
             trailer_added = ExprNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
     # continue adding trailer
@@ -493,6 +493,9 @@ def generate_array_dict(array_dict):
     if len(array_dict_builder.content) < 2:
         # get the element
         elem = generate_expr(array_dict_builder.content[0])
+        # check for tuples
+        if isinstance(elem.data_type, types.Tuple):
+            return Literal(types.ArrayType(elem.values[0].data_type, len(elem.data_type.values), 0), elem.data_type.values)
         # et = elem data_type
         return Literal(types.ArrayType(elem.data_type, 1, 0), [elem])
     # if the last element's (array_dict_branch) first element is a token
@@ -611,8 +614,13 @@ def generate_list(lst):
                 if item.name == 'expr':
                     # generate expr
                     expr = generate_expr(item)
-                    # add to internal list
-                    true_list.append(expr)
+                    # handle tuples
+                    if isinstance(expr.data_type, types.Tuple):
+                        for value in expr.data_type.values:
+                            true_list.append(value)
+                    # add regular value to internal list
+                    else:
+                        true_list.append(expr)
 
                 elif item.name == 'n_list':
                     # continue collecting from sub list
@@ -621,7 +629,7 @@ def generate_list(lst):
     # generate list value
     get_true_list(lst)
     # data type holder (used to check and acts as elem type)
-    # nulls are accepted from data checking as they can be coerced into anything
+    # nulls are exempted from data checking as they can be coerced into anything
     dt = None
     for elem in true_list:
         if dt:

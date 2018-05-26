@@ -14,8 +14,12 @@ class Modifiers(Enum):
     STATIC = 7
     PARTIAL = 8
 
-    # special modifier for variables
+    # special modifiers for variables
     CONSTANT = 9
+    CONSTEXPR = 10
+
+    # special modifier denoting a deleted symbol
+    DELETED = 11
 
 
 # class representing any declared symbol, not an identifier (variable, function, structure, ect.)
@@ -162,11 +166,37 @@ class SymbolTable:
         # iterate through layers INWARDS to OUTWARDS (allow for shadowing)
         for layer in reversed(layers):
             for item in layer:
+                # handle non packages
                 if isinstance(item, Symbol):
-                    if item.compare(var):
-                        # if the symbols are relatively equal (excluding members), return Symbol
+                    if item.compare(var) and Modifiers.DELETED not in item.modifiers:
+                        # if the symbols are relatively equal, return Symbol
+                        return item
+                # handle packages
+                elif isinstance(item, Package):
+                    if item.name == var:
                         return item
         # return nothing if unable to match
+
+    # delete a symbol (give it the delete modifier)
+    def delete(self, var):
+        deleted = False
+
+        def delete(layer):
+            nonlocal deleted
+            for i in range(len(layer)):
+                if isinstance(layer[i], list):
+                    layer[i] = delete(layer[i])
+            # if it has not been caught in previous layers
+            if not deleted:
+                for i in range(len(layer)):
+                    if isinstance(layer[i], Symbol) and layer[i].compare(var):
+                        layer[i].modifiers.append(Modifiers.DELETED)
+                        deleted = True
+            return layer
+        # attempt to delete symbol
+        self.table = delete(self.table)
+        # return false if unable to delete
+        return deleted
 
     # remove external modifiers from imported symbol table
     def remove_externals(self, table):

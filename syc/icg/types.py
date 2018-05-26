@@ -132,6 +132,12 @@ class IncompleteType:
         self.data_type = func.return_type
 
 
+# type to hold tuples
+class Tuple:
+    def __init__(self, values):
+        self.values = values
+
+
 #####################
 # UTILITY FUNCTIONS #
 #####################
@@ -139,6 +145,8 @@ class IncompleteType:
 
 # check if type can be coerced
 def coerce(base_type, unknown):
+    if base_type == unknown:
+        return True
     if isinstance(base_type, Package) or isinstance(unknown, Package):
         if type(base_type) == type(unknown):
             return True
@@ -161,7 +169,10 @@ def coerce(base_type, unknown):
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return False
     # if it is a complex or float or long, ints and bool can be coerced
-    elif base_type.data_type in {DataTypes.COMPLEX, DataTypes.FLOAT, DataTypes.LONG} and unknown.data_type in {DataTypes.INT, DataTypes.BOOL}:
+    elif base_type.data_type in {DataTypes.COMPLEX, DataTypes.FLOAT, DataTypes.LONG} and unknown.data_type == DataTypes.INT:
+        return True
+    # char overriding
+    elif base_type.data_type == DataTypes.INT and unknown.data_type == DataTypes.CHAR:
         return True
     # chars can be coerced to strings
     elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
@@ -169,48 +180,12 @@ def coerce(base_type, unknown):
     # check if is null
     elif not unknown.data_type:
         return True
-    # check if is byte
-    elif unknown.data_type == DataTypes.BYTE:
-        return True
     return False
 
 
-# check to see if type will be able to change the data type of a collection or expression
+# get dominant type from two different types
 def dominant(base_type, unknown):
-    if isinstance(base_type, Package) or isinstance(unknown, Package):
-        if type(base_type) == type(unknown):
-            return base_type
-        return
-    if base_type == unknown:
-        return base_type
-    # if neither is object and neither is data type return
-    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
-        if type(base_type) == type(unknown):
-            if isinstance(base_type, ListType) or isinstance(base_type, ArrayType):
-                return dominant(base_type.element_type, unknown.element_type)
-            elif isinstance(base_type, DictType):
-                return dominant(base_type.key_type, unknown.key_type) and coerce(base_type.value_type, unknown.value_type)
-        return
-    # if the types are not equal
-    if base_type.pointers != unknown.pointers:
-        return
-    # object type
-    if base_type.data_type == DataTypes.OBJECT or unknown.data_type == DataTypes.OBJECT:
-        return unknown if base_type.data_type.data_type != DataTypes.OBJECT else unknown
-    # if either is a not a raw data type, it does not work
-    if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
-        return
-    # check string and char data type
-    elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
-        return base_type
-    # int overriding
-    elif base_type.data_type in {DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG} and unknown.data_type == DataTypes.INT:
-        return base_type
-    # bool overriding
-    elif base_type.data_type in {DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG, DataTypes.INT} and unknown.data_type == DataTypes.BOOL:
-        return base_type
-    # char overriding
-    elif base_type.data_type == DataTypes.INT and unknown.data_type == DataTypes.CHAR:
+    if coerce(base_type, unknown):
         return base_type
 
 

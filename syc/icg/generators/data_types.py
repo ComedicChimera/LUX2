@@ -66,7 +66,6 @@ def generate_type(ext):
                 'STRING_TYPE': types.DataTypes.STRING,
                 'CHAR_TYPE': types.DataTypes.CHAR,
                 'OBJECT_TYPE': types.DataTypes.OBJECT,
-                'PACKAGE_TYPE': types.DataTypes.PACKAGE,
                 'DATA_TYPE': types.DataTypes.DATA_TYPE,
                             }[ext.content[0].content[0].type], pointers)
         else:
