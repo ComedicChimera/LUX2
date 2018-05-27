@@ -24,15 +24,16 @@ class Modifiers(Enum):
 
 # class representing any declared symbol, not an identifier (variable, function, structure, ect.)
 class Symbol:
-    def __init__(self, name, data_type, modifiers, members=None, instance=False, inherits=None):
+    def __init__(self, name, data_type, modifiers, value=None, instance=False, inherits=None):
         self.name = name
+        # data type holds members in the case of custom types
         self.data_type = data_type
         # modifiers [private, volatile, ect.]
         # unwrap to fix weird bug (not sure why it was broken)
         self.modifiers = [*modifiers]
-        if members:
+        if value:
             # members is used for things like structs and modules
-            self.members = members
+            self.value = value
         # if it is a module
         if inherits:
             self.inherits = inherits

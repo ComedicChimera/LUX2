@@ -80,7 +80,6 @@ def generate_variable_declaration(stmt, modifiers):
             elif item.name == 'initializer':
                 initializer = generate_expr(item.content[1])
                 constexpr = item.content[0].type == ':='
-                overall_type = initializer.data_type
         elif item.type == '@':
             constant = True
     if constant:
@@ -88,26 +87,40 @@ def generate_variable_declaration(stmt, modifiers):
     if constexpr and not constant:
         errormodule.throw('semantic_error', 'Declaration of constexpr on non-constant', stmt)
     if isinstance(variables, dict):
+        # if any variable has initializer
+        has_init = False
         for k, v in variables.items():
             if v.constexpr and not constant:
                 errormodule.throw('semantic_error', 'Declaration of constexpr on non-constant', stmt)
-            sym = Symbol(k.value, v.data_type if hasattr(v, 'data_type') else overall_type, modifiers + [Modifiers.CONSTEXPR] if v.constexpr else modifiers)
+            val = None
+            if hasattr(v, 'initializer'):
+                has_init = True
+            if v.constexpr:
+                val = v.initializer
+            sym = Symbol(k.value, v.data_type if hasattr(v, 'data_type') else overall_type, modifiers + [Modifiers.CONSTEXPR] if v.constexpr else modifiers, value=val)
             if not sym.data_type:
+                errormodule.throw('semantic_error', 'Unable to infer data type of variable', k)
+            elif not overall_type and isinstance(sym.data_type, types.DataType) and sym.data_type.data_type == types.DataTypes.NULL:
                 errormodule.throw('semantic_error', 'Unable to infer data type of variable', k)
             util.symbol_table.add_variable(sym, k)
         if initializer:
-            errormodule.throw('semantic_error', 'Multi-%s declaration cannot have global initializer' % ('constant' if constant else 'variable'), stmt)
+            if has_init:
+                errormodule.throw('semantic_error', '%s cannot have two initializers' % ('constant' if constant else 'variable'), stmt)
+            if isinstance(initializer.data_type, types.Tuple):
+                pass
         return StatementNode('DeclareConstants' if constant else 'DeclareVariables', overall_type, dict(zip([k.value for k in variables.keys()], variables.values())), modifiers)
     else:
         if not overall_type and not initializer:
             errormodule.throw('semantic_error', 'Unable to infer data type of variable', stmt)
-        if not types.coerce(overall_type, initializer.data_type) and overall_type:
+        if not overall_type and isinstance(initializer.data_type, types.DataType) and initializer.data_type.data_type == types.DataTypes.NULL:
+            errormodule.throw('semantic_error', 'Unable to infer data type of variable', stmt)
+        if overall_type and not types.coerce(overall_type, initializer.data_type):
             errormodule.throw('semantic_error', 'Variable type extension and initializer data types do not match', stmt)
         if constexpr:
             modifiers.append(Modifiers.CONSTEXPR)
             # assume initializer exists
             check_constexpr(initializer, stmt)
-        util.symbol_table.add_variable(Symbol(variables.value, overall_type, modifiers), stmt)
+        util.symbol_table.add_variable(Symbol(variables.value, overall_type, modifiers, None if not constexpr else initializer), stmt)
         return StatementNode('DeclareConstant' if constant else 'DeclareVariable', overall_type, variables.value, initializer, modifiers)
 
 

@@ -174,6 +174,9 @@ def coerce(base_type, unknown):
     # if it is a complex or float or long, ints and bool can be coerced
     elif base_type.data_type in {DataTypes.COMPLEX, DataTypes.FLOAT, DataTypes.LONG} and unknown.data_type == DataTypes.INT:
         return True
+    # coerce float to complex
+    elif base_type.data_type == DataTypes.COMPLEX and unknown.data_type == DataTypes.FLOAT:
+        return True
     # char overriding
     elif base_type.data_type == DataTypes.INT and unknown.data_type == DataTypes.CHAR:
         return True
