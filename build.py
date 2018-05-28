@@ -1,7 +1,7 @@
 import os
 
 import syc.ast.parser as parser
-from syc.ast.ast import ASTNode
+from syc.ast.ast import ASTNode, unparse
 import syc.icg.generate as generate
 
 import errormodule
@@ -30,7 +30,7 @@ def build(args):
         # if build file is set more than once, fail due to multiple build files
         if arg not in MODIFIERS:
             if util.build_file != '':
-                raise util.SyCloneError('Multiple build files specified.')
+                raise util.SyCloneRecoverableError('Multiple build files specified.')
             util.build_file = arg
         else:
             mods.append(arg)
@@ -91,7 +91,7 @@ def load_package(include_stmt, extern=False):
         if isinstance(item, ASTNode):
             # update name to be end of suffix
             if item.name == 'dot_id':
-                name = util.unparse(item)[-1].value
+                name = unparse(item)[-1].value
             # if this sub tree exists, that means the inclusion is used
             elif item.name == 'use':
                 used = True

@@ -175,7 +175,7 @@
   ],
  "for_body": [
     "for_header block",
-    "base trailer => iter_body"
+    "( base trailer ) => iter_body"
   ],
   "for_header": [
     "( for_expr )",

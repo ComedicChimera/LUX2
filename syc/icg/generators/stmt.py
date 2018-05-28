@@ -188,7 +188,7 @@ def generate_variable_declaration(stmt, modifiers):
             # assume initializer exists
             check_constexpr(initializer, stmt)
         # add to symbol table
-        util.symbol_table.add_variable(Symbol(variables.value, overall_type, modifiers, None if not constexpr else initializer), stmt)
+        util.symbol_table.add_variable(Symbol(variables.value, overall_type if overall_type else initializer.data_type, modifiers, None if not constexpr else initializer), stmt)
         # return generated statement node
         return StatementNode('DeclareConstant' if constant else 'DeclareVariable', overall_type, variables.value, initializer, modifiers)
 
@@ -337,68 +337,104 @@ def generate_assign_var(assign_var):
     if isinstance(assign_var.content[0], ASTNode):
         # return generate id type
         return generate_id_type(assign_var.content[0])
+    # there is a dereference operator
     else:
-        # check if there is a sub_var at the end
+        # check if there is an id type after the dereference operator
         if isinstance(assign_var.content[-1].content[0], ASTNode):
             root = generate_id_type(assign_var.content[-1].content[0])
-        # otherwise add note
+        # otherwise generate sub var
         else:
             root = generate_assign_var(assign_var.content[-1].content[1])
+            # check for trailer
             if len(assign_var.content[-1].content) > 3:
                 root = add_trailer(root, assign_var.content[-1].content[2])
+        # calculate the dereference count
         deref_count = 1 if len(assign_var.content) == 2 else len(unparse(assign_var.content[1])) + 1
-        if deref_count != root.data_type.pointers:
+        # check for non-pointer dereference
+        if deref_count > root.data_type.pointers:
             errormodule.throw('semantic_error', 'Unable to dereference a non-pointers', assign_var)
         return ExprNode('Dereference', None, deref_count, root)
 
 
+# generate the remain components of the assignment expression if possible
 def generate_assignment_expr(root, assign_expr):
+    # check for traditional assignment
     if isinstance(assign_expr.content[0], ASTNode):
+        # NOTE all upper level values are ASTNodes
+        # value is used to determine where to begin generating assignment expr
         is_n_assign = int(assign_expr.content[0].name != 'n_assignment')
+        # variables is the collection of variables used in assignment (assign vars)
+        # initializers is the matching initializer set
         variables, initializers = [root], [generate_expr(assign_expr.content[2 - is_n_assign])]
+        # if there are multiple variables
         if assign_expr.content[0].name == 'n_assignment':
+            # holding content used in recursive for loop
             assign_content = assign_expr.content[0].content
             for item in assign_content:
+                # ignore commas
                 if isinstance(item, ASTNode):
+                    # check for the assignment variable
                     if item.name == 'assign_var':
+                        # add generated assignment variable
                         variables.append(generate_assign_var(item))
                     elif item.name == 'n_assignment':
+                        # recur
                         assign_content = item.content
+        # if there are multiple expressions
         if assign_expr.content[-1].name == 'n_list':
+            # holding content used in recursive for loop
             expressions = assign_expr.content[-1].content
             for item in expressions:
+                # ignore commas
                 if isinstance(item, ASTNode):
+                    # check for expression (initializer)
                     if item.name == 'expr':
+                        # generate initializer expression
                         expr = generate_expr(item)
+                        # if it is a tuple (multiple values stored in a single expression)
                         if isinstance(expr.data_type, types.Tuple):
+                            # add each value to expression set (de-tuple)
                             for elem in expr.data_type.values:
                                 initializers.append(elem)
+                        # else add raw expr to list
                         else:
                             initializers.append(expr)
                     elif item.name == 'n_list':
+                        # recur
                         expressions = item.content
+        # check for matching assignment properties (unmodified variables)
         if len(variables) != len(initializers):
             errormodule.throw('semantic_error', 'Assignment value counts don\'t match', assign_expr)
+        # get the assignment operator used
+        # use offset to calculate it
         op = assign_expr.content[1 - is_n_assign].content[0]
+        # iterate through variables and initializers together
         for var, expr in zip(variables, initializers):
+            # if the variable is not modifiable
             if not modifiable(var):
                 errormodule.throw('semantic_error', 'Unable to modify unmodifiable l-value', assign_expr)
+            # if there is a type mismatch
             if not types.coerce(var.data_type, expr.data_type):
                 errormodule.throw('semantic_error', 'Variable type and reassignment type do not match', assign_expr)
+            # if there is a compound operator
             if op.type != '=':
+                # all compound operators only work on numeric types
                 if not types.numeric(var.data_type):
                     errormodule.throw('semantic_error', 'Compound assignment operator invalid for non-numeric type', op)
+        # return generate statement
         return StatementNode('Assign', op.type, dict(zip(variables, initializers)))
+    # else assume increment and decrement
     else:
+        # holds whether or not it is increment of decrement
+        increment = assign_expr.content[0].type == '+'
+        # check if the root is modifiable
         if not modifiable(root):
             errormodule.throw('semantic_error', 'Unable to modify unmodifiable l-value', assign_expr)
+        # check if the root is numeric (as only numeric types accept these operators)
         if not types.numeric(root.data_type):
-            errormodule.throw('semantic_error', 'Unable to increment/decrement non numeric value', assign_expr)
-        if assign_expr.content[0].type == '+':
-            root = StatementNode('Increment', root)
-        else:
-            root = StatementNode('Decrement', root)
-    return root
+            errormodule.throw('semantic_error', 'Unable to %s non numeric value' % 'increment' if increment else 'decrement', assign_expr)
+        # generate statement
+        return StatementNode('Increment' if increment else 'Decrement', root)
 
 
 # check if a root is modifiable via assignment
