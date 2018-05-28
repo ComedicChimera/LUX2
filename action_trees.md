@@ -50,6 +50,7 @@ This table documents all the names of the action tree nodes, their functions and
 | SliceBegin | Collection, Integer | Perform a slice from beginning to arbitrary index | \[:*integer*\] |
 | SliceEnd | Collection, Integer | Perform a slice from an arbitrary index to the end | \[*integer*:\] |
 | Slice | Collection, Integer, Integer | Slice a collection between 2 arbitrary points | \[*integer*:*integer*\] |
+| GetMember | Object, Property | Get member of a module or structure | obj.prop |
 
 ## Statement Nodes
 
@@ -62,8 +63,8 @@ This table documents all the names of the action tree nodes, their functions and
 | Throw | Error | Throw an error | throw *error* |
 | DeclareVariable | Type, Name, Initializer, Modifiers | Declare a single variable | $*var* = *initializer* |
 | DeclareConstant | Type, Name, Initializer, Modifiers | Declare a single constant | @*var* = *initializer* |
-| DeclareVariables | Overall Type, Variables, Modifiers | Declare multiple variables | $(*var*, *var2*): *type* |
-| DeclareConstants | Overall Type, Constants, Modifiers | Declare multiple constants | @(*var*, *var2*): *type* |
+| DeclareVariables | Overall Type, Variables, Modifiers, [\Initializer\] | Declare multiple variables | $(*var*, *var2*): *type* |
+| DeclareConstants | Overall Type, Constants, Modifiers, [\Initializer\] | Declare multiple constants | @(*var*, *var2*): *type* |
 | Increment | Numeric | Increment a value | *var*++ |
 | Decrement | Numeric | Decrement a value | *var*-- |
 | Expr | Expr | Invoke an expression as a statement | *expr* |

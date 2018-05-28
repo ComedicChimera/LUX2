@@ -17,15 +17,15 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add constexpr checker *(syc/icg/constexpr)*
  
  - Add packages to get members checking *(syc/icg/generators/atom.py)*
- 
- - Make constant modules have constant properties *(syc/icg/generators/stmt.py)*
- 
- - Add tuple based declaration *(syc/icg/generators/stmt.py)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.
 
- - Test: expr.py, atom.py (thoroughly) *TEST THE EXPRESSION PARSER*
+ - Test: expr.py, atom.py
+ 
+ - Test: stmt.py 
+ 
+ - Test: tuple-based declaration
  
 ## Notes
 This is a separate section regarding notes for things that need to be taken into account in future components of the compiler.

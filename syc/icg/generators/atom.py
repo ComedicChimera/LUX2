@@ -105,154 +105,21 @@ import syc.icg.generators.structs as structs
 import syc.icg.casting as casting
 
 
+############
+# TRAILERS #
+############
+
+
 def add_trailer(root, trailer):
     # root with trailer added
     trailer_added = None
     # assume first is token
     # if is function call
     if trailer.content[0].type == '(':
-        # if it is a function
-        if isinstance(root.data_type, types.Function):
-            # handle invalid calls on function pointers
-            if root.data_type.pointers != 0:
-                errormodule.throw('semantic_error', 'Function pointers are not callable', trailer)
-            else:
-                parameters = functions.compile_parameters(trailer.content[1])
-                functions.check_parameters(root, parameters, trailer)
-                trailer_added = ExprNode('Call', types.IncompleteType(root.data_type) if root.data_type.async else root.data_type.return_type,
-                                         root, parameters)
-        elif isinstance(root.data_type, types.DataType):
-            if root.data_type.pointers == 0:
-                # call (struct) constructor
-                if root.data_type.data_type == types.DataTypes.STRUCT:
-                    # check struct generator
-                    parameters = structs.check_constructor(root.data_type, trailer.content[1])
-                    trailer_added = ExprNode('Constructor', root.data_type, root, parameters)
-                elif root.data_type.data_type == types.DataTypes.DATA_TYPE:
-                    if isinstance(trailer.content[1], Token):
-                        return root
-                    parameters = trailer.content[1].content
-                    if len(parameters) > 1:
-                        if parameters[1].name == 'named_params':
-                            errormodule.throw('semantic_error', 'Type cast does not accept named parameters',
-                                              trailer.content[1])
-                        else:
-                            errormodule.throw('semantic_error', 'Unable to perform type cast on multiple objects',
-                                              trailer.content[1])
-                    obj = generate_expr(parameters[0])
-                    if isinstance(obj, Literal):
-                        tp = root.value
-                        casting.static_cast(tp, obj)
-                        return ExprNode('StaticCast', tp, obj)
-                    else:
-                        errormodule.warn('Dynamic cast performed in place of static cast', trailer)
-                        return ExprNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
-                elif root.data_type.data_type == types.DataTypes.VALUE:
-                    return casting.value_cast(generate_expr(trailer.content[1]))
-            errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
-        # if is module
-        elif isinstance(root.data_type, types.CustomType):
-            if root.pointers != 0:
-                errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
-            else:
-                constructor = modules.get_constructor(root.data_type.members)
-                parameters = modules.check_constructor_parameters(constructor, trailer.content[1])
-                return ExprNode('Call', root.data_type, constructor, parameters)
-        # throw invalid call error
-        else:
-            errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
+        trailer_added = add_call_trailer(root, trailer)
     # if is subscript
     elif trailer.content[0].type == '[':
-        # handle slicing
-        if isinstance(trailer.content[1].content[0], Token):
-            expr = generate_expr(trailer.content[1].content[1])
-            if expr.data_type.pointers != 0:
-                errormodule.throw('semantic_error', 'Subscript cannot be a pointer', trailer)
-            if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType)
-                                                                    or isinstance(root.data_type, types.ArrayType)):
-                return ExprNode('SliceBegin', root.data_type.element_type, root, expr)
-            elif isinstance(root.data_type, types.CustomType):
-                method = modules.get_property(root.data_type.members, '__slice__')
-                if method:
-                    functions.check_parameters(method, [expr], trailer)
-                    return ExprNode('Call', method.data_type.return_type, method, expr)
-                errormodule.throw('semantic_error', 'Object has no method \'__slice__\'', trailer)
-            elif root.data_type.data_type == types.DataTypes.STRING and expr.data_type.data_type == types.DataTypes.INT:
-                return ExprNode('SliceBegin', types.DataType(types.DataTypes.STRING, 0), root, expr)
-            if not isinstance(expr.data_type, types.DataType) or expr.data_type.data_type != types.DataTypes.INT:
-                errormodule.throw('semantic_error', 'Index must be an integral value', trailer)
-            errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
-        # handle slice till end
-        elif len(trailer.content[1].content) > 1:
-            expr = generate_expr(trailer.content[1].content[0])
-            if expr.pointers > 0:
-                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
-            if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type != types.DataTypes.INT:
-                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
-            if len(trailer.content[1].content[1].content) > 1:
-                expr2 = generate_expr(trailer.content[1].content[1].content[1])
-                if expr2.pointers > 0:
-                    errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
-                if isinstance(expr2.data_type, types.DataType) and expr2.data_type.data_type != types.DataTypes.INT:
-                    errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
-                if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
-                    if isinstance(root.data_type, types.CustomType):
-                        slice_method = modules.get_property(root.data_type.members, '__slice__')
-                        if slice_method:
-                            functions.check_parameters(slice_method, [expr, expr2], trailer)
-                            return ExprNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
-                    errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
-                elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                    return ExprNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
-                return ExprNode('Slice', root.data_type.element_type, root, expr, expr2)
-            else:
-                if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
-                    if isinstance(root.data_type, types.CustomType):
-                        slice_method = modules.get_property(root.data_type.members, '__slice__')
-                        if slice_method:
-                            functions.check_parameters(slice_method, [None, expr], trailer)
-                            return ExprNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
-                    errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
-                elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                    return ExprNode('SliceEnd', types.DataType(types.DataTypes.CHAR, 0), root, expr)
-                return ExprNode('SliceEnd', root.data_type.element_type, root, expr)
-        # handle traditional subscripting
-        else:
-            # the only subscriptable components are mutable (except for strings)
-            if types.mutable(root.data_type):
-                expr = generate_expr(trailer.content[1].content[0])
-                # if not dict, use element type, not value type
-                if isinstance(root.data_type, types.DictType):
-                    if expr.data_type != root.data_type.key_type and not types.coerce(root.data_type.key_type, expr.data_type):
-                        errormodule.throw('semantic_error',
-                                          'Type of subscript on dictionary must match data type of dictionary', trailer)
-                    dt = root.data_type.value_type
-                elif isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT:
-                    dt = root.data_type.element_type
-                else:
-                    errormodule.throw('semantic_error', 'Invalid type for subscript', trailer)
-                    dt = None
-                trailer_added = ExprNode('Subscript', dt, expr, root)
-            # if it is a module
-            elif isinstance(root.data_type, types.CustomType) and root.data_type.data_type == types.DataType(types.DataTypes.MODULE, 0):
-                # if it has subscript method
-                subscript_method = modules.get_property(root.data_type.members, '__subscript__')
-                if subscript_method:
-                    expr = generate_expr(trailer.content[1].content[0])
-                    functions.check_parameters(subscript_method, [expr], trailer)
-                    trailer_added = ExprNode('Call', subscript_method.data_type.return_type, subscript_method, expr)
-                # otherwise it is invalid
-                else:
-                    errormodule.throw('semantic_error', 'Object has no method \'__subscript__\'', trailer)
-            # strings members can be subscripted, but they cannot modified
-            elif root.data_type == types.DataType(types.DataTypes.STRING, 0):
-                expr = generate_expr(trailer.content[1])
-                if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT:
-                    trailer_added = ExprNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), expr, root)
-                else:
-                    errormodule.throw('semantic_error', 'Strings can only be subscripted using integers', trailer)
-            else:
-                errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
+        trailer_added = add_subscript_trailer(root, trailer)
     # if it is a get member
     elif trailer.content[0].type == '.':
         if isinstance(root.data_type, types.CustomType):
@@ -260,60 +127,213 @@ def add_trailer(root, trailer):
                 errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
             elif root.data_type.data_type.data_type == types.DataTypes.MODULE:
                 prop = modules.get_property(root.data_type.members, trailer.content[1].value)
-                if not prop:
-                    return Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers, Modifiers.CONSTEXPR in prop.modifiers)
+                if prop:
+                    trailer_added = ExprNode('GetMember', prop.data_type, root, Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers, Modifiers.CONSTEXPR in prop.modifiers))
                 errormodule.throw('semantic_error', 'Object has no member \'%s\'' % prop, trailer.content[1])
             else:
                 identifier = trailer.content[1].value
                 if identifier in root.data_type.members:
-                    return root.data_type.members[identifier]
+                    member = root.data_type.members[identifier]
+                    trailer_added = ExprNode('GetMember', member.data_type, root, member)
                 errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, trailer.content[1])
         else:
             errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
     # handle distribute
     elif trailer.content[0].type == '|>':
-        dt = None
-        # type check root
-        if isinstance(root.data_type, types.DataType):
-            if root.data_type.pointers != 0:
-                errormodule.throw('semantic_error', 'Unable to apply aggregation to operator to pointer', trailer)
-            elif not root.data_type.data_type != types.DataTypes.STRING:
-                errormodule.throw('semantic_error', 'Invalid data type from aggregation operator', trailer)
-            dt = types.DataType(types.DataTypes.CHAR, 0)
-        elif isinstance(root.data_type, types.CustomType):
-            if not root.data_type.enumerable:
-                errormodule.throw('semantic_error', 'Module used for aggregation is not enumerable', trailer)
-            dt = modules.get_property(root.data_type.members, '__next__').data_type.return_type
-        elif isinstance(root.data_type, types.ListType) or isinstance(root.data_type, types.ArrayType):
-            dt = root.data_type.element_type
-        elif isinstance(root.data_type, types.DictType):
-            dt = (root.data_type.key_type, root.data_type.value_type)
-        # check the aggregator expr
-        aggregate_expr = generate_expr(trailer.content[1])
-        # if it isn't a function
-        if not isinstance(aggregate_expr.data_type, types.Function):
-            errormodule.throw('semantic_error', 'Aggregator must be a function', trailer.content[1])
-        # otherwise add
-        else:
-            # check parameters
-            if len(aggregate_expr.data_type.parameters) != 2:
-                errormodule.throw('semantic_error', 'Aggregator can only take two parameters', trailer.content[1])
-            # check dictionary
-            if isinstance(dt, tuple):
-                params = aggregate_expr.data_type.parameters
-                if not types.coerce(params[0].data_type, dt[0]) or not types.coerce(params[1].data_type, dt[1]):
-                    errormodule.throw('semantic_error', 'Aggregator function parameters must match the key and value types of the dictionary', trailer.content[1])
-            # check all others
-            else:
-                if any(not types.coerce(x.data_type, dt) for x in aggregate_expr.data_type.parameters):
-                    errormodule.throw('semantic_error', 'Aggregator function parameters must match the element type of the aggregate set', trailer.content[1])
-            trailer_added = ExprNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
+        trailer_added = add_aggregator_trailer(root, trailer)
     # continue adding trailer
     if isinstance(trailer.content[-1], ASTNode):
         if trailer.content[-1].name == 'trailer':
             return add_trailer(trailer_added, trailer.content[-1])
     # otherwise return completed item
     return trailer_added
+
+
+# add function call trailer
+def add_call_trailer(root, trailer):
+    # if it is a function
+    if isinstance(root.data_type, types.Function):
+        # handle invalid calls on function pointers
+        if root.data_type.pointers != 0:
+            errormodule.throw('semantic_error', 'Function pointers are not callable', trailer)
+        else:
+            parameters = functions.compile_parameters(trailer.content[1])
+            functions.check_parameters(root, parameters, trailer)
+            return ExprNode('Call', types.IncompleteType(root.data_type) if root.data_type.async else root.data_type.return_type,
+                                     root, parameters)
+    elif isinstance(root.data_type, types.DataType):
+        if root.data_type.pointers == 0:
+            # call (struct) constructor
+            if root.data_type.data_type == types.DataTypes.STRUCT:
+                # check struct generator
+                parameters = structs.check_constructor(root.data_type, trailer.content[1])
+                return ExprNode('Constructor', root.data_type, root, parameters)
+            elif root.data_type.data_type == types.DataTypes.DATA_TYPE:
+                if isinstance(trailer.content[1], Token):
+                    return root
+                parameters = trailer.content[1].content
+                if len(parameters) > 1:
+                    if parameters[1].name == 'named_params':
+                        errormodule.throw('semantic_error', 'Type cast does not accept named parameters',
+                                          trailer.content[1])
+                    else:
+                        errormodule.throw('semantic_error', 'Unable to perform type cast on multiple objects',
+                                          trailer.content[1])
+                obj = generate_expr(parameters[0])
+                if isinstance(obj, Literal):
+                    tp = root.value
+                    casting.static_cast(tp, obj)
+                    return ExprNode('StaticCast', tp, obj)
+                else:
+                    errormodule.warn('Dynamic cast performed in place of static cast', trailer)
+                    return ExprNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
+            elif root.data_type.data_type == types.DataTypes.VALUE:
+                return casting.value_cast(generate_expr(trailer.content[1]))
+        errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
+    # if is module
+    elif isinstance(root.data_type, types.CustomType):
+        if root.pointers != 0:
+            errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
+        else:
+            constructor = modules.get_constructor(root.data_type.members)
+            parameters = modules.check_constructor_parameters(constructor, trailer.content[1])
+            return ExprNode('Call', root.data_type, constructor, parameters)
+    # throw invalid call error
+    else:
+        errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
+
+
+# add subscript trailer
+def add_subscript_trailer(root, trailer):
+    # handle slicing
+    if isinstance(trailer.content[1].content[0], Token):
+        expr = generate_expr(trailer.content[1].content[1])
+        if expr.data_type.pointers != 0:
+            errormodule.throw('semantic_error', 'Subscript cannot be a pointer', trailer)
+        if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType)
+                                                                                                               or isinstance(root.data_type, types.ArrayType)):
+            return ExprNode('SliceBegin', root.data_type.element_type, root, expr)
+        elif isinstance(root.data_type, types.CustomType):
+            method = modules.get_property(root.data_type.members, '__slice__')
+            if method:
+                functions.check_parameters(method, [expr], trailer)
+                return ExprNode('Call', method.data_type.return_type, method, expr)
+            errormodule.throw('semantic_error', 'Object has no method \'__slice__\'', trailer)
+        elif root.data_type.data_type == types.DataTypes.STRING and expr.data_type.data_type == types.DataTypes.INT:
+            return ExprNode('SliceBegin', types.DataType(types.DataTypes.STRING, 0), root, expr)
+        if not isinstance(expr.data_type, types.DataType) or expr.data_type.data_type != types.DataTypes.INT:
+            errormodule.throw('semantic_error', 'Index must be an integral value', trailer)
+        errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
+    # handle slice till end
+    elif len(trailer.content[1].content) > 1:
+        expr = generate_expr(trailer.content[1].content[0])
+        if expr.pointers > 0:
+            errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+        if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type != types.DataTypes.INT:
+            errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+        if len(trailer.content[1].content[1].content) > 1:
+            expr2 = generate_expr(trailer.content[1].content[1].content[1])
+            if expr2.pointers > 0:
+                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+            if isinstance(expr2.data_type, types.DataType) and expr2.data_type.data_type != types.DataTypes.INT:
+                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+            if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
+                if isinstance(root.data_type, types.CustomType):
+                    slice_method = modules.get_property(root.data_type.members, '__slice__')
+                    if slice_method:
+                        functions.check_parameters(slice_method, [expr, expr2], trailer)
+                        return ExprNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
+                errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
+            elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
+                return ExprNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
+            return ExprNode('Slice', root.data_type.element_type, root, expr, expr2)
+        else:
+            if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
+                if isinstance(root.data_type, types.CustomType):
+                    slice_method = modules.get_property(root.data_type.members, '__slice__')
+                    if slice_method:
+                        functions.check_parameters(slice_method, [None, expr], trailer)
+                        return ExprNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
+                errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
+            elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
+                return ExprNode('SliceEnd', types.DataType(types.DataTypes.CHAR, 0), root, expr)
+            return ExprNode('SliceEnd', root.data_type.element_type, root, expr)
+    # handle traditional subscripting
+    else:
+        # the only subscriptable components are mutable (except for strings)
+        if types.mutable(root.data_type):
+            expr = generate_expr(trailer.content[1].content[0])
+            # if not dict, use element type, not value type
+            if isinstance(root.data_type, types.DictType):
+                if expr.data_type != root.data_type.key_type and not types.coerce(root.data_type.key_type, expr.data_type):
+                    errormodule.throw('semantic_error',
+                                      'Type of subscript on dictionary must match data type of dictionary', trailer)
+                dt = root.data_type.value_type
+            elif isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT:
+                dt = root.data_type.element_type
+            else:
+                errormodule.throw('semantic_error', 'Invalid type for subscript', trailer)
+                dt = None
+            return ExprNode('Subscript', dt, expr, root)
+        # if it is a module
+        elif isinstance(root.data_type, types.CustomType) and root.data_type.data_type == types.DataType(types.DataTypes.MODULE, 0):
+            # if it has subscript method
+            subscript_method = modules.get_property(root.data_type.members, '__subscript__')
+            if subscript_method:
+                expr = generate_expr(trailer.content[1].content[0])
+                functions.check_parameters(subscript_method, [expr], trailer)
+                return ExprNode('Call', subscript_method.data_type.return_type, subscript_method, expr)
+            # otherwise it is invalid
+            else:
+                errormodule.throw('semantic_error', 'Object has no method \'__subscript__\'', trailer)
+        # strings members can be subscripted, but they cannot modified
+        elif root.data_type == types.DataType(types.DataTypes.STRING, 0):
+            expr = generate_expr(trailer.content[1])
+            if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT:
+                return ExprNode('Subscript', types.DataType(types.DataTypes.CHAR, 0), expr, root)
+            else:
+                errormodule.throw('semantic_error', 'Strings can only be subscripted using integers', trailer)
+        else:
+            errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
+
+
+def add_aggregator_trailer(root, trailer):
+    dt = None
+    # type check root
+    if isinstance(root.data_type, types.DataType):
+        if root.data_type.pointers != 0:
+            errormodule.throw('semantic_error', 'Unable to apply aggregation to operator to pointer', trailer)
+        elif not root.data_type.data_type != types.DataTypes.STRING:
+            errormodule.throw('semantic_error', 'Invalid data type from aggregation operator', trailer)
+        dt = types.DataType(types.DataTypes.CHAR, 0)
+    elif isinstance(root.data_type, types.CustomType):
+        if not root.data_type.enumerable:
+            errormodule.throw('semantic_error', 'Module used for aggregation is not enumerable', trailer)
+        dt = modules.get_property(root.data_type.members, '__next__').data_type.return_type
+    elif isinstance(root.data_type, types.ListType) or isinstance(root.data_type, types.ArrayType):
+        dt = root.data_type.element_type
+    elif isinstance(root.data_type, types.DictType):
+        dt = (root.data_type.key_type, root.data_type.value_type)
+    # check the aggregator expr
+    aggregate_expr = generate_expr(trailer.content[1])
+    # if it isn't a function
+    if not isinstance(aggregate_expr.data_type, types.Function):
+        errormodule.throw('semantic_error', 'Aggregator must be a function', trailer.content[1])
+    # otherwise add
+    else:
+        # check parameters
+        if len(aggregate_expr.data_type.parameters) != 2:
+            errormodule.throw('semantic_error', 'Aggregator can only take two parameters', trailer.content[1])
+        # check dictionary
+        if isinstance(dt, tuple):
+            params = aggregate_expr.data_type.parameters
+            if not types.coerce(params[0].data_type, dt[0]) or not types.coerce(params[1].data_type, dt[1]):
+                errormodule.throw('semantic_error', 'Aggregator function parameters must match the key and value types of the dictionary', trailer.content[1])
+        # check all others
+        else:
+            if any(not types.coerce(x.data_type, dt) for x in aggregate_expr.data_type.parameters):
+                errormodule.throw('semantic_error', 'Aggregator function parameters must match the element type of the aggregate set', trailer.content[1])
+        return ExprNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
 
 
 #########
