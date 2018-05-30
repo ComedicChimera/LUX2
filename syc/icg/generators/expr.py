@@ -232,6 +232,10 @@ def generate_unary_atom(u_atom):
         if isinstance(atom.data_type, types.Tuple):
             errormodule.throw('semantic_error', 'Unable to apply operator to multiple values', u_atom)
             return
+        # check data type literal
+        if isinstance(atom.data_type, types.DataTypeLiteral):
+            errormodule.throw('semantic_error', 'Unable to apply operator to Data Type literal', u_atom)
+            return
         prefix = u_atom.content[0].content[0]
         # handle sine change
         if prefix.type == '-':

@@ -15,6 +15,12 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add constexpr checker *(syc/icg/constexpr)*
  
  - Add packages to get members checking *(syc/icg/generators/atom.py)*
+ 
+ - Add interface, struct and module based type coercion *(syc/icg/types.py, syc/icg/casting.py)*
+ 
+ - Add validity cast *(syc/icg/casting.py)*
+ 
+ - Consider removing operator overloading from initial generation *(syc/icg/generators/...)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.

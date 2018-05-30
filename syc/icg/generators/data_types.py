@@ -56,6 +56,9 @@ def generate_type(ext):
             return types.DictType(kt, vt, pointers)
     else:
         if ext.content[0].name == 'pure_types':
+            # data type literal
+            if ext.content[0].content[0].type == 'DATA_TYPE':
+                return types.DataTypeLiteral(None)
             # return matched pure types
             return types.DataType({
                 'INT_TYPE': types.DataTypes.INT,
@@ -67,8 +70,7 @@ def generate_type(ext):
                 'STRING_TYPE': types.DataTypes.STRING,
                 'CHAR_TYPE': types.DataTypes.CHAR,
                 'OBJECT_TYPE': types.DataTypes.OBJECT,
-                'DATA_TYPE': types.DataTypes.DATA_TYPE,
-                            }[ext.content[0].content[0].type], pointers)
+                            }[ext.content[0].content[0].type], 0)
         else:
             # TODO add get member symbol checking
             # invalid code ->

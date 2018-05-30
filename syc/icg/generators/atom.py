@@ -92,7 +92,9 @@ def generate_atom(atom):
                         base = ExprNode('Malloc', base.data_type, ExprNode('SizeOf', types.DataType(types.DataTypes.INT, 1), base))
                 else:
                     # return object instance
-                    base = ExprNode('CreateObjectInstance', types.Instance(base.data_type), base)
+                    dt = base.data_type
+                    dt.instance = True
+                    base = ExprNode('CreateObjectInstance', dt, base)
             elif new:
                 # throw error if list, instance, or dict
                 errormodule.throw('semantic_error', 'Unable to dynamically allocate memory for object', atom)
@@ -168,25 +170,6 @@ def add_call_trailer(root, trailer):
                 # check struct generator
                 parameters = structs.check_constructor(root.data_type, trailer.content[1])
                 return ExprNode('Constructor', root.data_type, root, parameters)
-            elif root.data_type.data_type == types.DataTypes.DATA_TYPE:
-                if isinstance(trailer.content[1], Token):
-                    return root
-                parameters = trailer.content[1].content
-                if len(parameters) > 1:
-                    if parameters[1].name == 'named_params':
-                        errormodule.throw('semantic_error', 'Type cast does not accept named parameters',
-                                          trailer.content[1])
-                    else:
-                        errormodule.throw('semantic_error', 'Unable to perform type cast on multiple objects',
-                                          trailer.content[1])
-                obj = generate_expr(parameters[0])
-                if isinstance(obj, Literal):
-                    tp = root.value
-                    casting.static_cast(tp, obj)
-                    return ExprNode('StaticCast', tp, obj)
-                else:
-                    errormodule.warn('Dynamic cast performed in place of static cast', trailer)
-                    return ExprNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
             elif root.data_type.data_type == types.DataTypes.VALUE:
                 return casting.value_cast(generate_expr(trailer.content[1]))
         errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -198,6 +181,29 @@ def add_call_trailer(root, trailer):
             constructor = modules.get_constructor(root.data_type.members)
             parameters = modules.check_constructor_parameters(constructor, trailer.content[1])
             return ExprNode('Call', root.data_type, constructor, parameters)
+    elif isinstance(root.data_type, types.DataTypeLiteral):
+        if isinstance(trailer.content[1], Token):
+            return root
+        parameters = trailer.content[1].content
+        if len(parameters) > 1:
+            if parameters[1].name == 'named_params':
+                errormodule.throw('semantic_error', 'Type cast does not accept named parameters',
+                                  trailer.content[1])
+            else:
+                errormodule.throw('semantic_error', 'Unable to perform type cast on multiple objects',
+                                  trailer.content[1])
+        obj = generate_expr(parameters[0])
+        if isinstance(obj, Literal):
+            tp = root.data_type.data_type
+            if not casting.static_cast(tp, obj):
+                errormodule.throw('semantic_error', 'Invalid type cast', trailer)
+            return ExprNode('StaticCast', tp, obj)
+        else:
+            if not casting.dynamic_cast(root.data_type.data_type, obj.data_type):
+                errormodule.warn('Possible invalid type cast performed', trailer)
+                return ExprNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
+            else:
+                return ExprNode('StaticCast', root.data_type, root, obj)
     # throw invalid call error
     else:
         errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -461,11 +467,12 @@ def generate_base(ast):
                 return Literal(dt, fbody)
             else:
                 return_type = functions.get_return_from_type(base.content[-1].content[1])
-                return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), types.Function(parameters, return_type, 0,
-                                                                                            is_async, False))
+                func = types.Function(parameters, return_type, 0, is_async, False)
+                return Literal(types.DataTypeLiteral(func), func)
         elif base.name == 'atom_types':
+            tp = generate_type(base)
             # use types to generate a type result
-            return Literal(types.DataType(types.DataTypes.DATA_TYPE, 0), generate_type(base))
+            return Literal(types.DataTypeLiteral(tp), tp)
         # handle lambda generation
         elif base.name == 'lambda':
             # parameter holders

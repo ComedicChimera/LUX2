@@ -21,17 +21,14 @@ class DataTypes(Enum):
     # object type (parent type for all types)
     OBJECT = 11
 
-    # type for holding data type
-    DATA_TYPE = 13
-
     # general data type for byte types
-    BYTE = 14
+    BYTE = 12
 
     # null type
-    NULL = 15
+    NULL = 13
 
     # value type
-    VALUE = 16
+    VALUE = 14
 
 
 # parent class for all data type objects
@@ -116,13 +113,8 @@ class CustomType:
         self.hashable = True if 'IHashable' in interfaces else False
         # if it can be used like number (numeric operator overload)
         self.numeric = True if 'INumeric' in interfaces else False
-
-
-# type to hold object instances
-class Instance:
-    def __init__(self, dt):
-        # CustomType
-        self.data_type = dt
+        # if it is an instance
+        self.instance = False
 
 
 # type to hold incomplete types
@@ -136,6 +128,19 @@ class IncompleteType:
 class Tuple:
     def __init__(self, values):
         self.values = values
+
+
+# used to hold data type literals
+class DataTypeLiteral:
+    def __init__(self, dt):
+        self.data_type = dt
+        self.pointers = 0
+
+    def __eq__(self, other):
+        # "type" data type checking
+        if not self.data_type or not other.data_type:
+            return True
+        return self.data_type == other.data_type
 
 
 #####################
@@ -238,4 +243,19 @@ def numeric(dt):
         return True
     else:
         return False
+
+
+# get the size of a Data Type (non-pointer) in bytes
+def get_size(dt):
+    data_types = {
+        DataTypes.INT: 4,
+        DataTypes.FLOAT: 8,
+        DataTypes.COMPLEX: 16,
+        DataTypes.LONG: 8,
+        DataTypes.BOOL: 1,
+        DataTypes.BYTE: 1,
+        DataTypes.CHAR: 2  # TO BE DETERMINED
+
+    }
+    return data_types[dt]
 
