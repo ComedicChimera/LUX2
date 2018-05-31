@@ -1,4 +1,5 @@
 func Main() int {
     $x = char(2 + 2);
     $y = int(2.0);
+    $z = float(4);
 }
