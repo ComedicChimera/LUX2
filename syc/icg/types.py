@@ -30,6 +30,9 @@ class DataTypes(Enum):
     # value type
     VALUE = 14
 
+    # data type literal
+    DATA_TYPE = 15
+
 
 # parent class for all data type objects
 class DataType:
@@ -135,12 +138,6 @@ class DataTypeLiteral:
     def __init__(self, dt):
         self.data_type = dt
         self.pointers = 0
-
-    def __eq__(self, other):
-        # "type" data type checking
-        if not self.data_type or not other.data_type:
-            return True
-        return self.data_type == other.data_type
 
 
 #####################

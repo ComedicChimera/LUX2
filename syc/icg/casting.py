@@ -1,5 +1,6 @@
 import syc.icg.types as types
 from syc.icg.action_tree import Literal
+import errormodule
 
 
 # used to check if a static cast is valid
@@ -65,9 +66,12 @@ def static_cast(dt, obj):
             # integer literal to char
             elif obj.data_type.data_type == types.DataTypes.INT and 0 < int(obj.value) < 256:
                 return True
-        # int to byte
         elif dt.data_type == types.DataTypes.BYTE:
+            # int to byte
             if obj.data_type.data_type == types.DataTypes.INT and 0 < int(obj.value) < 256:
+                return True
+            # char to byte
+            elif obj.data_type.data_type == types.DataTypes.CHAR and 0 < ord(obj.value[1:-1]) < 256:
                 return True
     # default to false
     return False
@@ -116,7 +120,37 @@ def dynamic_cast(dt1, dt2):
         elif types.get_size(dt1.data_type) >= types.get_size(dt2.data_type):
             return True
     # default to false
-    return False
+    return validity_cast(dt1, dt2)
+
+
+# notes if outer cast warning is necessary
+warning = False
+
+
+# check if a dynamic cast could possibly be valid if the root value was known
+def validity_cast(dt1, dt2):
+    global warning
+    val = False
+    if isinstance(dt1, types.DataType):
+        # byte array
+        if isinstance(dt2, types.ArrayType):
+            if isinstance(dt2.element_type, types.DataType) and dt2.element_type.data_type == types.DataTypes.BYTE:
+                val = True
+        # return for non data types
+        elif not isinstance(dt2, types.DataType):
+            return False
+        # numeric to int
+        elif dt1.data_type == types.DataTypes.INT and types.numeric(dt2):
+            val = True
+        # int and string to char
+        elif dt1.data_type == types.DataTypes.CHAR and dt2.data_type in {types.DataTypes.INT, types.DataTypes.STRING}:
+            val = True
+        # int and char to byte
+        elif dt1.data_type == types.DataTypes.BYTE and dt2.data_type in {types.DataTypes.INT, types.DataTypes.CHAR}:
+            val = True
+    if val:
+        warning = True
+    return val
 
 
 # perform value cast (no assignment)

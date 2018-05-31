@@ -58,7 +58,7 @@ def generate_type(ext):
         if ext.content[0].name == 'pure_types':
             # data type literal
             if ext.content[0].content[0].type == 'DATA_TYPE':
-                return types.DataTypeLiteral(None)
+                return types.DataTypeLiteral(types.DataTypes.DATA_TYPE)
             # return matched pure types
             return types.DataType({
                 'INT_TYPE': types.DataTypes.INT,

@@ -5,8 +5,6 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Remove to_str methods once testing is complete *(everywhere)*
  
  - Comment expr.py *(syc/icg/generators/expr.py)*
-
- - Add static cast checking *(syc/icg/casting.py)*
  
  - Add value cast checking *(syc/icg/casting.py)*
  
@@ -17,8 +15,6 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add packages to get members checking *(syc/icg/generators/atom.py)*
  
  - Add interface, struct and module based type coercion *(syc/icg/types.py, syc/icg/casting.py)*
- 
- - Add validity cast *(syc/icg/casting.py)*
  
  - Consider removing operator overloading from initial generation *(syc/icg/generators/...)*
 
