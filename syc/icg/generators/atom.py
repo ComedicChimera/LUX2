@@ -182,6 +182,8 @@ def add_call_trailer(root, trailer):
             parameters = modules.check_constructor_parameters(constructor, trailer.content[1])
             return ExprNode('Call', root.data_type, constructor, parameters)
     elif isinstance(root.data_type, types.DataTypeLiteral):
+        if root.data_type.data_type.data_type == types.DataTypes.DATA_TYPE:
+            errormodule.throw('semantic_error', 'Invalid type cast', trailer)
         if isinstance(trailer.content[1], Token):
             return root
         parameters = trailer.content[1].content
@@ -200,9 +202,12 @@ def add_call_trailer(root, trailer):
             return ExprNode('StaticCast', tp, obj)
         else:
             if not casting.dynamic_cast(root.data_type.data_type, obj.data_type):
-                errormodule.warn('Possible invalid type cast performed', trailer)
-                return ExprNode('DynamicCast', types.DataType(types.DataTypes.OBJECT, 0), root, obj)
+                errormodule.throw('semantic_error', 'Invalid type cast', trailer)
             else:
+                if casting.warning:
+                    errormodule.warn('Possibly invalid type cast performed', trailer)
+                    casting.warning = False
+                    return ExprNode('DynamicCast', root.data_type, root, obj)
                 return ExprNode('StaticCast', root.data_type, root, obj)
     # throw invalid call error
     else:
