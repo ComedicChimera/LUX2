@@ -12,6 +12,8 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add constexpr checker *(syc/icg/constexpr)*
  
+ - Add struct, module, and enum casting *(syc/icg/casting.py)*
+ 
  - Consider removing operator overloading from initial generation *(syc/icg/generators/...)*
 
 ## Tests

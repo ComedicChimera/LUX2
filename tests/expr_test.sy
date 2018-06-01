@@ -1,7 +1,3 @@
 func Main() int {
-    $x = 2;
-    $ptr = &x;
-    *ptr = 3;
-    x = *ptr;
-    *ptr = 4;
+
 }

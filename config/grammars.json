@@ -34,13 +34,12 @@
   ],
   "block_stmt": [
     "if_block",
+    "select_block",
+    "match_block",
+    "for_block",
     "do_block",
-    "select_stmt",
     "with_block",
-    "except_block",
-    "for_block",
-    "for_block",
-    "match_stmt"
+    "except_block"
   ],
   "module_block": [
     "MODULE module_modifiers IDENTIFIER inherit { module_main }"
@@ -187,12 +186,12 @@
     "sub_scope",
     "stmt ;"
   ],
-  "select_stmt": [
-    "SELECT ( expr ) { select_block }"
-  ],
   "select_block": [
-    "case select_block",
-    "default select_block",
+    "SELECT ( expr ) { select_main }"
+  ],
+  "select_main": [
+    "case select_main",
+    "default select_main",
     "&"
   ],
   "case": [
@@ -219,11 +218,11 @@
     "{ main }",
     ";"
   ],
-  "match_stmt": [
-    "MATCH { match_block }"
-  ],
   "match_block": [
-    "? expr case_block match_block",
+    "MATCH { match_main }"
+  ],
+  "match_main": [
+    "? expr case_block match_main",
     "&"
   ],
   "stmt": [
