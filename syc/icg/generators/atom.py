@@ -1,12 +1,13 @@
 import errormodule
 import syc.icg.modules as modules
-from syc.icg.table import Symbol, Modifiers
+from syc.icg.table import Symbol, Modifiers, Package
 from syc.ast.ast import ASTNode, Token
 import util
 from syc.icg.action_tree import ExprNode, Identifier, Literal
 import syc.icg.types as types
 import syc.icg.generators.functions as functions
 from syc.icg.generators.data_types import generate_type
+from copy import copy
 
 
 #########
@@ -92,7 +93,7 @@ def generate_atom(atom):
                         base = ExprNode('Malloc', base.data_type, ExprNode('SizeOf', types.DataType(types.DataTypes.INT, 1), base))
                 else:
                     # return object instance
-                    dt = base.data_type
+                    dt = copy(base.data_type)
                     dt.instance = True
                     base = ExprNode('CreateObjectInstance', dt, base)
             elif new:
@@ -124,22 +125,7 @@ def add_trailer(root, trailer):
         trailer_added = add_subscript_trailer(root, trailer)
     # if it is a get member
     elif trailer.content[0].type == '.':
-        if isinstance(root.data_type, types.CustomType):
-            if root.data_type.data_type.data_type == types.DataTypes.INTERFACE:
-                errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
-            elif root.data_type.data_type.data_type == types.DataTypes.MODULE:
-                prop = modules.get_property(root.data_type.members, trailer.content[1].value)
-                if prop:
-                    trailer_added = ExprNode('GetMember', prop.data_type, root, Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers, Modifiers.CONSTEXPR in prop.modifiers))
-                errormodule.throw('semantic_error', 'Object has no member \'%s\'' % prop, trailer.content[1])
-            else:
-                identifier = trailer.content[1].value
-                if identifier in root.data_type.members:
-                    member = root.data_type.members[identifier]
-                    trailer_added = ExprNode('GetMember', member.data_type, root, member)
-                errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, trailer.content[1])
-        else:
-            errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
+        trailer_added = add_get_member_trailer(root, trailer)
     # handle distribute
     elif trailer.content[0].type == '|>':
         trailer_added = add_aggregator_trailer(root, trailer)
@@ -151,7 +137,7 @@ def add_trailer(root, trailer):
     return trailer_added
 
 
-# add function call trailer
+# add function call '()' trailer
 def add_call_trailer(root, trailer):
     # if it is a function
     if isinstance(root.data_type, types.Function):
@@ -181,40 +167,54 @@ def add_call_trailer(root, trailer):
             constructor = modules.get_constructor(root.data_type.members)
             parameters = modules.check_constructor_parameters(constructor, trailer.content[1])
             return ExprNode('Call', root.data_type, constructor, parameters)
+    # type cast
     elif isinstance(root.data_type, types.DataTypeLiteral):
+        # 'type' cannot be cast to
         if root.data_type.data_type.data_type == types.DataTypes.DATA_TYPE:
             errormodule.throw('semantic_error', 'Invalid type cast', trailer)
+        # handle null type casts
         if isinstance(trailer.content[1], Token):
-            return root
+            errormodule.throw('semantic_error', 'Type cast must be performed on at least one object', trailer)
+        # get parameters of type cast
         parameters = trailer.content[1].content
+        # ensure parameters are valid
         if len(parameters) > 1:
+            # no named parameters
             if parameters[1].name == 'named_params':
                 errormodule.throw('semantic_error', 'Type cast does not accept named parameters',
                                   trailer.content[1])
+            # too many parameters for type cast
             else:
                 errormodule.throw('semantic_error', 'Unable to perform type cast on multiple objects',
                                   trailer.content[1])
+        # generate casting object
         obj = generate_expr(parameters[0])
+        # static cast if literal
         if isinstance(obj, Literal):
             tp = root.data_type.data_type
             if not casting.static_cast(tp, obj):
                 errormodule.throw('semantic_error', 'Invalid type cast', trailer)
             return ExprNode('StaticCast', tp, obj)
+        # use raw type based cast
         else:
+            # if dynamic cast fails
             if not casting.dynamic_cast(root.data_type.data_type, obj.data_type):
                 errormodule.throw('semantic_error', 'Invalid type cast', trailer)
             else:
+                # add validity cast warning if dispatched
                 if casting.warning:
                     errormodule.warn('Possibly invalid type cast performed', trailer)
                     casting.warning = False
+                    # return dynamic cast if there is a warning
                     return ExprNode('DynamicCast', root.data_type, root, obj)
+                # else use default static cast
                 return ExprNode('StaticCast', root.data_type, root, obj)
     # throw invalid call error
     else:
         errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
 
 
-# add subscript trailer
+# add subscript/slice '[]' trailer
 def add_subscript_trailer(root, trailer):
     # handle slicing
     if isinstance(trailer.content[1].content[0], Token):
@@ -308,6 +308,38 @@ def add_subscript_trailer(root, trailer):
             errormodule.throw('semantic_error', 'Object is not subscriptable', trailer)
 
 
+# add get member '.' trailer
+def add_get_member_trailer(root, trailer):
+    # if it is a custom type
+    if isinstance(root.data_type, types.CustomType):
+        # interface members cannot be accessed
+        if root.data_type.data_type.data_type == types.DataTypes.INTERFACE:
+            errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
+        # use module method if necessary
+        elif root.data_type.data_type.data_type == types.DataTypes.MODULE:
+            prop = modules.get_property(root.data_type.members, trailer.content[1].value)
+            if prop:
+                return ExprNode('GetMember', prop.data_type, root, Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers, Modifiers.CONSTEXPR in prop.modifiers))
+            errormodule.throw('semantic_error', 'Object has no member \'%s\'' % prop, trailer.content[1])
+        # assume struct or enum
+        else:
+            identifier = trailer.content[1].value
+            if identifier in root.data_type.members:
+                member = root.data_type.members[identifier]
+                return ExprNode('GetMember', member.data_type, root, member)
+            errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, trailer.content[1])
+    # if it is a package
+    elif isinstance(root, Package):
+        prop = root.get_member(trailer.content[1].value)
+        if prop:
+            return ExprNode('GetMember', prop.data_type, root, prop)
+        errormodule.throw('semantic_error', 'Package has no member \'%s\'' % trailer.content[1].value, trailer.content[1])
+    # otherwise it is invalid
+    else:
+        errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
+
+
+# add aggregator '|>' trailer
 def add_aggregator_trailer(root, trailer):
     dt = None
     # type check root

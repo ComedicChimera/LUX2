@@ -8,6 +8,7 @@ from syc.icg.table import Symbol, Modifiers
 import syc.icg.types as types
 from syc.icg.modules import get_instance
 from syc.icg.constexpr import check as check_constexpr
+from copy import copy
 
 
 # context to hold where statements are valid
@@ -311,8 +312,10 @@ def generate_assignment(assignment):
                 root.data_type.pointers += 1
                 expr = ExprNode('Malloc', root.data_type, ExprNode('SizeOf', types.DataType(types.DataTypes.INT, 1), root))
         else:
+            dt = copy(root.data_type)
+            dt.instance = True
             # return object instance
-            expr = ExprNode('CreateObjectInstance', types.Instance(root.data_type), root)
+            expr = ExprNode('CreateObjectInstance', dt, root)
         root = StatementNode('Expr', expr)
     # return compiled root
     return root
@@ -353,7 +356,9 @@ def generate_assign_var(assign_var):
         # check for non-pointer dereference
         if deref_count > root.data_type.pointers:
             errormodule.throw('semantic_error', 'Unable to dereference a non-pointers', assign_var)
-        return ExprNode('Dereference', None, deref_count, root)
+        dt = copy(root.data_type)
+        dt.pointers -= deref_count
+        return ExprNode('Dereference', dt, deref_count, root)
 
 
 # generate the remain components of the assignment expression if possible
@@ -417,10 +422,10 @@ def generate_assignment_expr(root, assign_expr):
             if not types.coerce(var.data_type, expr.data_type):
                 errormodule.throw('semantic_error', 'Variable type and reassignment type do not match', assign_expr)
             # if there is a compound operator
-            if op.type != '=':
+            if op.type != '=' and not types.numeric(var.data_type):
                 # all compound operators only work on numeric types
-                if not types.numeric(var.data_type):
-                    errormodule.throw('semantic_error', 'Compound assignment operator invalid for non-numeric type', op)
+                errormodule.throw('semantic_error', 'Compound assignment operator invalid for non-numeric type', op)
+
         # return generate statement
         return StatementNode('Assign', op.type, dict(zip(variables, initializers)))
     # else assume increment and decrement

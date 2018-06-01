@@ -43,7 +43,7 @@ This table documents all the names of the action tree nodes, their functions and
 | BitwiseXor | Simple, Simple | Perform Bitwise Xor Operation | ^^ |
 | NullCoalesce | Object, Object | Perform a null coalescence on an object | ?? |
 | InlineCompare | Object, Object, Object | Perform an inline comparison between 2 objects | ? : |
-| StaticCast | Object | Perform a static cast on an object to the return type of the Action Node | *typename*() |
+| StaticCast | Object | Perform a static cast on an object | *typename*() |
 | DynamicCast | Type, Object | Perform a dynamic cast on an object (warning) | *type yielding expr*() |
 | Return | ~Object | Return a value from a function | return *expr \[, expr\]* |
 | Aggregate | Object, Function | Apply an aggregator | *expr*\|>*lambda/inline function*\| |

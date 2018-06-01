@@ -50,12 +50,17 @@ class Symbol:
 class Package:
     def __init__(self, name, symbol_table, action_tree):
         self.name = name
+        self.data_type = DataTypes.PACKAGE
+        self.pointers = 0
 
-    def get_property(self, name):
+    def get_member(self, name):
         pass
 
     def open(self):
         pass
+
+
+from syc.icg.types import DataTypes
 
 
 class SymbolTable:

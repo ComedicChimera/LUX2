@@ -33,6 +33,9 @@ class DataTypes(Enum):
     # data type literal
     DATA_TYPE = 15
 
+    # package type
+    PACKAGE = 16
+
 
 # parent class for all data type objects
 class DataType:
@@ -104,10 +107,12 @@ class Function:
 # class to hold all user defined group types
 class CustomType:
     def __init__(self, dt, members, interfaces):
-        # data type (struct, type, module)
+        # data type (struct, enum, module, interface)
         self.data_type = dt
-        # the internal symbol of the custom type
+        # the members of the custom type
         self.members = members
+        # the internal inferfaces of custom type
+        self.interfaces = interfaces
         # if it can be iterated through by a for loop & subscripted (list based)
         self.enumerable = True if 'IEnumerable' in interfaces else False
         # if it can be called with parameters (function based)
@@ -158,11 +163,20 @@ def coerce(base_type, unknown):
         return False
     # if neither is object and neither is data type return
     if not isinstance(base_type, DataType) and not isinstance(unknown, DataType):
+        # check for non data type match ups
         if type(base_type) == type(unknown):
+            # check lists
             if isinstance(base_type, ListType) or isinstance(base_type, ArrayType):
                 return coerce(base_type.element_type, unknown.element_type)
+            # check dictionaries
             elif isinstance(base_type, DictType):
                 return coerce(base_type.key_type, unknown.key_type) and coerce(base_type.value_type, unknown.value_type)
+            # check custom types
+            elif isinstance(base_type, CustomType):
+                if base_type.data_type == DataTypes.INTERFACE:
+                    return interface_coerce(base_type, unknown)
+                elif base_type.members == unknown.members:
+                    return True
         return False
     # if either is a not a raw data type, it does not work
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
@@ -186,6 +200,23 @@ def coerce(base_type, unknown):
     elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
         return True
     return False
+
+
+# check interface based type coercion
+def interface_coerce(interface, unknown):
+    # interfaces CANNOT be coerced between each other
+    if unknown.data_type == DataTypes.INTERFACE:
+        return False
+    elif unknown.data_type == DataTypes.MODULE:
+        # if module directly implements interface
+        if interface in unknown.interfaces.values():
+            return True
+        # if module implicitly implements interface
+        for method in interface.members:
+            if method not in unknown.members:
+                return False
+        # assume method implement interface
+        return True
 
 
 # get dominant type from two different types

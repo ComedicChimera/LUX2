@@ -2,6 +2,7 @@ from syc.ast.ast import ASTNode, unparse
 from syc.icg.action_tree import ExprNode
 import errormodule
 from syc.icg.table import Package
+from copy import copy
 
 
 def generate_expr(expr):
@@ -252,10 +253,11 @@ def generate_unary_atom(u_atom):
                 # throw error
                 errormodule.throw('semantic_error', 'Unable to change sine on non-numeric type.', u_atom)
         elif prefix.type == 'AMP':
+            dt = copy(atom.data_type)
             # create pointer
-            atom.data_type.pointers += 1
+            dt.pointers += 1
             # reference pointer
-            return ExprNode('Reference', atom.data_type, atom)
+            return ExprNode('Reference', dt, atom)
         # handle deref op
         elif prefix.type == '*':
             do = len(unparse(u_atom.content[0].content[1])) + 1 if len(u_atom.content[0].content) > 1 else 1
@@ -264,8 +266,10 @@ def generate_unary_atom(u_atom):
             if atom.data_type.pointers < do:
                 errormodule.throw('semantic_error', 'Dereferencing of non-pointer', u_atom)
             else:
+                dt = copy(atom.data_type)
+                dt.pointers -= do
                 # return dereference with count
-                return ExprNode('Dereference', atom.data_type, do, atom)
+                return ExprNode('Dereference', dt, do, atom)
 
     else:
         return atom
