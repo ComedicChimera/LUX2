@@ -1,6 +1,5 @@
 import syc.icg.types as types
-from syc.icg.action_tree import Literal
-import errormodule
+from syc.icg.action_tree import Literal, Identifier
 
 
 # used to check if a static cast is valid
@@ -107,6 +106,13 @@ def dynamic_cast(dt1, dt2):
             elif not dt1.async and dt2.async:
                 return False
             return True
+        # check custom types
+        elif isinstance(dt1, types.CustomType):
+            # if data types match
+            if dt1.data_type == dt2.data_type:
+                # members need to be equal
+                if dt1.members == dt2.members:
+                    return True
 
     # list / array type conversion
     elif (isinstance(dt1, types.ListType) or isinstance(dt1, types.ArrayType)) and (isinstance(dt2, types.ListType) or isinstance(dt2, types.ArrayType)):
@@ -155,4 +161,18 @@ def validity_cast(dt1, dt2):
 
 # perform value cast (no assignment)
 def value_cast(value):
-    pass
+    # root properties set
+    properties = value.__dict__
+
+    # end module properties set
+    module_properties = []
+
+    # get type mappings
+    def map_type(dt):
+        pass
+
+    # generate module properties
+    for item in properties:
+        pass
+
+    return Identifier('', types.CustomType('#VALUE', types.DataTypes.MODULE, module_properties, [], True), False)

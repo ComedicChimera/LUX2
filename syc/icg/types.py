@@ -106,23 +106,27 @@ class Function:
 
 # class to hold all user defined group types
 class CustomType:
-    def __init__(self, dt, members, interfaces):
+    def __init__(self, name, dt, members, inherits, instance=False):
+        # custom type name
+        self.name = name
         # data type (struct, enum, module, interface)
         self.data_type = dt
         # the members of the custom type
         self.members = members
         # the internal inferfaces of custom type
-        self.interfaces = interfaces
+        self.inherits = inherits
+        # create interface set
+        self.interfaces = [i.name for i in inherits if i.data_type == DataTypes.INTERFACE]
         # if it can be iterated through by a for loop & subscripted (list based)
-        self.enumerable = True if 'IEnumerable' in interfaces else False
+        self.enumerable = True if 'IEnumerable' in inherits else False
         # if it can be called with parameters (function based)
-        self.callable = True if 'ICallable' in interfaces else False
+        self.callable = True if 'ICallable' in inherits else False
         # if it can be used to store a key-value pair and is ENUMERABLE (dict based)
-        self.hashable = True if 'IHashable' in interfaces else False
+        self.hashable = True if 'IHashable' in inherits else False
         # if it can be used like number (numeric operator overload)
-        self.numeric = True if 'INumeric' in interfaces else False
+        self.numeric = True if 'INumeric' in inherits else False
         # if it is an instance
-        self.instance = False
+        self.instance = instance
 
 
 # type to hold incomplete types
@@ -173,10 +177,12 @@ def coerce(base_type, unknown):
                 return coerce(base_type.key_type, unknown.key_type) and coerce(base_type.value_type, unknown.value_type)
             # check custom types
             elif isinstance(base_type, CustomType):
+                # check interfaces
                 if base_type.data_type == DataTypes.INTERFACE:
                     return interface_coerce(base_type, unknown)
-                elif base_type.members == unknown.members:
-                    return True
+                # check modules
+                elif base_type.data_type == DataTypes.MODULE:
+                    return module_coerce(base_type, unknown)
         return False
     # if either is a not a raw data type, it does not work
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
@@ -200,6 +206,9 @@ def coerce(base_type, unknown):
     elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
         return True
     return False
+
+
+from syc.icg.modules import module_coerce
 
 
 # check interface based type coercion
@@ -271,6 +280,21 @@ def numeric(dt):
         return True
     else:
         return False
+
+
+# check if element is a boolean
+def boolean(dt):
+    # if element has pointers, it is not numeric
+    if dt.pointers != 0:
+        return False
+    # if it not a simple type
+    if not isinstance(dt, DataType):
+        return False
+    # check if it is a boolean type
+    if dt.data_type != DataTypes.BOOL:
+        return False
+    # passed all checks => default to true
+    return True
 
 
 # get the size of a Data Type (non-pointer) in bytes

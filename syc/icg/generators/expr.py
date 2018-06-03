@@ -6,54 +6,76 @@ from copy import copy
 
 
 def generate_expr(expr):
+    # hold the resulting expr
     root = None
     for item in expr.content:
-        if isinstance(item, ASTNode):
-            if item.name == 'or':
-                root = generate_logical(item)
-            elif item.name == 'n_expr':
-                if item.content[0].type == '?':
-                    val1 = generate_logical(item.content[1])
-                    val2 = generate_logical(item.content[3])
-                    dt = root.data_type
-                    if not (val1.data_type == val2.data_type):
-                        dt = types.dominant(val1.data_type, val2.data_type)
-                        if not dt:
-                            dt = types.dominant(val2.data_type, val1.data_type)
-                            if not dt:
-                                errormodule.throw('semantic_error', 'Types of inline comparison must be similar', item)
-                    return ExprNode('InlineCompare', dt, root, val1, val2)
-                else:
-                    n_expr = item
-                    while n_expr.name == 'n_expr':
-                        logical = generate_logical(n_expr.content[1])
-                        if logical.data_type == root.data_type:
-                            root = ExprNode('NullCoalesce', root.data_type, root, logical)
-                        else:
-                            dom_type = types.dominant(root.data_type, logical.data_type)
-                            if dom_type:
-                                root = ExprNode('NullCoalesce', dom_type, root, logical)
-                            else:
-                                errormodule.throw('semantic_error', 'Types of null coalescing must be similar', expr)
-                        n_expr = n_expr.content[-1]
+        # only possible value is ASTNode
+        # if it is a root ASTNode, generate it
+        if item.name == 'or':
+            root = generate_logical(item)
+        # if the root has a continued expr
+        elif item.name == 'n_expr':
+            # if it is InlineIf
+            if item.content[0].type == '?':
+                # root ? val1 : val2
+                val1 = generate_logical(item.content[1])
+                val2 = generate_logical(item.content[3])
+                # ensure root is boolean
+                if not types.boolean(root.data_type):
+                    errormodule.throw('semantic_error', 'Comparison expression of inline comparison must be a boolean', expr.content[0])
+                # get the dominant resulting type
+                dt = types.dominant(val1.data_type, val2.data_type)
+                if not dt:
+                    dt = types.dominant(val2.data_type, val1.data_type)
+                    # if neither can be overruled by each other, throw error
+                    if not dt:
+                        errormodule.throw('semantic_error', 'Types of inline comparison must be similar', item)
+                return ExprNode('InlineCompare', dt, root, val1, val2)
+            # otherwise, it is Null Coalescence
+            else:
+                # recursive while loop
+                n_expr = item
+                while n_expr.name == 'n_expr':
+                    # get root expression
+                    logical = generate_logical(n_expr.content[1])
+                    # ensure the root and logical are coercible / equivalent
+                    if types.coerce(root.data_type, logical.data_type):
+                        root = ExprNode('NullCoalesce', root.data_type, root, logical)
+                    # otherwise it is an invalid null coalescence
+                    else:
+                        errormodule.throw('semantic_error', 'Types of null coalescing must be similar', expr)
+                    # recur
+                    n_expr = n_expr.content[-1]
+    # return final expr
     return root
 
 
+# allow for recursive imports
 import syc.icg.types as types
 import syc.icg.modules as modules
 import syc.icg.generators.functions as functions
 
 
+# operate on logical operator (or, and, xor)
 def generate_logical(logical):
+    # if it is a comparison, pass it on to the next generator
     if logical.name == 'comparison':
         return generate_comparison(logical)
+    # unpack tree if it exists
     if len(logical.content) > 1:
+        # hold the unpacked tree
         unpacked_tree = logical.content[:]
+        # semi-recursive for loop to unpack tree
         for item in unpacked_tree:
+            # if it is an ASTNode
             if isinstance(item, ASTNode):
-                if item.name in {'n_or', 'n_xor', 'n_and'}:
+                # and falls into the 'n' categories
+                if item.name.startswith('n'):
+                    # unpack it
                     unpacked_tree += unpacked_tree.pop().content
+        # root holds the next level downward, op = operator being used
         root, op = generate_logical(unpacked_tree.pop(0)), None
+        # iterate through unpacked tree
         for item in unpacked_tree:
             if isinstance(item, ASTNode):
                 tree = generate_comparison(item) if item.name == 'comparison' else generate_logical(item)
@@ -81,6 +103,7 @@ def generate_logical(logical):
                 name = item.type.lower()
                 op = name[0].upper() + name[1:]
         return root
+    # otherwise recur to next level down
     else:
         return generate_logical(logical.content[0])
 

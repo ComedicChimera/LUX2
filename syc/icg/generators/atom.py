@@ -325,7 +325,7 @@ def add_get_member_trailer(root, trailer):
         else:
             identifier = trailer.content[1].value
             if identifier in root.data_type.members:
-                member = root.data_type.members[identifier]
+                member = [x for x in root.data_type.members if x.name == identifier][0]
                 return ExprNode('GetMember', member.data_type, root, member)
             errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, trailer.content[1])
     # if it is a package

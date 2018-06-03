@@ -16,3 +16,7 @@ def check_modifiers(modifiers):
 
 def check_constructor_parameters(constructor, parameters):
     pass
+
+
+def module_coerce(dt1, dt2):
+    pass
