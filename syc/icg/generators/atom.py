@@ -313,16 +313,20 @@ def add_get_member_trailer(root, trailer):
     # if it is a custom type
     if isinstance(root.data_type, types.CustomType):
         # interface members cannot be accessed
-        if root.data_type.data_type.data_type == types.DataTypes.INTERFACE:
+        if root.data_type.data_type == types.DataTypes.INTERFACE:
             errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
         # use module method if necessary
-        elif root.data_type.data_type.data_type == types.DataTypes.MODULE:
+        elif root.data_type.data_type == types.DataTypes.MODULE:
             prop = modules.get_property(root.data_type.members, trailer.content[1].value)
             if prop:
                 return ExprNode('GetMember', prop.data_type, root, Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers, Modifiers.CONSTEXPR in prop.modifiers))
             errormodule.throw('semantic_error', 'Object has no member \'%s\'' % prop, trailer.content[1])
         # assume struct or enum
         else:
+            # check to ensure it is an instance of a struct if it is a struct
+            if root.data_type.data_type == types.DataTypes.STRUCT:
+                if not root.data_type.instance:
+                    errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
             identifier = trailer.content[1].value
             if identifier in root.data_type.members:
                 member = [x for x in root.data_type.members if x.name == identifier][0]

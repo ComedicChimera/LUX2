@@ -175,8 +175,7 @@
   "for_body": [
     "( for_expr ) block",
     "base trailer => iter_body",
-    "!",
-    "&"
+    "! block"
   ],
   "for_expr": [
     "$ IDENTIFIER extension = expr ; expr ; assignment ;",

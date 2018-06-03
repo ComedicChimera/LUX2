@@ -111,6 +111,8 @@ class CustomType:
         self.name = name
         # data type (struct, enum, module, interface)
         self.data_type = dt
+        # pointers
+        self.pointers = 0
         # the members of the custom type
         self.members = members
         # the internal inferfaces of custom type

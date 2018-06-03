@@ -181,13 +181,14 @@ def generate_variable_declaration(stmt, modifiers):
         if not overall_type and isinstance(initializer.data_type, types.DataType) and initializer.data_type.data_type == types.DataTypes.NULL:
             errormodule.throw('semantic_error', 'Unable to infer data type of variable', stmt)
         # check for type extension and initializer mismatch
-        if overall_type and not types.coerce(overall_type, initializer.data_type):
+        if overall_type and initializer and not types.coerce(overall_type, initializer.data_type):
             errormodule.throw('semantic_error', 'Variable type extension and initializer data types do not match', stmt)
         # add constexpr if marked as such
         if constexpr:
             modifiers.append(Modifiers.CONSTEXPR)
             # assume initializer exists
-            check_constexpr(initializer, stmt)
+            if not check_constexpr(initializer):
+                errormodule.throw('semantic_error', 'Expected constexpr', stmt)
         # add to symbol table
         util.symbol_table.add_variable(Symbol(variables.value, overall_type if overall_type else initializer.data_type, modifiers, None if not constexpr else initializer), stmt)
         # return generated statement node
@@ -245,7 +246,8 @@ def generate_var(var_ast):
                         variable['constexpr'] = item.content[0].type == ':='
                         # perform constexpr check if is constexpr
                         if variable['constexpr']:
-                            check_constexpr(variable['initializer'], item.content[-1])
+                            if not check_constexpr(variable['initializer']):
+                                errormodule.throw('semantic_error', 'Expected constexpr', item.content[-1])
                     # recur and continue building variable dictionary
                     elif item.name == 'multi_var':
                         add_final_variable()

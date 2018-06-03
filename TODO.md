@@ -13,7 +13,7 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add constexpr checker *(syc/icg/constexpr)*
  
  - Consider removing operator overloading from initial generation or fix uses of module.get_property to
- pass the full module (CustomType) in *(syc/icg/generators/...)*
+ pass the full module in *(syc/icg/generators/...)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.

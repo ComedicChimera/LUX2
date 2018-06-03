@@ -23,14 +23,20 @@ def generate_type(ext):
             # extract count value
             # ext.content[1].content[1] == pure_types -> array_modifiers -> expr
             count = get_array_bound(generate_expr(ext.content[1].content[3]))
-            if not count:
+            print(count)
+            if not count and count != 0:
                 errormodule.throw('semantic_error', 'Non-constexpr array bound', ext.content[1].content[3])
-            # check to ensure count is integer
-            if not isinstance(count.data_type, types.DataType):
-                errormodule.throw('semantic_error', 'Invalid type for array initializer', ext.content[1].content[3])
-            if count.data_type.data_type != types.DataTypes.INT or count.data_type.pointers != 0:
-                errormodule.throw('semantic_error', 'Invalid type for array initializer', ext.content[1].content[3])
-            return types.ArrayType(et, count, pointers)
+
+            try:
+                _ = count < 0
+                count = float(count)
+            except (ValueError, TypeError):
+                errormodule.throw('semantic_error', 'Invalid value for array bound', ext.content[1].content[3])
+            if not count.is_integer():
+                errormodule.throw('semantic_error', 'Invalid value for array bound', ext.content[1].content[3])
+            elif count < 1:
+                errormodule.throw('semantic_error', 'Invalid value for array bound', ext.content[1].content[3])
+            return types.ArrayType(et, int(count), pointers)
         # assume list
         elif ext.content[0].type == 'LIST_TYPE':
             # ext.content[1].content[1] == pure_types -> list_modifier -> types
