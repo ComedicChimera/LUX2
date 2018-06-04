@@ -136,7 +136,7 @@ def generate_type(ext):
             if not isinstance(sym, types.CustomType):
                 errormodule.throw('semantic_error', 'Object is not a valid is a data type', prev_sym)
             # add instance marker if necessary
-            if sym.data_type.data_type not in {types.DataTypes.INTERFACE, types.DataTypes.ENUM}:
+            if sym.data_type.data_type != types.DataTypes.INTERFACE:
                 sym.data_type.instance = True
             return sym.data_type
 

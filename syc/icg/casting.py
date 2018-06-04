@@ -1,5 +1,6 @@
 import syc.icg.types as types
 from syc.icg.action_tree import Literal, Identifier
+import syc.icg.templates as templates
 
 
 # used to check if a static cast is valid
@@ -80,6 +81,9 @@ def static_cast(dt, obj):
 def dynamic_cast(dt1, dt2):
     if types.coerce(dt1, dt2):
         return True
+    # template casting
+    if isinstance(dt2, templates.Template):
+        return templates.template_cast(dt2, dt1)
     # coerce catches explicitly equal types, so this is a valid test to assume complex data types
     if type(dt1) == type(dt2):
         # check lists and arrays

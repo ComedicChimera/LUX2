@@ -331,6 +331,17 @@ def add_get_member_trailer(root, trailer):
             member_names = [x.name for x in root.data_type.members if x.name == identifier]
             if identifier in member_names:
                 member = [x for x in root.data_type.members if x.name == identifier][0]
+                # convert member data type for enums
+                if root.data_type.data_type == types.DataTypes.ENUM:
+                    # copy enum data type
+                    enum_dt = copy(root.data_type)
+                    # set instance
+                    enum_dt.instance = True
+                    # add the value property to it
+                    setattr(enum_dt, 'value', Identifier(member.name, member.data_type, True, Modifiers.CONSTEXPR in member.modifiers))
+                    # return generated expression node
+                    return ExprNode('GetMember', enum_dt, root, Identifier(member.name, member.data_type, True, Modifiers.CONSTEXPR in member.modifiers))
+                # return struct get member
                 return ExprNode('GetMember', member.data_type, root, Identifier(member.name, member.data_type, Modifiers.CONSTANT in member.modifiers,
                                                                                 Modifiers.CONSTEXPR in member.modifiers))
             errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, trailer.content[1])

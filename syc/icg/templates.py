@@ -1,7 +1,6 @@
 from enum import Enum
 import syc.icg.modules as modules
 from syc.ast.ast import ASTNode, Token
-from syc.icg.generators.data_types import generate_type
 
 
 # used to hold template
@@ -35,7 +34,7 @@ class Template:
             self.members = kwargs['members']
             self.interface = kwargs['interface']
 
-    def __eq__(self, other):
+    def compare(self, other):
         # if it is a type template, check if type is in type list
         if self.template_type == self.TemplateTypes.TYPE:
             if other not in self.type_list:
@@ -119,3 +118,10 @@ def generate_type_list(ast):
             elif item.name == 'n_type_template':
                 type_list.extend(item.content)
     return type_list
+
+
+def template_cast(template, dt):
+    pass
+
+
+from syc.icg.generators.data_types import generate_type

@@ -1,5 +1,6 @@
 from enum import Enum
 from syc.icg.table import Package
+import syc.icg.templates as templates
 
 
 # enum representing all simple SyClone types
@@ -158,8 +159,13 @@ class DataTypeLiteral:
 
 # check if type can be coerced
 def coerce(base_type, unknown):
+    # if there is equality => coercible
     if base_type == unknown:
         return True
+    # template coercion
+    elif isinstance(base_type, templates.Template):
+        return base_type.compare(unknown)
+    # package coercion
     if isinstance(base_type, Package) or isinstance(unknown, Package):
         if type(base_type) == type(unknown):
             return True
@@ -185,7 +191,18 @@ def coerce(base_type, unknown):
                 # check modules
                 elif base_type.data_type == DataTypes.MODULE:
                     return module_coerce(base_type, unknown)
+                # check enums
+                elif base_type.data_type == DataTypes.ENUM:
+                    # make sure they are the same enum
+                    if base_type.name != unknown.name or base_type.members != unknown.members:
+                        return False
+                    # if they are both enum instances, they are valid
+                    if base_type.instance and unknown.instance:
+                        return True
         return False
+    # extract enum member type
+    if isinstance(unknown, CustomType) and unknown.data_type == DataTypes.ENUM and hasattr(unknown, 'value'):
+        unknown = unknown.value.data_type
     # if either is a not a raw data type, it does not work
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return False
