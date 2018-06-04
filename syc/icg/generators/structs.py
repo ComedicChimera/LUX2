@@ -1,6 +1,7 @@
-from syc.ast.ast import ASTNode
+from syc.ast.ast import ASTNode, unparse
 from syc.icg.table import Symbol, Modifiers
 import syc.icg.types as types
+from syc.icg.generators.data_types import generate_type
 import syc.icg.modules as modules
 import util
 
@@ -23,7 +24,7 @@ def generate_struct(struct_tree):
             if item.type == 'IDENTIFIER':
                 name = item.value
     # generate symbol
-    symbol = Symbol(name, types.DataType(types.DataTypes.STRUCT, 0), modifiers, members=members)
+    symbol = Symbol(name, types.CustomType(name, types.DataTypes.STRUCT, members, []), modifiers)
     util.symbol_table.scope.append(symbol)
 
 
@@ -42,7 +43,7 @@ def generate_modifiers(modifier_tree):
         'SEALED': Modifiers.SEALED
     }
     # iterate through unparsed tokens
-    for item in util.unparse(modifier_tree):
+    for item in unparse(modifier_tree):
         # map to enum representation
         mods.append(mod_map[item.type])
     # check modifiers
@@ -59,7 +60,7 @@ def generate_members(member_tree):
             if item.name == 'n_var':
                 members += generate_members(item)
             elif item.name == 'extension':
-                working_member['data_type'] = types.generate_type(item.content[1])
+                working_member['data_type'] = generate_type(item.content[1])
         elif item.type == 'IDENTIFIER':
             working_member['name'] = item.value
     if 'data_type' not in working_member.keys():

@@ -171,14 +171,14 @@
     "&"
   ],
   "function_template": [
-    "template_return template_params"
-  ],
-  "template_return": [
-    "[ type_template ]",
-    "&"
+    "template_params template_return"
   ],
   "template_params": [
     "( type_template )",
+    "&"
+  ],
+  "template_return": [
+    "[ type_template ]",
     "&"
   ],
   "struct_template": [
@@ -674,7 +674,7 @@
     "[ types , expr ]"
   ],
   "id": [
-    "THIS . IDENTIFIER dot_id",
+    "THIS dot_id",
     "IDENTIFIER dot_id"
   ],
   "dot_id": [

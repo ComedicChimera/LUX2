@@ -70,7 +70,7 @@ def generate_atom(atom):
                 # otherwise compile base
                 base = generate_base(item) if item.name == 'base' else None
             # if awaited and not an async function, throw an error
-            if await and not isinstance(base.data_type, types.IncompleteType):
+            if await and not isinstance(base.data_type, types.Future):
                 errormodule.throw('semantic_error', 'Unable to await object', atom)
             elif await:
                 base = ExprNode('Await', base.data_type.data_type, base)
@@ -147,8 +147,8 @@ def add_call_trailer(root, trailer):
         else:
             parameters = functions.compile_parameters(trailer.content[1])
             functions.check_parameters(root, parameters, trailer)
-            return ExprNode('Call', types.IncompleteType(root.data_type) if root.data_type.async else root.data_type.return_type,
-                                     root, parameters)
+            return ExprNode('Call', types.Future(root.data_type) if root.data_type.async else root.data_type.return_type,
+                            root, parameters)
     elif isinstance(root.data_type, types.DataType):
         if root.data_type.pointers == 0:
             # call (struct) constructor
@@ -320,7 +320,7 @@ def add_get_member_trailer(root, trailer):
             prop = modules.get_property(root.data_type, trailer.content[1].value)
             if prop:
                 return ExprNode('GetMember', prop.data_type, root, Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers, Modifiers.CONSTEXPR in prop.modifiers))
-            errormodule.throw('semantic_error', 'Object has no member \'%s\'' % prop, trailer.content[1])
+            errormodule.throw('semantic_error', 'Object has no member \'%s\'' % trailer.content[1].value, trailer.content[1])
         # assume struct or enum
         else:
             # check to ensure it is an instance of a struct if it is a struct

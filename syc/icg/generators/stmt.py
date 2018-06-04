@@ -292,7 +292,7 @@ def generate_assignment(assignment):
     # check await
     if await:
         # if it is not returning and Incomplete Type, an async function was not called
-        if not isinstance(root.data_type, types.IncompleteType):
+        if not isinstance(root.data_type, types.Future):
             errormodule.throw('semantic_error', 'Unable to await object', assignment)
         root = StatementNode('Expr', ExprNode('Await', root.data_type.data_type, root))
     # check new

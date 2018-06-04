@@ -2,6 +2,8 @@ from syc.ast.ast import Token, unparse
 import syc.icg.types as types
 import errormodule
 from syc.icg.constexpr import get_array_bound
+import util
+import syc.icg.modules as modules
 
 
 # generate type from ast (extension or atom types)
@@ -84,12 +86,60 @@ def generate_type(ext):
                 'OBJECT_TYPE': types.DataTypes.OBJECT,
                             }[ext.content[0].content[0].type], 0)
         else:
-            # TODO add get member symbol checking
-            # invalid code ->
-            """sym = util.symbol_table.look_up(ext.content[0].value)
-            if not sym:
-                errormodule.throw('semantic_error', 'Variable \'%s\' is undefined' % ext.content[0].value, ext.content[0])
-            return types.CustomType(sym.data_type, sym, sym.inherits if hasattr(sym, 'inherits') else [])"""
+            # get root symbol
+            name = ext.content[0].content[0].value
+            if name.type == 'THIS':
+                sym = modules.get_instance()
+            else:
+                sym = util.symbol_table.look_up(name)
+            # hold previous symbol ASTNode for error messages
+            prev_sym = ext.content[0].content[0]
+            # extract outer symbols if necessary
+            if len(ext.content[0].content) > 1:
+                content = ext.content[0].content[1:]
+                for item in content:
+                    if isinstance(item, Token):
+                        if item.type == 'IDENTIFIER':
+                            # make sure symbol is a custom type
+                            if not isinstance(sym, types.CustomType):
+                                errormodule.throw('semantic_error', 'Object is not a valid is a data type', prev_sym)
+                            identifier = item.value
+                            # get member for modules
+                            if sym.data_type.data_type == types.DataTypes.MODULE:
+                                # get and check property
+                                prop = modules.get_property(sym.data_type, identifier)
+                                if not prop:
+                                    errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, item)
+                                # update previous symbol
+                                prev_sym = item
+                                # update symbol
+                                sym = prop
+                            # invalid get member on interfaces
+                            elif sym.data_type.data_type == types.DataTypes.INTERFACE:
+                                errormodule.throw('semantic_error', '\'.\' is not valid for this object', item)
+                            # assume struct or enum
+                            else:
+                                for member in sym.data_type.members:
+                                    # if there is a match, extract value
+                                    if member.name == identifier:
+                                        prev_sym = item
+                                        sym = member
+                                        # break to prevent else condition
+                                        break
+                                # if there is no match, throw error
+                                else:
+                                    errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, item)
+                    # continue recursive for loop
+                    elif item.name == 'dot_id':
+                            content.extend(item.content)
+            # final check for invalid data types
+            if not isinstance(sym, types.CustomType):
+                errormodule.throw('semantic_error', 'Object is not a valid is a data type', prev_sym)
+            # add instance marker if necessary
+            if sym.data_type.data_type not in {types.DataTypes.INTERFACE, types.DataTypes.ENUM}:
+                sym.data_type.instance = True
+            return sym.data_type
+
 
 from syc.icg.generators.functions import generate_parameter_list, get_return_from_type
 from syc.icg.generators.expr import generate_expr

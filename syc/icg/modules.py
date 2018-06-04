@@ -1,12 +1,12 @@
-def get_property(members, name):
-    return members
+def get_property(custom_type, name):
+    return custom_type
 
 
 def get_instance():
     return 0
 
 
-def get_constructor(members):
+def get_constructor(custom_type):
     pass
 
 

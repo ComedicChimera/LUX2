@@ -24,7 +24,9 @@ class Parser:
         while len(stack) > 0:
             if stack[len(stack) - 1] == "queue":
                 # handles closing of ASTs
-                sem_stack[-2].content.append(sem_stack[-1])
+                # ensures that the it is not an empty AST
+                if len(sem_stack[-1].content) > 0:
+                    sem_stack[-2].content.append(sem_stack[-1])
                 sem_stack.pop()
                 stack.pop()
                 continue
