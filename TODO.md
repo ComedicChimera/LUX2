@@ -10,8 +10,6 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Redo function checking to check for code paths and allow for type coercion *(syc/icg/generators/functions.py)*
  
- - Add constexpr checker *(syc/icg/constexpr)*
- 
  - Consider removing operator overloading from initial generation or fix uses of module.get_property to
  pass the full module in *(syc/icg/generators/...)*
 
@@ -23,6 +21,8 @@ This is a special section of TODO.md devoted specifically to tests that need to 
  - Test: stmt.py 
  
  - Test: tuple-based declaration
+ 
+ - Test: get member in constexpr and in general
  
 ## Notes
 This is a separate section regarding notes for things that need to be taken into account in future components of the compiler.

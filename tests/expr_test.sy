@@ -1,3 +1,4 @@
 func Main() int {
-    $x: array[int, 2 ^ 2 ^ 3];
+    @ndx := 3 + 3;
+    $x: array[int, ndx];
 }

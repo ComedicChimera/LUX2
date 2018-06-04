@@ -223,7 +223,7 @@ def add_subscript_trailer(root, trailer):
             errormodule.throw('semantic_error', 'Subscript cannot be a pointer', trailer)
         if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType)
                                                                                                                or isinstance(root.data_type, types.ArrayType)):
-            return ExprNode('SliceBegin', root.data_type.element_type, root, expr)
+            return ExprNode('SliceBegin', root.data_type, root, expr)
         elif isinstance(root.data_type, types.CustomType):
             method = modules.get_property(root.data_type.members, '__slice__')
             if method:
@@ -231,20 +231,20 @@ def add_subscript_trailer(root, trailer):
                 return ExprNode('Call', method.data_type.return_type, method, expr)
             errormodule.throw('semantic_error', 'Object has no method \'__slice__\'', trailer)
         elif root.data_type.data_type == types.DataTypes.STRING and expr.data_type.data_type == types.DataTypes.INT:
-            return ExprNode('SliceBegin', types.DataType(types.DataTypes.STRING, 0), root, expr)
+            return ExprNode('SliceBegin', root.data_type, root, expr)
         if not isinstance(expr.data_type, types.DataType) or expr.data_type.data_type != types.DataTypes.INT:
             errormodule.throw('semantic_error', 'Index must be an integral value', trailer)
         errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
     # handle slice till end
     elif len(trailer.content[1].content) > 1:
         expr = generate_expr(trailer.content[1].content[0])
-        if expr.pointers > 0:
+        if expr.data_type.pointers > 0:
             errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
         if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type != types.DataTypes.INT:
             errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
         if len(trailer.content[1].content[1].content) > 1:
-            expr2 = generate_expr(trailer.content[1].content[1].content[1])
-            if expr2.pointers > 0:
+            expr2 = generate_expr(trailer.content[1].content[1].content[1].content[0])
+            if expr2.data_type.pointers > 0:
                 errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
             if isinstance(expr2.data_type, types.DataType) and expr2.data_type.data_type != types.DataTypes.INT:
                 errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
@@ -257,7 +257,7 @@ def add_subscript_trailer(root, trailer):
                 errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
             elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
                 return ExprNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
-            return ExprNode('Slice', root.data_type.element_type, root, expr, expr2)
+            return ExprNode('Slice', root.data_type, root, expr, expr2)
         else:
             if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
                 if isinstance(root.data_type, types.CustomType):
@@ -267,8 +267,8 @@ def add_subscript_trailer(root, trailer):
                         return ExprNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
                 errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
             elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                return ExprNode('SliceEnd', types.DataType(types.DataTypes.CHAR, 0), root, expr)
-            return ExprNode('SliceEnd', root.data_type.element_type, root, expr)
+                return ExprNode('SliceEnd', root.data_type, root, expr)
+            return ExprNode('SliceEnd', root.data_type, root, expr)
     # handle traditional subscripting
     else:
         # the only subscriptable components are mutable (except for strings)
@@ -328,9 +328,11 @@ def add_get_member_trailer(root, trailer):
                 if not root.data_type.instance:
                     errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
             identifier = trailer.content[1].value
-            if identifier in root.data_type.members:
+            member_names = [x.name for x in root.data_type.members if x.name == identifier]
+            if identifier in member_names:
                 member = [x for x in root.data_type.members if x.name == identifier][0]
-                return ExprNode('GetMember', member.data_type, root, member)
+                return ExprNode('GetMember', member.data_type, root, Identifier(member.name, member.data_type, Modifiers.CONSTANT in member.modifiers,
+                                                                                Modifiers.CONSTEXPR in member.modifiers))
             errormodule.throw('semantic_error', 'Object has no member \'%s\'' % identifier, trailer.content[1])
     # if it is a package
     elif isinstance(root, Package):
@@ -400,8 +402,8 @@ def generate_base(ast):
             # if it is not able to found in the table, throw an error
             if not sym:
                 errormodule.throw('semantic_error', 'Variable used without declaration', ast)
-            # otherwise return the raw symbol
-            return Literal(sym.data_type, Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers, Modifiers.CONSTEXPR in sym.modifiers))
+            # otherwise return the Identifier
+            return Identifier(sym.name, sym.data_type, Modifiers.CONSTANT in sym.modifiers, Modifiers.CONSTEXPR in sym.modifiers)
         # if it is an instance pointer
         elif base.type == 'THIS':
             # get the group instance (typeof Instance)

@@ -22,20 +22,26 @@ def generate_type(ext):
             et = generate_type(ext.content[1].content[1])
             # extract count value
             # ext.content[1].content[1] == pure_types -> array_modifiers -> expr
-            count = get_array_bound(generate_expr(ext.content[1].content[3]))
+            error_ast = ext.content[1].content[3]
+            try:
+                count = get_array_bound(generate_expr(ext.content[1].content[3]))
+            except IndexError:
+                errormodule.throw('semantic_error', 'Index out of range', error_ast)
+                return
             print(count)
             if not count and count != 0:
-                errormodule.throw('semantic_error', 'Non-constexpr array bound', ext.content[1].content[3])
-
+                errormodule.throw('semantic_error', 'Non-constexpr array bound', error_ast)
+            elif type(count) == bool:
+                errormodule.throw('semantic_error', 'Invalid value for array bound', error_ast)
             try:
                 _ = count < 0
                 count = float(count)
             except (ValueError, TypeError):
-                errormodule.throw('semantic_error', 'Invalid value for array bound', ext.content[1].content[3])
+                errormodule.throw('semantic_error', 'Invalid value for array bound', error_ast)
             if not count.is_integer():
-                errormodule.throw('semantic_error', 'Invalid value for array bound', ext.content[1].content[3])
+                errormodule.throw('semantic_error', 'Invalid value for array bound', error_ast)
             elif count < 1:
-                errormodule.throw('semantic_error', 'Invalid value for array bound', ext.content[1].content[3])
+                errormodule.throw('semantic_error', 'Invalid value for array bound', error_ast)
             return types.ArrayType(et, int(count), pointers)
         # assume list
         elif ext.content[0].type == 'LIST_TYPE':

@@ -87,8 +87,12 @@ def generate_logical(logical):
                     else:
                         dom = types.dominant(root.data_type, tree.data_type)
                         if dom:
+                            if not types.coerce(types.DataType(types.DataTypes.INT, 0), dom):
+                                errormodule.throw('semantic_error', 'Unable to apply bitwise %s to object' % op.lower(), logical)
                             root = ExprNode('Bitwise' + op, dom, root, tree)
                         else:
+                            if not types.coerce(types.DataType(types.DataTypes.INT, 0), tree.data_type):
+                                errormodule.throw('semantic_error', 'Unable to apply bitwise %s to object' % op.lower(), logical)
                             root = ExprNode('Bitwise' + op, tree.data_type, root, tree)
                 elif isinstance(root.data_type, types.CustomType):
                     method = modules.get_property(tree.data_type.symbol, '__%s__' % op.lower())
@@ -98,7 +102,7 @@ def generate_logical(logical):
                     else:
                         errormodule.throw('semantic_error', 'Object has no method \'__%s__\'' % op.lower(), logical)
                 else:
-                    errormodule.throw('semantic_error', 'Unable to apply bitwise operator to collection', logical)
+                    errormodule.throw('semantic_error', 'Unable to apply bitwise operator to object', logical)
             else:
                 name = item.type.lower()
                 op = name[0].upper() + name[1:]

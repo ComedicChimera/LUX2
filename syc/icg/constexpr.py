@@ -30,13 +30,14 @@ valid_nodes = {
     'Or': lambda args: args[0] or args[1],
     'And': lambda args: args[0] and args[1],
     'Xor': lambda args: not args[0] and args[1] or args[0] and not args[1],
-    'BitwiseOr': lambda args: args[0] | args[1],
-    'BitwiseAnd': lambda args: args[0] & args[1],
-    'BitwiseXor': lambda args: args[0] ^ args[1],
+    'BitwiseOr': lambda args: bitwise_convert(args[0]) | bitwise_convert(args[1]),
+    'BitwiseAnd': lambda args: bitwise_convert(args[0]) & bitwise_convert(args[1]),
+    'BitwiseXor': lambda args: bitwise_convert(args[0]) ^ bitwise_convert(args[1]),
     'InlineCompare': lambda args: args[1] if args[0] else args[2],
     'SliceBegin': lambda args: args[0][:args[1]],
     'SliceEnd': lambda args: args[0][args[1]:],
-    'Slice': lambda args: args[0][args[1]:args[2]]
+    'Slice': lambda args: args[0][args[1]:args[2]],
+    'GetMember': lambda args: args[1]  # value has already been computed during generation
 }
 
 
@@ -52,6 +53,13 @@ def aggregate(func, c):
 # used to compare both type and value
 def type_compare(a, b):
     return a == b and type(a) == type(b)
+
+
+# used to make value applicable with python bitwise operators
+def bitwise_convert(x):
+    if type(x) == str:
+        return ord(x)
+    return x
 
 
 # check if expression is a constexpr
@@ -100,6 +108,9 @@ def _extract_value(expr):
     elif isinstance(expr, action_tree.Identifier):
         # assume symbol exists
         sym = util.symbol_table.look_up(expr.name)
+        # check if it is a static custom type
+        if isinstance(sym.data_type, types.CustomType) and not sym.data_type.instance:
+            return sym
         # return extracted value from expression
         # assume it has value as all constexpr symbols have value
         return _extract_value(sym.value)
@@ -126,7 +137,7 @@ def _extract_literal(literal):
             return literal.value[1:-1]
         # if boolean
         elif dt == types.DataTypes.BOOL:
-            return bool(literal.value)
+            return literal.value == 'true'
         # assume complex
         else:
             return complex(literal.value.replace('i', 'j'))

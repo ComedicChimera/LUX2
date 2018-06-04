@@ -242,7 +242,7 @@ def mutable(dt):
     if dt.pointers != 0:
         return False
     # if it is a list, dict, or array
-    if isinstance(dt, ListType) or isinstance(dt, DictType):
+    if isinstance(dt, ListType) or isinstance(dt, DictType) or isinstance(dt, ArrayType):
         return True
     # return false if not mutable
     return False
