@@ -95,7 +95,7 @@ def generate_logical(logical):
                                 errormodule.throw('semantic_error', 'Unable to apply bitwise %s to object' % op.lower(), logical)
                             root = ExprNode('Bitwise' + op, tree.data_type, root, tree)
                 elif isinstance(root.data_type, types.CustomType):
-                    method = modules.get_property(tree.data_type.symbol, '__%s__' % op.lower())
+                    method = modules.get_property(tree.data_type, '__%s__' % op.lower())
                     functions.check_parameters(method, tree, item)
                     if method:
                         root = ExprNode('Call', method.data_type.return_type, method, tree)
@@ -121,7 +121,7 @@ def generate_comparison(comparison):
             if isinstance(tree.data_type, types.DataType):
                 return ExprNode('Not', tree.data_type, tree)
             elif isinstance(tree.data_type, types.CustomType):
-                not_method = modules.get_property(tree.symbol, '__not__')
+                not_method = modules.get_property(tree.data_type, '__not__')
                 functions.check_parameters(not_method, tree, comparison)
                 if not_method:
                     return ExprNode('Call', not_method.data_type.return_type, not_method, tree)
@@ -271,7 +271,7 @@ def generate_unary_atom(u_atom):
             if types.numeric(atom.data_type):
                 # handle modules
                 if isinstance(atom.data_type, types.CustomType):
-                    invert_method = modules.get_property(atom.data_type.members, '__invert__')
+                    invert_method = modules.get_property(atom.data_type, '__invert__')
                     return ExprNode('Call', invert_method.data_type.return_type, invert_method)
                 # change the sine of an element
                 else:

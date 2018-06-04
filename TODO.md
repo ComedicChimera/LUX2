@@ -10,8 +10,7 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Redo function checking to check for code paths and allow for type coercion *(syc/icg/generators/functions.py)*
  
- - Consider removing operator overloading from initial generation or fix uses of module.get_property to
- pass the full module in *(syc/icg/generators/...)*
+ - Add default operator overloading to arithmetic operators *(syc/icg/generators/expr.py)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.
