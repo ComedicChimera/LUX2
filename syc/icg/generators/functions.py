@@ -54,7 +54,7 @@ def generate_parameter(decl_params):
             elif item.name == 'extension':
                 param['data_type'] = data_types.generate_type(item.content[-1])
             # handle initializer
-            elif item.name == 'initializer':
+            elif item.name == 'func_initializer':
                 param['default_value'] = generate_expr(item.content[-1])
                 param['data_type'] = param['default_value'].data_type
                 param['optional'] = True

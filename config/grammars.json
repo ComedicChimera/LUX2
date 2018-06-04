@@ -30,7 +30,8 @@
     "func_block",
     "enum_block",
     "interface_block",
-    "struct_block"
+    "struct_block",
+    "template_block"
   ],
   "block_stmt": [
     "if_block",
@@ -83,7 +84,7 @@
     "&"
   ],
   "func_params_decl": [
-    "func_param_prefix IDENTIFIER extension initializer n_func_params",
+    "func_param_prefix IDENTIFIER extension func_initializer n_func_params",
     "... func_param_prefix IDENTIFIER extension",
     "&"
   ],
@@ -92,12 +93,16 @@
     "DOLLAR",
     "AMP"
   ],
+  "func_initializer": [
+    "= expr",
+    "&"
+  ],
   "n_func_params": [
     ", n_func_param n_func_params",
     "&"
   ],
   "n_func_param": [
-    "func_param_prefix IDENTIFIER extension initializer",
+    "func_param_prefix IDENTIFIER extension func_initializer",
     "~ func_param_prefix IDENTIFIER extension"
   ],
   "functional_block": [
@@ -144,6 +149,72 @@
   "n_var": [
     ", DOLLAR IDENTIFIER extension n_var",
     "&"
+  ],
+  "template_block": [
+    "TEMPLATE extern IDENTIFIER < template > template_region"
+  ],
+  "template": [
+    "DATA_TYPE { type_template }",
+    "FUNC { function_template }",
+    "ASYNC { function_template }",
+    "LAMBDA { function_template }",
+    "STRUCT { struct_template }",
+    "ENUM { enum_template }",
+    "MODULE { module_template }"
+  ],
+  "type_template": [
+    "types n_type_template",
+    "&"
+  ],
+  "n_type_template": [
+    ", types n_type_template",
+    "&"
+  ],
+  "function_template": [
+    "template_return template_params"
+  ],
+  "template_return": [
+    "[ type_template ]",
+    "&"
+  ],
+  "template_params": [
+    "( type_template )",
+    "&"
+  ],
+  "struct_template": [
+    "struct_main",
+    "&"
+  ],
+  "enum_template": [
+    "enum_main",
+    "&"
+  ],
+  "module_template": [
+    "template_struct template_interface template_constructor"
+  ],
+  "template_struct": [
+    "STRUCT { template_properties }",
+    "&"
+  ],
+  "template_interface": [
+    "INTERFACE { interface_main }",
+    "&"
+  ],
+  "template_constructor": [
+    "CONSTRUCTOR ( func_params_decl ) rt_type",
+    "&"
+  ],
+  "template_properties": [
+    "modifiers DOLLAR IDENTIFIER extension n_property",
+    "&"
+  ],
+  "n_property": [
+    ", modifiers DOLLAR IDENTIFIER extension n_property",
+    "&"
+  ],
+  "template_region": [
+    "block_declaration",
+    ";"
   ],
   "if_block": [
     "IF ( expr ) block if_follow"

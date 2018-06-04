@@ -1,4 +1,6 @@
 func Main() int {
     @ndx := 3 + 3;
     $x: array[int, ndx];
+
+    template fn<module{struct{$x: int} interface{}}>;
 }
