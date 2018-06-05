@@ -1,6 +1,6 @@
 import syc.icg.action_tree as action_tree
-import util
 import syc.icg.types as types
+import util
 
 # dictionary containing valid nodes and all evaluation functions
 # these functions do not perform any kind of checking as the Nodes have already been checked during their generation

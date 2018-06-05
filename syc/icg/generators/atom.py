@@ -194,21 +194,15 @@ def add_call_trailer(root, trailer):
             tp = root.data_type.data_type
             if not casting.static_cast(tp, obj):
                 errormodule.throw('semantic_error', 'Invalid type cast', trailer)
-            return ExprNode('StaticCast', tp, obj)
+            return ExprNode('TypeCast', tp, obj)
         # use raw type based cast
         else:
             # if dynamic cast fails
             if not casting.dynamic_cast(root.data_type.data_type, obj.data_type):
                 errormodule.throw('semantic_error', 'Invalid type cast', trailer)
             else:
-                # add validity cast warning if dispatched
-                if casting.warning:
-                    errormodule.warn('Possibly invalid type cast performed', trailer)
-                    casting.warning = False
-                    # return dynamic cast if there is a warning
-                    return ExprNode('DynamicCast', root.data_type, root, obj)
                 # else use default static cast
-                return ExprNode('StaticCast', root.data_type, root, obj)
+                return ExprNode('TypeCast', root.data_type, root, obj)
     # throw invalid call error
     else:
         errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)

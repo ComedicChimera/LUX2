@@ -52,7 +52,7 @@ def generate_parameter(decl_params):
                     param['const'] = True
             # specify type
             elif item.name == 'extension':
-                param['data_type'] = data_types.generate_type(item.content[-1])
+                param['data_type'] = generate_type(item.content[-1])
             # handle initializer
             elif item.name == 'func_initializer':
                 param['default_value'] = generate_expr(item.content[-1])
@@ -188,7 +188,7 @@ def get_return_from_type(rt_type):
     for item in rt_type.content:
         if isinstance(item, ASTNode):
             if item.name == 'types':
-                rt_types.append(data_types.generate_type(item))
+                rt_types.append(generate_type(item))
             elif item.name == 'n_rt_type':
                 n_types = get_return_from_type(item)
                 if isinstance(n_types, list):
@@ -219,5 +219,5 @@ def compile_parameters(param_ast):
     return [generate_expr(expr) if isinstance(expr, ASTNode) else expr] + params
 
 
-import syc.icg.generators.data_types as data_types
+from syc.icg.generators.data_types import generate_type
 from syc.icg.generators.expr import generate_expr

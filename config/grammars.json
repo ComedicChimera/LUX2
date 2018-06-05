@@ -214,7 +214,8 @@
   ],
   "template_region": [
     "block_declaration",
-    ";"
+    ";",
+    "sub_scope"
   ],
   "if_block": [
     "IF ( expr ) block if_follow"

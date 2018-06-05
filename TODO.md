@@ -12,7 +12,9 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add default operator overloading to arithmetic operators *(syc/icg/generators/expr.py)*
  
- - Add templates and template casting *(syc/icg/...)*
+ - Add templates *(syc/icg/...)*
+ 
+ - Make value casts template aware *(syc/icg/casting.py)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.

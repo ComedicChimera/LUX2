@@ -1,9 +1,10 @@
 from syc.ast.ast import Token, unparse
-import syc.icg.types as types
 import errormodule
-from syc.icg.constexpr import get_array_bound
 import util
+
+from syc.icg.constexpr import get_array_bound
 import syc.icg.modules as modules
+import syc.icg.types as types
 
 
 # generate type from ast (extension or atom types)

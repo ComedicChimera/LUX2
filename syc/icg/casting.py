@@ -1,6 +1,5 @@
 import syc.icg.types as types
 from syc.icg.action_tree import Literal, Identifier
-import syc.icg.templates as templates
 
 
 # used to check if a static cast is valid
@@ -82,8 +81,8 @@ def dynamic_cast(dt1, dt2):
     if types.coerce(dt1, dt2):
         return True
     # template casting
-    if isinstance(dt2, templates.Template):
-        return templates.template_cast(dt2, dt1)
+    if isinstance(dt2, types.Template):
+        return dt2.compare(dt1)
     # coerce catches explicitly equal types, so this is a valid test to assume complex data types
     if type(dt1) == type(dt2):
         # check lists and arrays
@@ -133,13 +132,8 @@ def dynamic_cast(dt1, dt2):
     return validity_cast(dt1, dt2)
 
 
-# notes if outer cast warning is necessary
-warning = False
-
-
 # check if a dynamic cast could possibly be valid if the root value was known
 def validity_cast(dt1, dt2):
-    global warning
     val = False
     if isinstance(dt1, types.DataType):
         # byte array
@@ -158,8 +152,6 @@ def validity_cast(dt1, dt2):
         # int and char to byte
         elif dt1.data_type == types.DataTypes.BYTE and dt2.data_type in {types.DataTypes.INT, types.DataTypes.CHAR}:
             val = True
-    if val:
-        warning = True
     return val
 
 
