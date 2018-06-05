@@ -3,6 +3,7 @@ from syc.ast.ast import ASTNode, Token
 
 
 from syc.icg.generators.data_types import generate_type
+from syc.icg.generators.structs import generate_members
 
 
 # generates the template type itself (from 'template' ast)
@@ -10,6 +11,9 @@ def generate_template(ast):
     # all first elements are tokens
     # generate type template
     if ast.content[0].type == 'DATA_TYPE':
+        # check for null type template
+        if isinstance(ast.content[2], Token):
+            return Template(Template.TemplateTypes.TYPE, type_list=None)
         # type list is the second element in the AST
         return Template(Template.TemplateTypes.TYPE, type_list=generate_type_list(ast.content[2]))
     # generate function template
@@ -33,6 +37,13 @@ def generate_template(ast):
                 template_components['return_type'] = generate_type_list(item.content[1])
         # return completed function template
         return Template(Template.TemplateTypes.FUNC, **template_components)
+    # generate struct template
+    elif ast.content[0].type == 'STRUCT':
+        # check for null struct
+        if isinstance(ast.content[2], Token):
+            return Template(Template.TemplateTypes.STRUCT, members=[])
+        # generate normal struct template
+        return Template(Template.TemplateTypes.STRUCT, members=generate_members(ast.content[2]))
 
 
 def generate_type_list(ast):

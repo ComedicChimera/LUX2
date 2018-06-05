@@ -2,7 +2,7 @@
 This is a file annotating all the current tasks that are unable to be completed until another component is finished.
 This file exists to prevent potential debug hell and to ensure that all features get implemented properly and are not forgotten.
  
- - Remove to_str methods once testing is complete *(everywhere)*
+ - Remove to_str methods once testing is complete *(syc/...)*
  
  - Comment expr.py *(syc/icg/generators/expr.py)*
  
@@ -15,6 +15,10 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add templates *(syc/icg/...)*
  
  - Make value casts template aware *(syc/icg/casting.py)*
+ 
+ - Make struct member parsing produce symbols *(syc/icg/generators/structs.py)*
+ 
+ - Remove object type *(syc/...)*
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.

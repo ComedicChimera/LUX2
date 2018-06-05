@@ -186,10 +186,17 @@ class Template:
     def compare(self, other):
         # if it is a type template, check if type is in type list
         if self.template_type == self.TemplateTypes.TYPE:
+            # check for null, object type
+            if not self.type_list:
+                return True
+            # check by normal type list
             if other not in self.type_list:
                 return False
         # if it is a function template, check if it fulfills all function requirements
         elif self.template_type == self.TemplateTypes.FUNC:
+            # check for data type match up
+            if not isinstance(other, Function):
+                return False
             # all values not specified are None
             if self.parameters and [x.data_type for x in other.parameters] != self.parameters:
                 return False
@@ -201,8 +208,16 @@ class Template:
             # async's must match
             elif self.is_async != other.async:
                 return False
+        # all remaining types require a custom type
+        elif not isinstance(other, CustomType):
+            return False
         # if it is a struct or enum template, types must match
         elif self.template_type in {self.TemplateTypes.STRUCT, self.TemplateTypes.ENUM}:
+            # check type match ups
+            if other.data_type != DataTypes.STRUCT and self.template_type == self.TemplateTypes.STRUCT:
+                return False
+            elif other.data_type != DataTypes.ENUM and self.template_type == self.TemplateTypes.ENUM:
+                return False
             for member in self.members:
                 if member not in other.members:
                     return False
