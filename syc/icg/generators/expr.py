@@ -264,6 +264,10 @@ def generate_unary_atom(u_atom):
         if isinstance(atom.data_type, types.DataTypeLiteral):
             errormodule.throw('semantic_error', 'Unable to apply operator to Data Type literal', u_atom)
             return
+        # check for template
+        if isinstance(atom.data_type, types.Template):
+            errormodule.throw('semantic_error', 'Unable to apply operator to template', u_atom)
+            return
         prefix = u_atom.content[0].content[0]
         # handle sine change
         if prefix.type == '-':
@@ -291,7 +295,13 @@ def generate_unary_atom(u_atom):
             # handle pointer error
             # < because that means there is more dereferencing than there are references to dereference
             if atom.data_type.pointers < do:
-                errormodule.throw('semantic_error', 'Dereferencing of non-pointer', u_atom)
+                errormodule.throw('semantic_error', 'Unable to dereference a non-pointer', u_atom.content[0])
+            elif isinstance(atom.data_type, types.VoidPointer):
+                if atom.data_type.pointers <= do:
+                    errormodule.throw('semantic_error', 'Unable to dereference void pointer', u_atom.content[0])
+                vp = copy(atom.data_type)
+                vp.pointers -= 1
+                return ExprNode('Dereference', vp, do, atom)
             else:
                 dt = copy(atom.data_type)
                 dt.pointers -= do

@@ -84,7 +84,7 @@ def generate_type(ext):
                 'COMPLEX_TYPE': types.DataTypes.COMPLEX,
                 'STRING_TYPE': types.DataTypes.STRING,
                 'CHAR_TYPE': types.DataTypes.CHAR,
-                'OBJECT_TYPE': types.DataTypes.OBJECT,
+                'OBJECT_TYPE': types.OBJECT_TEMPLATE,
                             }[ext.content[0].content[0].type], 0)
         else:
             # get root symbol

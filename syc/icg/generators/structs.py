@@ -64,7 +64,7 @@ def generate_members(member_tree):
         elif item.type == 'IDENTIFIER':
             working_member['name'] = item.value
     if 'data_type' not in working_member.keys():
-        working_member['data_type'] = types.DataType(types.DataTypes.OBJECT, 0)
+        working_member['data_type'] = types.OBJECT_TEMPLATE
     members.append(type('Object', (), working_member))
     return members
 

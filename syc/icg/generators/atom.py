@@ -78,19 +78,22 @@ def generate_atom(atom):
             if new and isinstance(base.data_type, types.CustomType) | isinstance(base.data_type, types.DataType):
                 # if it is not a structure of a group
                 if base.data_type not in [types.DataType(types.DataTypes.STRUCT, 0), types.DataType(types.DataTypes.MODULE, 0)]:
-                    # if it is not a data type
-                    if base.data_type != types.DataType(types.DataTypes.DATA_TYPE, 0):
+                    # if it is a data type
+                    if isinstance(base.data_type, types.DataTypeLiteral):
+                        # get new pointer type
+                        dt = copy(base.data_type)
+                        dt.pointers += 1
+                        # return memory allocation with size of type
+                        base = ExprNode('Malloc', dt, ExprNode('SizeOf', types.DataType(types.DataTypes.INT, 1), base))
+                    else:
                         # if it is not an integer
                         if base.data_type != types.DataType(types.DataTypes.INT, 0):
                             # all tests failed, not allocatable
                             errormodule.throw('semantic_error', 'Unable to dynamically allocate memory for object', atom)
                         else:
                             # malloc for just int size
-                            base = ExprNode('Malloc', types.DataType(types.DataTypes.OBJECT, 1), base)
-                    else:
-                        # return memory allocation with size of type
-                        base.data_type.pointers += 1
-                        base = ExprNode('Malloc', base.data_type, ExprNode('SizeOf', types.DataType(types.DataTypes.INT, 1), base))
+                            base = ExprNode('Malloc', types.VOID_PTR, base)
+
                 else:
                     # return object instance
                     dt = copy(base.data_type)
@@ -618,7 +621,7 @@ def generate_array_dict(array_dict):
                         if nnt:
                             return nnt
                         else:
-                            return types.DataType(types.DataTypes.OBJECT, 0)
+                            return types.OBJECT_TEMPLATE
 
                     kt = match(kt, kv1t)
                     vt = match(vt, kv2t)
@@ -638,7 +641,7 @@ def generate_array_dict(array_dict):
                 # type check array
                 dt = types.dominant(lst[0].data_type, lst[1].data_type)
                 if not dt:
-                    dt = lst[1].data_type if types.coerce(lst[1].data_type, lst[0].data_type) else types.DataType(types.DataTypes.OBJECT, 0)
+                    dt = lst[1].data_type if types.coerce(lst[1].data_type, lst[0].data_type) else types.OBJECT_TEMPLATE
                 # return compiled literal
                 return Literal(types.ArrayType(dt, 2, 0), lst)
             else:
@@ -654,7 +657,7 @@ def generate_array_dict(array_dict):
                 elif types.coerce(lst.data_type.element_type, f_elem.data_type):
                     dt = lst.data_type.element_type
                 else:
-                    dt = types.DataType(types.DataTypes.OBJECT, 0)
+                    dt = types.OBJECT_TEMPLATE
                 # reformed list classified as array
                 return Literal(types.ArrayType(dt, len(lst.value) + 1, 0), [f_elem] + lst.value)
 
@@ -714,7 +717,7 @@ def generate_list(lst):
                     ndt = types.dominant(elem.data_type, dt)
                     # if it is None
                     if not ndt:
-                        dt = types.DataType(types.DataTypes.OBJECT, 0)
+                        dt = types.OBJECT_TEMPLATE
                         break
                     dt = ndt
         else:

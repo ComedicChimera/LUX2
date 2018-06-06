@@ -201,15 +201,15 @@
     "&"
   ],
   "template_constructor": [
-    "CONSTRUCTOR ( func_params_decl ) rt_type",
+    "constructor",
     "&"
   ],
   "template_properties": [
-    "modifiers DOLLAR IDENTIFIER extension n_property",
+    "member_declaration n_property",
     "&"
   ],
   "n_property": [
-    ", modifiers DOLLAR IDENTIFIER extension n_property",
+    ", member_declaration n_property",
     "&"
   ],
   "template_region": [

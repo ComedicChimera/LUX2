@@ -20,3 +20,4 @@ def check_constructor_parameters(constructor, parameters):
 
 def module_coerce(dt1, dt2):
     pass
+

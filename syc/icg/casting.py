@@ -83,6 +83,10 @@ def dynamic_cast(dt1, dt2):
     # template casting
     if isinstance(dt2, types.Template):
         return dt2.compare(dt1)
+    # test for void pointer
+    elif isinstance(dt2, types.VoidPointer):
+        if dt1.pointers == dt2.pointers:
+            return True
     # coerce catches explicitly equal types, so this is a valid test to assume complex data types
     if type(dt1) == type(dt2):
         # check lists and arrays

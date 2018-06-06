@@ -11,14 +11,7 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Redo function checking to check for code paths and allow for type coercion *(syc/icg/generators/functions.py)*
  
  - Add default operator overloading to arithmetic operators *(syc/icg/generators/expr.py)*
- 
- - Add templates *(syc/icg/...)*
- 
- - Make value casts template aware *(syc/icg/casting.py)*
- 
- - Make struct member parsing produce symbols *(syc/icg/generators/structs.py)*
- 
- - Remove object type *(syc/...)*
+
 
 ## Tests
 This is a special section of TODO.md devoted specifically to tests that need to be run on certain components of the compiler.
@@ -38,3 +31,6 @@ This is a separate section regarding notes for things that need to be taken into
  they are checked for context. (along with break and continue)
  
  - Functions that return multiple values actually return tuples
+ 
+ - Data types can be obtained from a value cast through the use of the `DataType` function; the raw property is ignored to allow for
+ template-aware type accessing.

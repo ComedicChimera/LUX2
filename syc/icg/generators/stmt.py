@@ -300,19 +300,21 @@ def generate_assignment(assignment):
         expr = None
         # if it is not a structure of a group
         if root.data_type not in [types.DataType(types.DataTypes.STRUCT, 0), types.DataType(types.DataTypes.MODULE, 0)]:
-            # if it is not a data type
-            if root.data_type != types.DataType(types.DataTypes.DATA_TYPE, 0):
+            # if it is a data type
+            if isinstance(root.data_type, types.DataTypeLiteral):
+                # get new pointer type
+                dt = copy(root.data_type)
+                dt.pointers += 1
+                # return memory allocation with size of type
+                expr = ExprNode('Malloc', dt, ExprNode('SizeOf', types.DataType(types.DataTypes.INT, 1), root))
+            else:
                 # if it is not an integer
                 if root.data_type != types.DataType(types.DataTypes.INT, 0):
                     # all tests failed, not allocatable
                     errormodule.throw('semantic_error', 'Unable to dynamically allocate memory for object', assignment)
                 else:
                     # malloc for just int size
-                    expr = ExprNode('Malloc', types.DataType(types.DataTypes.OBJECT, 1), root)
-            else:
-                # return memory allocation with size of type
-                root.data_type.pointers += 1
-                expr = ExprNode('Malloc', root.data_type, ExprNode('SizeOf', types.DataType(types.DataTypes.INT, 1), root))
+                    expr = ExprNode('Malloc', types.VOID_PTR, root)
         else:
             dt = copy(root.data_type)
             dt.instance = True

@@ -19,23 +19,20 @@ class DataTypes(Enum):
     ENUM = 9
     INTERFACE = 10
 
-    # object type (parent type for all types)
-    OBJECT = 11
-
     # general data type for byte types
-    BYTE = 12
+    BYTE = 11
 
     # null type
-    NULL = 13
+    NULL = 12
 
     # value type
-    VALUE = 14
+    VALUE = 13
 
     # data type literal
-    DATA_TYPE = 15
+    DATA_TYPE = 14
 
     # package type
-    PACKAGE = 16
+    PACKAGE = 15
 
 
 # parent class for all data type objects
@@ -239,6 +236,18 @@ class Template:
         return True
 
 
+# store generic object type
+OBJECT_TEMPLATE = Template(Template.TemplateTypes.TYPE, type_list=None)
+
+
+class VoidPointer:
+    def __init__(self):
+        self.data_type = OBJECT_TEMPLATE,
+        self.pointers = 1
+
+
+VOID_PTR = VoidPointer()
+
 #####################
 # UTILITY FUNCTIONS #
 #####################
@@ -293,9 +302,6 @@ def coerce(base_type, unknown):
     # if either is a not a raw data type, it does not work
     if not isinstance(base_type, DataType) or not isinstance(unknown, DataType):
         return False
-    # object
-    if base_type.data_type == DataTypes.OBJECT or unknown.data_type == DataTypes.OBJECT:
-        return True
     # null
     if unknown.data_type == DataTypes.NULL:
         return True
