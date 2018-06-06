@@ -183,69 +183,113 @@ def generate_shift(shift):
 
 
 def generate_arithmetic(ari):
+    # names of overload methods
+    method_names = {
+        '+': '__add__',
+        '-': '__sub__',
+        '*': '__mul__',
+        '/': '__div__',
+        '%': '__mod__'
+    }
+    # unpack tree in operator sets
     unpacked_tree = ari.content[:]
     while unpacked_tree[-1].name in {'add_sub_op', 'mul_div_mod_op', 'exp_op'}:
         unpacked_tree += unpacked_tree.pop().content
+    # root = base tree, op = operator, tree = resulting tree
     root, op, tree = None, None, None
     for item in unpacked_tree:
+        # ast => expression
         if isinstance(item, ASTNode):
+            # if there is an operator, generate arithmetic tree
             if op:
+                # generate next value
                 val2 = generate_unary_atom(item) if item.name == 'unary_atom' else generate_arithmetic(item)
-                dt = check_operands(root, val2, op, ari)
+                # check operands and extract data type
+                dt = check_operands(root.data_type, val2.data_type, op, ari)
                 if tree:
+                    # operator overloading
+                    if isinstance(val2.data_type, types.CustomType):
+                        # convert to method name
+                        name = method_names[op]
+                        method = modules.get_property(val2.data_type, name)
+                        # assume method exists
+                        tree = ExprNode('Call', dt, method, [tree])
+                    # add arguments to previous tree (allow for multiple items)
                     if tree.name == op:
                         tree.arguments.append(val2)
+                    # create expression node from tree
                     else:
                         tree = ExprNode(op, dt, tree, val2)
+                # create root tree
                 else:
-                    tree = ExprNode(op, dt, root, val2)
+                    # operator overloading
+                    if isinstance(val2.data_type, types.CustomType):
+                        # convert to method name
+                        name = method_names[op]
+                        method = modules.get_property(val2.data_type, name)
+                        tree = ExprNode('Call', dt, method, [root])
+                    # default generation
+                    else:
+                        tree = ExprNode(op, dt, root, val2)
                 op, root, = None, tree
+            # otherwise, generate root
             else:
                 root = generate_unary_atom(item) if item.name == 'unary_atom' else generate_arithmetic(item)
+        # token => operator
         else:
             op = item.value
+    # ensure tree is initialized
     if not tree:
         tree = root
     return tree
 
 
-def check_operands(val1, val2, operator, ast):
-    if val1.data_type.pointers > 0:
-        if isinstance(val2.data_type, types.DataType):
-            if val2.data_type.data_type == types.DataTypes.INT and val2.pointers == 0:
-                return val1.data_type
+def check_operands(dt1, dt2, operator, ast):
+    # check for invalid pointer arithmetic
+    if dt1.pointers > 0:
+        if isinstance(dt2, types.DataType):
+            if dt2.data_type == types.DataTypes.INT and dt2.pointers == 0:
+                return dt1
         errormodule.throw('semantic_error', 'Pointer arithmetic can only be performed between an integer and a pointer', ast)
+    # check addition operator
     if operator == '+':
-        if types.numeric(val1.data_type) and types.numeric(val2.data_type):
-            if types.coerce(val1.data_type, val2.data_type):
-                return val2.data_type
-            return val1.data_type
-        elif types.enumerable(val1.data_type) and types.enumerable(val2.data_type):
-            if val1.data_type == val2.data_type:
-                return val1.data_type
-            elif isinstance(val1.data_type, types.ArrayType) and isinstance(val2.data_type, types.ArrayType):
-                if val1.data_type.element_type == val2.data_type.element_type:
-                    return val1.data_type
+        # numeric addition
+        if types.numeric(dt1) and types.numeric(dt2):
+            if types.coerce(dt1, dt2):
+                return dt2
+            return dt1
+        # list / string concatenation
+        elif types.enumerable(dt1) and types.enumerable(dt2):
+            if dt1 == dt2:
+                return dt1
+            # check arrays and lists
+            elif (isinstance(dt1, types.ArrayType) or isinstance(dt1, types.ListType)) and \
+                    (isinstance(dt2, types.ArrayType) or isinstance(dt2, types.ListType)):
+                if dt1.element_type == dt2.element_type:
+                    return dt1
             errormodule.throw('semantic_error', 'Unable to apply operator to dissimilar enumerable types', ast)
         errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
+    # check multiply operator
     elif operator == '*':
-        if types.numeric(val1.data_type) and types.numeric(val2.data_type):
-            if types.coerce(val1.data_type, val2.data_type):
-                return val2.data_type
-            return val1.data_type
-        if isinstance(val1.data_type, types.DataType) and isinstance(val2.data_type, types.DataType):
+        # numeric multiplication
+        if types.numeric(dt1) and types.numeric(dt2):
+            if types.coerce(dt1, dt2):
+                return dt2
+            return dt1
+        # string multiplication
+        if isinstance(dt1, types.DataType) and isinstance(dt2, types.DataType):
             # we can assume val1's pointers
-            if val2.data_type.pointers == 0:
-                if val1.data_type.data_type == types.DataTypes.STRING and val2.data_type.data_type == types.DataTypes.INT:
-                    return val1.data_type
+            if dt2.pointers == 0:
+                if dt1.data_type == types.DataTypes.STRING and dt2.data_type == types.DataTypes.INT:
+                    return dt1
         errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
-    elif operator in {'-', '%', '^'}:
-        if types.numeric(val1.data_type) and types.numeric(val2.data_type):
-            if types.coerce(val1.data_type, val2.data_type):
-                return val2.data_type
-            return val1.data_type
+    # check all other operators
+    else:
+        if types.numeric(dt1) and types.numeric(dt2):
+            if types.coerce(dt1, dt2):
+                return dt2
+            return dt1
         errormodule.throw('semantic_error', 'Invalid type(s) for operator \'%s\'' % operator, ast)
-    return val1.data_type
 
 
 def generate_unary_atom(u_atom):

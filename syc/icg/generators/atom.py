@@ -197,14 +197,26 @@ def add_call_trailer(root, trailer):
             tp = root.data_type.data_type
             if not casting.static_cast(tp, obj):
                 errormodule.throw('semantic_error', 'Invalid type cast', trailer)
-            return ExprNode('TypeCast', tp, obj)
+            # check for interface type cast (assume obj is custom type)
+            if isinstance(tp, types.CustomType) and tp.data_type == types.DataTypes.INTERFACE and obj.data_type.data_type != tp.data_type:
+                ndt = copy(obj.data_type)
+                ndt.interfaces.append(tp.name)
+                ndt.update_interface_overloads()
+                return ExprNode('TypeCast', ndt, root, obj)
+            return ExprNode('TypeCast', tp, root, obj)
         # use raw type based cast
         else:
             # if dynamic cast fails
             if not casting.dynamic_cast(root.data_type.data_type, obj.data_type):
                 errormodule.throw('semantic_error', 'Invalid type cast', trailer)
             else:
-                # else use default static cast
+                # check for interface type cast (assume obj is custom type)
+                if isinstance(root.data_type, types.CustomType) and root.data_type.data_type == types.DataTypes.INTERFACE and \
+                                obj.data_type.data_type != root.data_type.data_type:
+                    ndt = copy(obj.data_type)
+                    ndt.interfaces.append(root.data_type.name)
+                    ndt.update_interface_overloads()
+                    return ExprNode('TypeCast', ndt, root, obj)
                 return ExprNode('TypeCast', root.data_type, root, obj)
     # throw invalid call error
     else:
@@ -216,55 +228,81 @@ def add_subscript_trailer(root, trailer):
     # handle slicing
     if isinstance(trailer.content[1].content[0], Token):
         expr = generate_expr(trailer.content[1].content[1])
+        # subscript cannot be a pointer
         if expr.data_type.pointers != 0:
             errormodule.throw('semantic_error', 'Subscript cannot be a pointer', trailer)
-        if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType)
-                                                                                                               or isinstance(root.data_type, types.ArrayType)):
+        # check begin subscript
+        # check for invalid data types
+        if not isinstance(expr.data_type, types.DataType):
+            errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+        if expr.data_type.data_type == types.DataTypes.INT and (isinstance(root.data_type, types.ListType) or isinstance(root.data_type, types.ArrayType)):
             return ExprNode('SliceBegin', root.data_type, root, expr)
+        # overload based slicing
         elif isinstance(root.data_type, types.CustomType):
             method = modules.get_property(root.data_type, '__slice__')
             if method:
                 functions.check_parameters(method, [expr], trailer)
                 return ExprNode('Call', method.data_type.return_type, method, expr)
             errormodule.throw('semantic_error', 'Object has no method \'__slice__\'', trailer)
+        # string slicing
         elif root.data_type.data_type == types.DataTypes.STRING and expr.data_type.data_type == types.DataTypes.INT:
             return ExprNode('SliceBegin', root.data_type, root, expr)
+        # check for invalid integer slicing
         if not isinstance(expr.data_type, types.DataType) or expr.data_type.data_type != types.DataTypes.INT:
             errormodule.throw('semantic_error', 'Index must be an integral value', trailer)
         errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
-    # handle slice till end
+    # handle slice till end / general slice
     elif len(trailer.content[1].content) > 1:
+        # first expression of slice
         expr = generate_expr(trailer.content[1].content[0])
+        # check for invalid pointers
         if expr.data_type.pointers > 0:
             errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
-        if isinstance(expr.data_type, types.DataType) and expr.data_type.data_type != types.DataTypes.INT:
+        # check for invalid slice data type
+        if not isinstance(expr.data_type, types.DataType):
             errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+        if expr.data_type.data_type != types.DataTypes.INT:
+            errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+        # check for two way slicing
         if len(trailer.content[1].content[1].content) > 1:
+            # get secondary expression
             expr2 = generate_expr(trailer.content[1].content[1].content[1].content[0])
+            # check secondary expression
+            # no pointers
             if expr2.data_type.pointers > 0:
                 errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
-            if isinstance(expr2.data_type, types.DataType) and expr2.data_type.data_type != types.DataTypes.INT:
+            # check for invalid data types
+            if not isinstance(expr2.data_type, types.DataType):
+                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+            # ensure correct data type
+            if expr2.data_type.data_type != types.DataTypes.INT:
                 errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
             if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
+                # operator overloading
                 if isinstance(root.data_type, types.CustomType):
                     slice_method = modules.get_property(root.data_type, '__slice__')
                     if slice_method:
                         functions.check_parameters(slice_method, [expr, expr2], trailer)
                         return ExprNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
+                # string slicing
+                elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
+                    return ExprNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
                 errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
-            elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                return ExprNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
             return ExprNode('Slice', root.data_type, root, expr, expr2)
+        # check slice till end
         else:
             if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
+                # use operator overloading
                 if isinstance(root.data_type, types.CustomType):
                     slice_method = modules.get_property(root.data_type, '__slice__')
                     if slice_method:
                         functions.check_parameters(slice_method, [None, expr], trailer)
                         return ExprNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
+                # use string overloading
+                elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
+                    return ExprNode('SliceEnd', root.data_type, root, expr)
                 errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
-            elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                return ExprNode('SliceEnd', root.data_type, root, expr)
+            # general slice
             return ExprNode('SliceEnd', root.data_type, root, expr)
     # handle traditional subscripting
     else:

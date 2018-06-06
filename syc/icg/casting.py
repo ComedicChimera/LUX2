@@ -120,6 +120,10 @@ def dynamic_cast(dt1, dt2):
                 # members need to be equal
                 if dt1.members == dt2.members:
                     return True
+            # check interface coercion
+            if dt1.data_type == types.DataTypes.INTERFACE:
+                if types.interface_coerce(dt1, dt2):
+                    return True
 
     # list / array type conversion
     elif (isinstance(dt1, types.ListType) or isinstance(dt1, types.ArrayType)) and (isinstance(dt2, types.ListType) or isinstance(dt2, types.ArrayType)):

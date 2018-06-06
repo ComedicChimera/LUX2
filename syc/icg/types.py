@@ -128,6 +128,16 @@ class CustomType:
         # if it is an instance
         self.instance = instance
 
+    def update_interface_overloads(self):
+        # if it can be iterated through by a for loop & subscripted (list based)
+        self.enumerable = True if 'IEnumerable' in self.inherits else False
+        # if it can be called with parameters (function based)
+        self.callable = True if 'ICallable' in self.inherits else False
+        # if it can be used to store a key-value pair and is ENUMERABLE (dict based)
+        self.hashable = True if 'IHashable' in self.inherits else False
+        # if it can be used like number (numeric operator overload)
+        self.numeric = True if 'INumeric' in self.inherits else False
+
 
 # type to hold incomplete types
 class Future:
@@ -179,6 +189,8 @@ class Template:
             self.constructor = kwargs['constructor']
             self.members = kwargs['members']
             self.interface = kwargs['interface']
+        # pointers value used to prevent errors (impossible for template to have pointers)
+        self.pointers = 0  # 0 is default unchangeable value
 
     def compare(self, other):
         # if it is a type template, check if type is in type list

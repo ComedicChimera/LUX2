@@ -9,8 +9,6 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add value cast checking *(syc/icg/casting.py)*
  
  - Redo function checking to check for code paths and allow for type coercion *(syc/icg/generators/functions.py)*
- 
- - Add default operator overloading to arithmetic operators *(syc/icg/generators/expr.py)*
 
 
 ## Tests
