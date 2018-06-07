@@ -91,10 +91,8 @@ class SymbolTable:
 
         # enter the new scope
         self.scope = self.scope[self.pos]
-        # update the position
-        self.pos += 1
         # add previous position to scope path
-        self.scope_path.append(self.pos - 1)
+        self.scope_path.append(self.pos)
         # reset position
         self.pos = 0
 
@@ -133,12 +131,14 @@ class SymbolTable:
     # add variable to symbol table
     def add_variable(self, sym, ast):
         # compile symbol from action tree Identifier
-        if sym.name in [x.name for x in self.scope]:
+        if sym.name in [x.name for x in self.scope if isinstance(x, Symbol)]:
             # throw error
             errormodule.throw('semantic_error', 'Variable \'%s\' redeclared.' % sym.name, ast)
         self.scope.append(sym)
         # update table
         self.table = self.update_scope(self.table)
+        # add to pos
+        self.pos += 1
 
     # add package to symbol table
     # NOTE packages content is expected to be IR Object

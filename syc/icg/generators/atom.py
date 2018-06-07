@@ -1,7 +1,7 @@
 import errormodule
 import syc.icg.modules as modules
 from syc.icg.table import Symbol, Modifiers, Package
-from syc.ast.ast import ASTNode, Token
+from syc.ast.ast import ASTNode, Token, unparse
 import util
 from syc.icg.action_tree import ExprNode, Identifier, Literal
 import syc.icg.types as types
@@ -150,6 +150,9 @@ def add_call_trailer(root, trailer):
         else:
             parameters = functions.compile_parameters(trailer.content[1])
             functions.check_parameters(root, parameters, trailer)
+            # check for generators
+            if root.data_type.generator:
+                return ExprNode('Call', types.Generator(root.data_type.return_type), root, parameters)
             return ExprNode('Call', types.Future(root.data_type) if root.data_type.async else root.data_type.return_type,
                             root, parameters)
     elif isinstance(root.data_type, types.DataType):
@@ -217,7 +220,7 @@ def add_call_trailer(root, trailer):
                     ndt.interfaces.append(root.data_type.name)
                     ndt.update_interface_overloads()
                     return ExprNode('TypeCast', ndt, root, obj)
-                return ExprNode('TypeCast', root.data_type, root, obj)
+                return ExprNode('TypeCast', root.data_type.data_type, root, obj)
     # throw invalid call error
     else:
         errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
@@ -310,7 +313,7 @@ def add_subscript_trailer(root, trailer):
         if types.mutable(root.data_type):
             expr = generate_expr(trailer.content[1].content[0])
             # if not dict, use element type, not value type
-            if isinstance(root.data_type, types.DictType):
+            if isinstance(root.data_type, types.MapType):
                 if expr.data_type != root.data_type.key_type and not types.coerce(root.data_type.key_type, expr.data_type):
                     errormodule.throw('semantic_error',
                                       'Type of subscript on dictionary must match data type of dictionary', trailer)
@@ -407,7 +410,7 @@ def add_aggregator_trailer(root, trailer):
         dt = modules.get_property(root.data_type, '__next__').data_type.return_type
     elif isinstance(root.data_type, types.ListType) or isinstance(root.data_type, types.ArrayType):
         dt = root.data_type.element_type
-    elif isinstance(root.data_type, types.DictType):
+    elif isinstance(root.data_type, types.MapType):
         dt = (root.data_type.key_type, root.data_type.value_type)
     # check the aggregator expr
     aggregate_expr = generate_expr(trailer.content[1])
@@ -522,9 +525,9 @@ def generate_base(ast):
                     # return raw byte array
                     return Literal(types.DataType(types.DataTypes.BYTE, 0), val)
         # create array or dictionary
-        elif base.name == 'array_dict':
+        elif base.name == 'array_map':
             # return generated literal
-            return generate_array_dict(base)
+            return generate_array_map(base)
         # handle inline functions / function data types
         elif base.name == 'inline_function':
             # decide if it is asynchronous or not
@@ -602,28 +605,29 @@ def generate_base(ast):
 ###############
 
 # decide whether or not an array dict is an array or dict, and generate an output accordingly
-def generate_array_dict(array_dict):
+def generate_array_map(array_map):
     # access array dict builder
-    array_dict_builder = array_dict.content[1]
+    array_map_builder = array_map.content[1]
     # if it only contains an expression, it is an array
-    if len(array_dict_builder.content) < 2:
+    if len(array_map_builder.content) < 2:
         # get the element
-        elem = generate_expr(array_dict_builder.content[0])
+        elem = generate_expr(array_map_builder.content[0])
         # check for tuples
         if isinstance(elem.data_type, types.Tuple):
+            # TODO check tuple values
             return Literal(types.ArrayType(elem.values[0].data_type, len(elem.data_type.values), 0), elem.data_type.values)
         # et = elem data_type
         return Literal(types.ArrayType(elem.data_type, 1, 0), [elem])
     # if the last element's (array_dict_branch) first element is a token
-    elif isinstance(array_dict_builder.content[-1].content[0], Token):
-        if array_dict_builder.content[-1].content[0].type == ':':
+    elif isinstance(array_map_builder.content[-1].content[0], Token):
+        if array_map_builder.content[-1].content[0].type == ':':
             # raw dict == expr : expr n_dict (as a list)
-            raw_dict = [array_dict_builder.content[0]] + array_dict_builder.content[-1].content
+            raw_dict = [array_map_builder.content[0]] + array_map_builder.content[-1].content
             # f_key == first key
             f_key = generate_expr(raw_dict[0])
             # make sure f key can be added to dictionary (not mutable
             if types.mutable(f_key.data_type):
-                errormodule.throw('semantic_error', 'Dictionary keys cannot be mutable', raw_dict[0])
+                errormodule.throw('semantic_error', 'Map keys cannot be mutable', raw_dict[0])
             # true dict is made up of the action tree values of the first and third element (expr1, and expr2)
             true_dict = {
                 f_key: generate_expr(raw_dict[2])
@@ -643,7 +647,7 @@ def generate_array_dict(array_dict):
                             if item.name == 'expr':
                                 kv_pair.append(generate_expr(item))
                             # continue adding elements
-                            elif item.name == 'n_dict':
+                            elif item.name == 'n_map':
                                 get_true_dict(item)
                     # type checking
                     # kv1t/kv2t == key-value (pos) type
@@ -669,13 +673,13 @@ def generate_array_dict(array_dict):
                 # create dictionary
                 get_true_dict(raw_dict[-1])
             # return dictionary literal
-            return Literal(types.DictType(kt, vt, 0), true_dict)
+            return Literal(types.MapType(kt, vt, 0), true_dict)
 
         # else assume it is an array and use the list generator
         else:
-            if array_dict_builder.content[-1].content[-1].name == 'expr':
+            if array_map_builder.content[-1].content[-1].name == 'expr':
                 # generate array base
-                lst = [generate_expr(array_dict_builder.content[0]), generate_expr(array_dict_builder.content[-1].content[-1])]
+                lst = [generate_expr(array_map_builder.content[0]), generate_expr(array_map_builder.content[-1].content[-1])]
                 # type check array
                 dt = types.dominant(lst[0].data_type, lst[1].data_type)
                 if not dt:
@@ -684,11 +688,11 @@ def generate_array_dict(array_dict):
                 return Literal(types.ArrayType(dt, 2, 0), lst)
             else:
                 # get the first element
-                f_elem = generate_expr(array_dict_builder.content[0])
+                f_elem = generate_expr(array_map_builder.content[0])
                 # reform list
-                array_dict.content[1] = type('Object', (), dict(name='list_builder', content=array_dict_builder.content[-1].content[1:]))
+                array_map.content[1] = type('Object', (), dict(name='list_builder', content=array_map_builder.content[-1].content[1:]))
                 # reuse list generator
-                lst = generate_list(array_dict)
+                lst = generate_list(array_map)
                 # check data types
                 if types.coerce(f_elem.data_type, lst.data_type.element_type):
                     dt = f_elem.data_type
@@ -764,25 +768,29 @@ def generate_list(lst):
     return Literal(types.ListType(dt, 0), true_list)
 
 
-#########################
+############################
 # INLINE FOR AND ITERATORS #
-#########################
+############################
 
 # create a comprehension from an inline for
-def generate_comprehension(lb):
+def generate_comprehension(for_comp):
     # descend into new scope for comprehension
     util.symbol_table.add_scope()
     # arguments for action node
     l_args = []
     # narrow down from FOR ( inline_for_expr ) to inline_for_expr
-    lb = lb.content[2]
+    for_comp = for_comp.content[2]
     # data type of return value from comprehension
-    l_type = None
-    for item in lb.content:
+    # atom holds value of atom during generation
+    l_type, atom = None, None
+    for item in for_comp.content:
         if isinstance(item, ASTNode):
             if item.name == 'atom':
+                # store atom ast
+                atom = item
+            elif item.name == 'iterator':
                 # get iterator from ASTNode (atom)
-                la = generate_iterator(item)
+                la = generate_iterator(atom, item)
                 # get type for la
                 l_type = la.data_type
                 # add to args
@@ -802,90 +810,62 @@ def generate_comprehension(lb):
                 l_args.append(ExprNode('ForIf', cond_expr.data_type, cond_expr))
     # exit lambda scope
     util.symbol_table.exit_scope()
-    return ExprNode('ForExpr', l_type, *l_args)
+    return ExprNode('ForComprehension', l_type, *l_args)
 
 
-# convert iter atom to an Iterator
-def generate_iterator(lb_atom):
-    # temporary variable to hold the lambda iterator
-    iterator = None
-    # if the ending of the atom is not a trailer (is token), throw error
-    if isinstance(lb_atom.content[-1], Token):
-        errormodule.throw('semantic_error', 'Invalid iterator', lb_atom)
-    ending = lb_atom.content[-1]
-    while ending.name == 'trailer':
-        iterator = lb_atom.content[-1]
-        if isinstance(iterator.content[-1], Token):
-            break
-        ending = iterator.content[-1]
-    # if the ending of the atom is not a trailer (iterator never assigned), throw error
-    if not iterator:
-        errormodule.throw('semantic_error', 'Invalid iterator', lb_atom)
-    # if the trailer found is not a subscript trailer
-    if not iterator.content[0].type == '[':
-        errormodule.throw('semantic_error', 'Invalid iterator', lb_atom)
-    # extract name from trailer
-    iter_name = get_iter_name(iterator.content[1])
+# iterator and atom to iterator
+def generate_iterator(atom_ast, iterator):
+    # generate atom expr node
+    atom = generate_atom(atom_ast)
+    # unable to use iterator pointer
+    if atom.data_type.pointers != 0:
+        errormodule.throw('semantic_error', 'Invalid type for iterator', atom_ast)
+    # unpack iterator into variables
+    variable_tokens = [iterator.content[1]]
+    # check for multiple variables
+    if len(iterator.content) > 3:
+        variable_tokens.extend([x for x in unparse(iterator.content[2]) if x.type == 'IDENTIFIER'])
 
-    # remove the (by normal standards) malformed trailer from the end of the atom
-    def remove_iterator(ast):
-        if isinstance(ast.content[-1], ASTNode):
-            if ast.content[-1].name == 'trailer':
-                if remove_iterator(ast.content[-1]):
-                    ast.content.pop()
-                    return ast
-            return True
-        return True
+    # generate single variable iterators
+    def generate_single_iterator(dt):
+        # check for token mismatch
+        if len(variable_tokens) > 1:
+            errormodule.throw('semantic_error', 'Too many iterator variables for iterator', variable_tokens[1])
+        # add variable to symbol table
+        util.symbol_table.add_variable(Symbol(variable_tokens[0].value, dt, [Modifiers.CONSTANT]), variable_tokens[0])
+        return types.Iterator(dt, Identifier(variable_tokens[0].value, dt, True), atom)
 
-    # generate an atom from the remaining components
-    base_atom = generate_atom(remove_iterator(lb_atom))
-    # get the data type of the iterator
-    # check if enumerable
-    if types.enumerable(base_atom.data_type):
-        # if it is an array or a list
-        if isinstance(base_atom.data_type, types.ArrayType) or isinstance(base_atom.data_type, types.ListType):
-            iterator_type = base_atom.data_type.element_type
-        # if it is a dictionary
-        elif isinstance(base_atom.data_type, types.DictType):
-            iterator_type = base_atom.data_type.key_type
-        # if is is a string
-        elif base_atom.data_type.data_type != types.DataTypes.STRING:
-            iterator_type = types.DataType(types.DataTypes.CHAR, 0)
-        # assume custom type
-        else:
-            # get return value of its subscript method
-            iterator_type = modules.get_property(base_atom.data_type, '__subscript__').data_type.return_type
-    # if it is not enumerable and is not either a dict or list, it is an invalid iterative base
-    else:
-        errormodule.throw('semantic_error', 'Value must be enumerable', lb_atom)
-        return
-    sym = Symbol(iter_name, iterator_type, [])
-    util.symbol_table.add_variable(sym, lb_atom)
-    # arguments: [compiled root atom, Iterator]
-    args = [base_atom, sym]
-    # return generated iterator
-    return ExprNode('Iterator', base_atom.data_type, *args)
+    # generate multi-variable iterator
+    def generate_tuple_iterator(dt):
+        # check for token mismatch
+        if len(variable_tokens) != len(dt.values):
+            errormodule.throw('semantic_error', 'Number of variables does not match number of tupled values', atom_ast)
+        # variable list
+        variables = []
+        # data types
+        for v, d in zip(variable_tokens, map(lambda x: x.data_type, dt.values)):
+            variables.append(Identifier(v.value, d, True))
+            util.symbol_table.add_variable(Symbol(v.value, d, [Modifiers.CONSTANT]))
+        # generate iterator
+        return types.Iterator(dt, variables, atom)
 
-
-# gets the name of the new iterator
-def get_iter_name(expr):
-    for item in expr.content:
-        if isinstance(item, ASTNode):
-            # the expression must contain only one token (an identifier)
-            if len(item.content) > 1:
-                errormodule.throw('semantic_error', 'Invalid iterator', expr)
-            # if it is a base, and has a length of 1
-            elif item.name == 'base':
-                # if it is a token, it is valid (again, only identifier), otherwise error
-                if isinstance(item.content[0], Token):
-                    # must be identifier
-                    if item.content[0].type != 'IDENTIFIER':
-                        errormodule.throw('semantic_error', 'Invalid iterator', expr)
-                    else:
-                        # return value (or name)
-                        return item.content[0].value
-                else:
-                    errormodule.throw('semantic_error', 'Invalid iterator', expr)
-            else:
-                # recur if it is right size, but not base
-                return get_iter_name(item)
+    if isinstance(atom.data_type, types.Tuple):
+        return generate_tuple_iterator(atom.data_type)
+    # check lists and arrays
+    elif isinstance(atom.data_type, types.ListType) or isinstance(atom.data_type, types.ArrayType):
+        return generate_single_iterator(atom.data_type.element_type)
+    # check map
+    elif isinstance(atom.data_type, types.MapType):
+        return generate_single_iterator(atom.data_type.key_type)
+    # check generators
+    elif isinstance(atom.data_type, types.Generator):
+        generator_dt = atom.data_type.data_type
+        if isinstance(generator_dt, types.Tuple):
+            return generate_tuple_iterator(generator_dt)
+        return generate_single_iterator(generator_dt)
+    # check custom types
+    elif isinstance(atom.data_type, types.CustomType):
+        if atom.data_type.enumerable:
+            prop = modules.get_property(atom.data_type, '__next__')
+            return generate_single_iterator(prop.data_type.return_type)
+    errormodule.throw('semantic_error', 'Invalid type for iterator', atom_ast)

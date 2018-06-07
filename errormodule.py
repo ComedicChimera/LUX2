@@ -60,7 +60,8 @@ def _print_syntax_error(message, params):
     line, ndx = get_position(params[0].ndx)
     message += ' [line:%d position:%d]' % (line, ndx)
     message += '\n\n%s' % getln(line, ndx, len_carrots)
-    message += '\n\nExpected: ' + (', '.join(map(token_transform, params[1])) if isinstance(params[1], list) else token_transform(params[1]))
+    if len(params[1]) > 0:
+        message += '\n\nExpected: ' + (', '.join(map(token_transform, params[1])) if isinstance(params[1], list) else token_transform(params[1]))
     print(message)
     exit(1)
 
@@ -71,6 +72,6 @@ def token_transform(token):
     }
     if token in remaps:
         return remaps[token]
-    elif len(token) == 1:
+    elif len(token) < 2:
         return token
     return ''.join(map(lambda t: t[0] + t[1:].lower(), token.split('_')))

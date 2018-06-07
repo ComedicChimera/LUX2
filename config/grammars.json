@@ -246,7 +246,7 @@
   ],
   "for_body": [
     "( for_expr ) block",
-    "base trailer => iter_body",
+    "base trailer iterator => iter_body",
     "! block"
   ],
   "for_expr": [
@@ -505,8 +505,7 @@
   "prefix": [
     "-",
     "* deref_op",
-    "AMP",
-    "~"
+    "AMP"
   ],
   "deref_op": [
     "* deref_op",
@@ -521,7 +520,14 @@
     "FOR ( inline_for_expr )"
   ],
   "inline_for_expr": [
-    "atom => expr inline_for_if"
+    "atom iterator => expr inline_for_if"
+  ],
+  "iterator": [
+    "| IDENTIFIER n_iter_var |"
+  ],
+  "n_iter_var": [
+    ", IDENTIFIER n_iter_var",
+    "&"
   ],
   "inline_for_if": [
     "IF expr",
@@ -569,7 +575,7 @@
     "THIS",
     "inline_function",
     "list",
-    "array_dict",
+    "array_map",
     "NULL",
     "BOOL_LITERAL",
     "byte",
@@ -630,20 +636,20 @@
     ", expr n_list",
     "&"
   ],
-  "array_dict": [
-    "{ array_dict_builder }"
+  "array_map": [
+    "{ array_map_builder }"
   ],
-  "array_dict_builder": [
-    "expr array_dict_branch",
+  "array_map_builder": [
+    "expr array_map_branch",
     "&"
   ],
-  "array_dict_branch": [
-    ": expr n_dict",
+  "array_map_branch": [
+    ": expr n_map",
     ", expr n_list",
     "&"
   ],
-  "n_dict": [
-    ", expr : expr n_dict",
+  "n_map": [
+    ", expr : expr n_map",
     "&"
   ],
   "extension": [
@@ -656,7 +662,7 @@
   "simple_types": [
     "pure_types",
     "LIST_TYPE list_modifier",
-    "DICT_TYPE dict_modifier",
+    "MAP_TYPE map_modifier",
     "ARRAY_TYPE array_modifier",
     "FUNC func_modifier",
     "ASYNC func_modifier",
@@ -668,7 +674,7 @@
   "list_modifier": [
     "[ types ]"
   ],
-  "dict_modifier": [
+  "map_modifier": [
     "[ types , types ]"
   ],
   "array_modifier": [

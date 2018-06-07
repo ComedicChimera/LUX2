@@ -1,0 +1,15 @@
+func sum(... $n: int) int {
+	return n |> ... + |;
+}
+
+func Main() int {
+    sum({1, 2, 3, 4} ...);
+
+    for [1, 2, 3]|i| => print(i);
+
+    $m: map[int, str];
+
+    for m.pairs()|k, v| => print(k, v);
+}
+
+

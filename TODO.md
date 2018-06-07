@@ -9,6 +9,18 @@ This file exists to prevent potential debug hell and to ensure that all features
  - Add value cast checking *(syc/icg/casting.py)*
  
  - Redo function checking to check for code paths and allow for type coercion *(syc/icg/generators/functions.py)*
+ 
+ - Add char* casting *(syc/icg/casting.py)*
+ 
+ **General**
+ 
+ - Apply Raymond's optimization rules *(syc/...)*
+ 
+ - Add detupling *(syc/...)*
+ 
+ - Add operator aggregators *(syc/...)*
+ 
+ - Add static templates *(syc/icg/...)*
 
 
 ## Tests

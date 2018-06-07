@@ -72,7 +72,7 @@ class ListType:
 
 
 # adapted data type class for dicts
-class DictType:
+class MapType:
     def __init__(self, kt, vt, pointers):
         self.key_type = kt
         self.value_type = vt
@@ -260,6 +260,18 @@ class VoidPointer:
 
 VOID_PTR = VoidPointer()
 
+
+class Iterator:
+    def __init__(self, dt, variables, root):
+        self.data_type = dt
+        self.variables = variables
+        self.root = root
+
+
+class Generator:
+    def __init__(self, dt):
+        self.data_type = dt
+
 #####################
 # UTILITY FUNCTIONS #
 #####################
@@ -289,7 +301,7 @@ def coerce(base_type, unknown):
             if isinstance(base_type, ListType) or isinstance(base_type, ArrayType):
                 return coerce(base_type.element_type, unknown.element_type)
             # check dictionaries
-            elif isinstance(base_type, DictType):
+            elif isinstance(base_type, MapType):
                 return coerce(base_type.key_type, unknown.key_type) and coerce(base_type.value_type, unknown.value_type)
             # check custom types
             elif isinstance(base_type, CustomType):
@@ -364,7 +376,7 @@ def mutable(dt):
     if dt.pointers != 0:
         return False
     # if it is a list, dict, or array
-    if isinstance(dt, ListType) or isinstance(dt, DictType) or isinstance(dt, ArrayType):
+    if isinstance(dt, ListType) or isinstance(dt, MapType) or isinstance(dt, ArrayType):
         return True
     # return false if not mutable
     return False
@@ -376,7 +388,7 @@ def enumerable(dt):
     if dt.pointers != 0:
         return False
     # if it is a collection
-    if isinstance(dt, ListType) or isinstance(dt, ArrayType) or isinstance(dt, DictType):
+    if isinstance(dt, ListType) or isinstance(dt, ArrayType) or isinstance(dt, MapType):
         return True
     # if it is an enumerable CustomType
     elif isinstance(dt, CustomType):
@@ -394,11 +406,14 @@ def numeric(dt):
     if dt.pointers != 0:
         return False
     # if it is a collection
-    if isinstance(dt, ListType) or isinstance(dt, ArrayType) or isinstance(dt, DictType):
+    if isinstance(dt, ListType) or isinstance(dt, ArrayType) or isinstance(dt, MapType):
         return False
     # if it is an enumerable CustomType
     elif isinstance(dt, CustomType):
         return dt.numeric
+    # check for invalid data type
+    elif not isinstance(dt, DataType):
+        return False
     # check if is a number
     elif dt.data_type in {DataTypes.INT, DataTypes.FLOAT, DataTypes.COMPLEX, DataTypes.LONG}:
         return True

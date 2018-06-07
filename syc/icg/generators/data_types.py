@@ -68,7 +68,7 @@ def generate_type(ext):
             if types.mutable(kt):
                 errormodule.throw('semantic_error', 'Invalid key type for dictionary', ext.content[1].content[1])
             # compile dictionary type
-            return types.DictType(kt, vt, pointers)
+            return types.MapType(kt, vt, pointers)
     else:
         if ext.content[0].name == 'pure_types':
             # data type literal

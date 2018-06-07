@@ -28,7 +28,7 @@ def static_cast(dt, obj):
                     return False
             return True
         # check dictionary
-        elif isinstance(dt, types.DictType):
+        elif isinstance(dt, types.MapType):
             for k, v in obj.value.items():
                 if not check_elem(dt.key_type, k) or not check_elem(dt.value_type, v):
                     return False
@@ -93,7 +93,7 @@ def dynamic_cast(dt1, dt2):
         if isinstance(dt1, types.ListType) or isinstance(dt1, types.ArrayType):
             return dynamic_cast(dt1.element_type, dt2.element_type)
         # check dictionaries
-        elif isinstance(dt1, types.DictType):
+        elif isinstance(dt1, types.MapType):
             return dynamic_cast(dt1.key_type, dt2.key_type) and dynamic_cast(dt1.value_type, dt2.value_type)
         # check functions
         elif isinstance(dt1, types.Function):

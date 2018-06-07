@@ -156,7 +156,7 @@ def _extract_literal(literal):
         # return generated list
         return lst
     # if it a dictionary
-    elif isinstance(literal.data_type, types.DictType):
+    elif isinstance(literal.data_type, types.MapType):
         # converted dict
         dct = {}
         # convert dictionary of expressions to dictionary of values
