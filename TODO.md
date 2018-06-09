@@ -1,8 +1,6 @@
 # TODO
-This is a file annotating all the current tasks that are unable to be completed until another component is finished.
-This file exists to prevent potential debug hell and to ensure that all features get implemented properly and are not forgotten.
- 
- - Remove to_str methods once testing is complete *(syc/...)*
+This is a file annotating all the current tasks that are unable to be completed until another component is finished or that simply need
+to be done.  This file exists to prevent potential debug hell and to ensure that all features get implemented properly and are not forgotten.
  
  - Add value cast checking *(syc/icg/casting.py)*
  
@@ -14,21 +12,25 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add static member checking to modules *(syc/icg/generators/atom.py)*
  
+ - Add step slice to trailer parser *(syc/icg/generators/atom.py)*
+ 
  **General**
  
- - Apply Raymond's optimization rules *(syc/...)*
+ - Apply Raymond's optimization rules
  
- - Add detupling *(syc/...)*
+ - Add detupling
  
- - Add operator aggregators *(syc/...)*
+ - Add operator aggregators
  
  - Fix tuples to operate on types instead of values *(syc/icg/...)*
  
- - Remove structs and lambdas.
+ - Remove structs and lambdas
    
- - Add expression functions and initializer lists. *(syc/...)*
+ - Add expression functions and initializer lists
  
- - Fix the need for template casting *(syc/...)*
+ - Fix the need for template casting *(syc/icg/...)*
+ 
+ - Remove to_str methods once testing is complete
 
 
 ## Tests
