@@ -18,6 +18,6 @@ def check_constructor_parameters(constructor, parameters):
     pass
 
 
-def module_coerce(dt1, dt2):
+def check_initializer_list(custom_type, init_list):
     pass
 

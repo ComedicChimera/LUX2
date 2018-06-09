@@ -26,7 +26,7 @@ to be done.  This file exists to prevent potential debug hell and to ensure that
  
  - Remove structs and lambdas
    
- - Add expression functions and initializer lists
+ - Add expression functions
  
  - Fix the need for template casting *(syc/icg/...)*
  

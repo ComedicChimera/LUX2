@@ -244,9 +244,6 @@ def coerce(base_type, unknown):
                 # check interfaces
                 if base_type.data_type == DataTypes.INTERFACE:
                     return interface_coerce(base_type, unknown)
-                # check modules
-                elif base_type.data_type == DataTypes.MODULE:
-                    return module_coerce(base_type, unknown)
                 # check enums
                 elif base_type.data_type == DataTypes.ENUM:
                     # make sure they are the same enum
@@ -278,9 +275,6 @@ def coerce(base_type, unknown):
     elif base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
         return True
     return False
-
-
-from syc.icg.modules import module_coerce
 
 
 # check interface based type coercion

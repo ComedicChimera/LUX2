@@ -9,7 +9,7 @@ This table documents all the names of the action tree nodes, their functions and
 | ForComprehension | Iterator, Expression, \[ForIf\] | Generate a for comprehension expression | for(lst\|i\| => *expr*); |
 | Await | Incomplete Type (result of function call) | Await an async function | await |
 | Malloc | Integer/Data Type | Dynamically allocate a block of memory | new *size/data_type*|
-| CreateObjectInstance | Object | Create an instance of an object | new Constructor() |
+| CreateObjectInstance | Object, \[*init_list*\] | Create an instance of an object | new Constructor() |
 | Call | Function, Parameters | Call a function | () |
 | Constructor | Constructor, Parameters | Call a constructor for a struct | *constructor*() |
 | Subscript | Index, Collection | Get a value from a collection | \[ndx\] |

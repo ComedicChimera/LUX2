@@ -129,9 +129,12 @@ def add_trailer(root, trailer):
     # if it is a get member
     elif trailer.content[0].type == '.':
         trailer_added = add_get_member_trailer(root, trailer)
-    # handle distribute
+    # handle aggregator
     elif trailer.content[0].type == '|>':
         trailer_added = add_aggregator_trailer(root, trailer)
+    # handle initializer lists
+    elif trailer.content[0].type == '{':
+        trailer_added = add_initializer_trailer(root, trailer)
     # continue adding trailer
     if isinstance(trailer.content[-1], ASTNode):
         if trailer.content[-1].name == 'trailer':
@@ -439,6 +442,22 @@ def add_aggregator_trailer(root, trailer):
     else:
         op = aggregate_expr.content[1].content[0].type
         # TODO type check operators
+
+
+# adds and checks the initializer list trailer
+def add_initializer_trailer(root, trailer):
+    # only custom typed modules can have initializer lists
+    if isinstance(root.data_type, types.CustomType):
+        if root.data_type.data_type == types.DataTypes.MODULE:
+            dt = copy(root.data_type)
+            dt.instance = True
+            if isinstance(trailer.content[1], ASTNode):
+                init_list = functions.compile_parameters(trailer.content[1])
+                modules.check_initializer_list(root.data_type, init_list)
+                return ExprNode('CreateObjectInstance', dt, root, init_list)
+            return ExprNode('CreateObjectInstance', dt, root)
+    errormodule.throw('semantic_error', 'Invalid type for initializer list', trailer)
+
 
 
 #########
