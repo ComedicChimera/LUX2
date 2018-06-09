@@ -89,19 +89,19 @@ def dynamic_cast(dt1, dt2):
             return True
     # coerce catches explicitly equal types, so this is a valid test to assume complex data types
     if type(dt1) == type(dt2):
+        # check for pointer mismatch
+        if dt1.pointers != dt2.pointers:
+            return False
         # check lists and arrays
-        if isinstance(dt1, types.ListType) or isinstance(dt1, types.ArrayType):
+        elif isinstance(dt1, types.ListType) or isinstance(dt1, types.ArrayType):
             return dynamic_cast(dt1.element_type, dt2.element_type)
         # check dictionaries
         elif isinstance(dt1, types.MapType):
             return dynamic_cast(dt1.key_type, dt2.key_type) and dynamic_cast(dt1.value_type, dt2.value_type)
         # check functions
         elif isinstance(dt1, types.Function):
-            # check for pointer mismatch
-            if dt1.pointers != dt2.pointers:
-                return False
             # check for generator mismatch
-            elif dt1.generator != dt2.generator:
+            if dt1.generator != dt2.generator:
                 return False
             # check for parameter mismatch
             elif dt1.parameters != dt2.parameters:

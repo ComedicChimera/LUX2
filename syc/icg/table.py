@@ -5,21 +5,17 @@ import errormodule
 # holder class for all used modifiers (generally used by table)
 class Modifiers(Enum):
     EXTERNAL = 0
-    VOLATILE = 1
+    LOCK = 1
     PRIVATE = 2
-    PROTECTED = 3
-    ABSTRACT = 4
-    SEALED = 5
-    FINAL = 6
-    STATIC = 7
-    PARTIAL = 8
+    PARTIAL = 3
+    PROPERTY = 4
 
     # special modifiers for variables
-    CONSTANT = 9
-    CONSTEXPR = 10
+    CONSTANT = 5
+    CONSTEXPR = 6
 
     # special modifier denoting a deleted symbol
-    DELETED = 11
+    DELETED = 7
 
 
 # class representing any declared symbol, not an identifier (variable, function, structure, ect.)

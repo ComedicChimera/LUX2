@@ -414,24 +414,31 @@ def add_aggregator_trailer(root, trailer):
         dt = (root.data_type.key_type, root.data_type.value_type)
     # check the aggregator expr
     aggregate_expr = generate_expr(trailer.content[1])
-    # if it isn't a function
-    if not isinstance(aggregate_expr.data_type, types.Function):
-        errormodule.throw('semantic_error', 'Aggregator must be a function', trailer.content[1])
-    # otherwise add
-    else:
-        # check parameters
-        if len(aggregate_expr.data_type.parameters) != 2:
-            errormodule.throw('semantic_error', 'Aggregator can only take two parameters', trailer.content[1])
-        # check dictionary
-        if isinstance(dt, tuple):
-            params = aggregate_expr.data_type.parameters
-            if not types.coerce(params[0].data_type, dt[0]) or not types.coerce(params[1].data_type, dt[1]):
-                errormodule.throw('semantic_error', 'Aggregator function parameters must match the key and value types of the dictionary', trailer.content[1])
-        # check all others
+    # check for standard expr
+    if isinstance(aggregate_expr.content[0], ASTNode):
+        aggregate_expr = aggregate_expr.content[0]
+        # if it isn't a function
+        if not isinstance(aggregate_expr.data_type, types.Function):
+            errormodule.throw('semantic_error', 'Aggregator must be a function', trailer.content[1])
+        # otherwise add
         else:
-            if any(not types.coerce(x.data_type, dt) for x in aggregate_expr.data_type.parameters):
-                errormodule.throw('semantic_error', 'Aggregator function parameters must match the element type of the aggregate set', trailer.content[1])
-        return ExprNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
+            # check parameters
+            if len(aggregate_expr.data_type.parameters) != 2:
+                errormodule.throw('semantic_error', 'Aggregator can only take two parameters', trailer.content[1])
+            # check dictionary
+            if isinstance(dt, tuple):
+                params = aggregate_expr.data_type.parameters
+                if not types.coerce(params[0].data_type, dt[0]) or not types.coerce(params[1].data_type, dt[1]):
+                    errormodule.throw('semantic_error', 'Aggregator function parameters must match the key and value types of the dictionary', trailer.content[1])
+            # check all others
+            else:
+                if any(not types.coerce(x.data_type, dt) for x in aggregate_expr.data_type.parameters):
+                    errormodule.throw('semantic_error', 'Aggregator function parameters must match the element type of the aggregate set', trailer.content[1])
+            return ExprNode('Aggregate', aggregate_expr.data_type.return_type, root, aggregate_expr)
+    # add operator aggregator
+    else:
+        op = aggregate_expr.content[1].content[0].type
+        # TODO type check operators
 
 
 #########

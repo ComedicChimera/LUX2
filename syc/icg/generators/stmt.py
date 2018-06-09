@@ -40,8 +40,8 @@ def generate_statement(stmt, context: Context):
         # generate variable with external modifier
         'external_stmt': lambda s: generate_variable_declaration(s.content[1].content[0], [Modifiers.EXTERNAL]),
         # generate variable with volatile and possibly external modifiers
-        'volatile_stmt': lambda s: generate_variable_declaration(s.content[-1], [Modifiers.VOLATILE] if s.content[1].name != 'extern' else [Modifiers.VOLATILE,
-                                                                                                                                            Modifiers.EXTERNAL]),
+        'lock_stmt': lambda s: generate_variable_declaration(s.content[-1], [Modifiers.LOCK] if s.content[1].name != 'extern' else [Modifiers.LOCK,
+                                                                                                                                        Modifiers.EXTERNAL]),
         # generate assignment / function call statement
         'assignment': generate_assignment,
         # generate delete statement

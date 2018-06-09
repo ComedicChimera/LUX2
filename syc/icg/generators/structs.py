@@ -39,7 +39,7 @@ def generate_modifiers(modifier_tree):
         'ABSTRACT': Modifiers.ABSTRACT,
         'STATIC': Modifiers.STATIC,
         'FINAL': Modifiers.FINAL,
-        'VOLATILE': Modifiers.VOLATILE,
+        'VOLATILE': Modifiers.LOCK,
         'SEALED': Modifiers.SEALED
     }
     # iterate through unparsed tokens

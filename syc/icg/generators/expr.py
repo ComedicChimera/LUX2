@@ -77,14 +77,20 @@ def generate_logical(logical):
         root, op = generate_logical(unpacked_tree.pop(0)), None
         # iterate through unpacked tree
         for item in unpacked_tree:
+            # main tree
             if isinstance(item, ASTNode):
+                # get next comparison tree if it is a comparison otherwise get next logical tree
                 tree = generate_comparison(item) if item.name == 'comparison' else generate_logical(item)
+                # if both are simple data types
                 if isinstance(tree.data_type, types.DataType) and isinstance(root.data_type, types.DataType):
+                    # check booleans and generate boolean operators
                     if tree.data_type.data_type == types.DataTypes.BOOL and tree.data_type.pointers == 0 and \
                                     root.data_type.data_type == types.DataTypes.BOOL and root.data_type.pointers == 0:
                         root = ExprNode(op, types.DataType(types.DataTypes.BOOL, 0), root, tree)
                         continue
+                    # generate bitwise operators
                     else:
+                        # extract dominant type and if there is not one, throw error
                         dom = types.dominant(root.data_type, tree.data_type)
                         if dom:
                             if not types.coerce(types.DataType(types.DataTypes.INT, 0), dom):
@@ -94,7 +100,9 @@ def generate_logical(logical):
                             if not types.coerce(types.DataType(types.DataTypes.INT, 0), tree.data_type):
                                 errormodule.throw('semantic_error', 'Unable to apply bitwise %s to object' % op.lower(), logical)
                             root = ExprNode('Bitwise' + op, tree.data_type, root, tree)
+                # handle operator overloading
                 elif isinstance(root.data_type, types.CustomType):
+                    # get and check method
                     method = modules.get_property(tree.data_type, '__%s__' % op.lower())
                     functions.check_parameters(method, tree, item)
                     if method:
@@ -103,6 +111,7 @@ def generate_logical(logical):
                         errormodule.throw('semantic_error', 'Object has no method \'__%s__\'' % op.lower(), logical)
                 else:
                     errormodule.throw('semantic_error', 'Unable to apply bitwise operator to object', logical)
+            # only token is operator
             else:
                 name = item.type.lower()
                 op = name[0].upper() + name[1:]
@@ -112,15 +121,27 @@ def generate_logical(logical):
         return generate_logical(logical.content[0])
 
 
+# generate comparison operators
 def generate_comparison(comparison):
+    # generate shift if it is a shift tree (because the comparison generator is recursive)
     if comparison.name == 'shift':
         return generate_shift(comparison)
+    # evaluate comparison if there is one
     if len(comparison.content) > 1:
+        # generate inversion operator
         if comparison.name == 'not':
+            # generate base tree to invert
             tree = generate_shift(comparison.content[1])
+            # check for data types
             if isinstance(tree.data_type, types.DataType):
+                # unable to ! pointers
+                if tree.data_type.pointers > 0:
+                    errormodule.throw('semantic_error', 'The \'!\' operator is not applicable to pointer', comparison)
+                # generate normal not operator
                 return ExprNode('Not', tree.data_type, tree)
+            # generate overloaded not operator
             elif isinstance(tree.data_type, types.CustomType):
+                # get and check overloaded not method
                 not_method = modules.get_property(tree.data_type, '__not__')
                 functions.check_parameters(not_method, tree, comparison)
                 if not_method:
@@ -129,47 +150,68 @@ def generate_comparison(comparison):
                     errormodule.throw('semantic_error', 'Object has no method \'__not__\'', comparison)
             else:
                 errormodule.throw('semantic_error', 'The \'!\' operator is not applicable to object', comparison)
+        # otherwise generate normal comparison operator
         else:
+            # unpack tree into expressions and operators
             unpacked_tree = comparison.content[:]
             for item in unpacked_tree:
                 if item.name == 'n_comparison':
                     unpacked_tree += unpacked_tree.pop().content
+            # root = first element in unpacked tree, op = operator
             root, op = generate_comparison(unpacked_tree.pop(0)), None
             for item in unpacked_tree:
+                # all elements are ASTs
+                # not is base expression
                 if item.name == 'not':
+                    # extract next operator tree
                     n_tree = generate_comparison(item)
+                    # check numeric comparison
                     if op in {'<=', '>=', '<', '>'}:
                         if types.numeric(n_tree.data_type) and types.numeric(root.data_type):
                             root = ExprNode(op, types.DataType(types.DataTypes.BOOL, 0), root, n_tree)
                         else:
                             errormodule.throw('semantic_error', 'Unable to use numeric comparison with non-numeric type'
                                               , comparison)
+                    # generate standard comparison
                     elif op in {'==', '!=', '===', '!=='}:
                         root = ExprNode(op, types.DataType(types.DataTypes.BOOL, 0), root, n_tree)
+                # if it is not a base expression, it is an operators
                 elif item.name == 'comparison_op':
                     op = item.content[0].value
             return root
+    # otherwise recur
     else:
         return generate_comparison(comparison.content[0])
 
 
+# generate binary shift operators
 def generate_shift(shift):
+    # if there is a shift performed
     if len(shift.content) > 1:
+        # extract operator-expr list
         unpacked_tree = shift.content[:]
         while unpacked_tree[-1].name == 'n_shift':
             unpacked_tree += unpacked_tree.pop().content
+        # get first expression
         root = generate_arithmetic(unpacked_tree.pop(0))
+        # check root data type
         if not isinstance(root.data_type, types.DataType):
             errormodule.throw('semantic_error', 'Invalid type for left operand of binary shift', shift.content[0])
+        # operator used
         op = ''
         for item in unpacked_tree:
+            # ast node => arithmetic expr
             if isinstance(item, ASTNode):
+                # generate next tree element
                 tree = generate_arithmetic(item)
+                # type check element
                 if isinstance(tree.data_type, types.DataType):
+                    # ensure it is an integer (binary shifts can only be continued by integers)
                     if tree.data_type.data_type == types.DataTypes.INT and tree.data_type.pointers == 0:
                         root = ExprNode(op, root.data_type, root, tree)
                         continue
                 errormodule.throw('semantic_error', 'Invalid type for right operand of binary shift', item)
+            # token => operator
             else:
                 if item.type == '<<':
                     op = 'Lshift'
@@ -178,6 +220,7 @@ def generate_shift(shift):
                 else:
                     op = 'LRshift'
         return root
+    # otherwise, pass on to arithmetic parser
     else:
         return generate_arithmetic(shift.content[0])
 
@@ -189,7 +232,8 @@ def generate_arithmetic(ari):
         '-': '__sub__',
         '*': '__mul__',
         '/': '__div__',
-        '%': '__mod__'
+        '%': '__mod__',
+        '^': '__pow__'
     }
     # unpack tree in operator sets
     unpacked_tree = ari.content[:]

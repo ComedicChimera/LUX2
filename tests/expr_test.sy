@@ -8,4 +8,6 @@ func Main() int {
     }
 
     $z = for(m|k| => int(k) * 2);
+
+    lock $a = 43;
 }

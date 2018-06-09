@@ -4,6 +4,7 @@
     "variable_declaration ; syclone",
     "include_stmt ; syclone",
     "sub_scope syclone",
+    "lock_stmt ; syclone",
     "external_stmt ; syclone",
     "&"
   ],
@@ -43,17 +44,15 @@
     "except_block"
   ],
   "module_block": [
-    "MODULE module_modifiers IDENTIFIER inherit { module_main }"
+    "MODULE module_modifiers IDENTIFIER interfaces { module_main }"
   ],
   "module_modifiers": [
     "EXTERN module_modifiers",
-    "STATIC module_modifiers",
-    "ABSTRACT module_modifiers",
     "PARTIAL module_modifiers",
     "&"
   ],
-  "inherit": [
-    ": id inherit",
+  "interfaces": [
+    ": id interfaces",
     "&"
   ],
   "module_main": [
@@ -67,7 +66,7 @@
   ],
   "member_declaration": [
     "modifiers variable_declaration",
-    "VOLATILE modifiers variable_declaration"
+    "LOCK modifiers variable_declaration"
   ],
   "async_block": [
     "ASYNC modifiers IDENTIFIER ( func_params_decl ) rt_type functional_block"
@@ -112,16 +111,9 @@
   ],
   "modifiers": [
     "EXTERN modifiers",
-    "access_modifiers modifiers",
-    "FINAL modifiers",
+    "PRIVATE modifiers",
     "PROPERTY modifiers",
     "&"
-  ],
-  "access_modifiers": [
-    "PRIVATE",
-    "PROTECTED",
-    "ABSTRACT",
-    "SEALED"
   ],
   "enum_block": [
     "ENUM modifiers IDENTIFIER { enum_main }"
@@ -154,62 +146,11 @@
     "TEMPLATE extern IDENTIFIER < template > template_region"
   ],
   "template": [
-    "DATA_TYPE { type_template }",
-    "FUNC { function_template }",
-    "ASYNC { function_template }",
-    "LAMBDA { function_template }",
-    "STRUCT { struct_template }",
-    "ENUM { enum_template }",
-    "MODULE { module_template }"
-  ],
-  "type_template": [
     "types n_type_template",
     "&"
   ],
   "n_type_template": [
-    ", types n_type_template",
-    "&"
-  ],
-  "function_template": [
-    "template_params template_return"
-  ],
-  "template_params": [
-    "( type_template )",
-    "&"
-  ],
-  "template_return": [
-    "[ type_template ]",
-    "&"
-  ],
-  "struct_template": [
-    "struct_main",
-    "&"
-  ],
-  "enum_template": [
-    "enum_main",
-    "&"
-  ],
-  "module_template": [
-    "template_struct template_interface template_constructor"
-  ],
-  "template_struct": [
-    "STRUCT { template_properties }",
-    "&"
-  ],
-  "template_interface": [
-    "INTERFACE { interface_main }",
-    "&"
-  ],
-  "template_constructor": [
-    "constructor",
-    "&"
-  ],
-  "template_properties": [
-    "member_declaration n_property",
-    "&"
-  ],
-  "n_property": [
-    ", member_declaration n_property",
+    ", types n_template",
     "&"
   ],
   "template_region": [
@@ -245,13 +186,12 @@
     "FOR for_body"
   ],
   "for_body": [
-    "( for_expr ) block",
-    "base trailer iterator => iter_body",
-    "! block"
+    "( expr ) block",
+    "for_iter => iter_body"
   ],
-  "for_expr": [
-    "$ IDENTIFIER extension = expr ; expr ; assignment ;",
-    "expr"
+  "for_iter": [
+    "base trailer iterator",
+    "| expr : expr step , IDENTIFIER |"
   ],
   "iter_body": [
     "sub_scope",
@@ -306,11 +246,11 @@
     "include_stmt",
     "yield_stmt",
     "external_stmt",
-    "volatile_stmt",
+    "lock_stmt",
     "delete_stmt"
   ],
-  "volatile_stmt": [
-    "VOLATILE extern variable_declaration"
+  "lock_stmt": [
+    "LOCK extern variable_declaration"
   ],
   "extern": [
     "EXTERN",
@@ -540,8 +480,10 @@
   "trailer": [
     "[ subscript ] trailer",
     "( func_params ) trailer",
+    "{ func_params } trailer",
     ". base trailer",
-    "|> expr | trailer",
+    "|> aggr_expr | trailer",
+    "... trailer",
     "&"
   ],
   "subscript": [
@@ -549,12 +491,41 @@
     "expr slice"
   ],
   "slice": [
-    ": optional_expr",
+    ": optional_expr step",
     "&"
   ],
   "optional_expr": [
     "expr",
     "&"
+  ],
+  "step": [
+    ": expr",
+    "&"
+  ],
+  "aggr_expr": [
+    "expr",
+    "... aggr_op"
+  ],
+  "aggr_op": [
+    "+",
+    "-",
+    "*",
+    "/",
+    "%",
+    "^",
+    "<=",
+    ">=",
+    "==",
+    "!=",
+    "<",
+    ">",
+    ">>",
+    "<<",
+    ">>>",
+    "||",
+    "&&",
+    "^^",
+    "!"
   ],
   "func_params": [
     "expr named_param n_param",

@@ -1,6 +1,5 @@
 from enum import Enum
 from syc.icg.table import Package
-import syc.icg.modules as modules
 
 
 # enum representing all simple SyClone types
@@ -104,7 +103,7 @@ class Function:
 
 # class to hold all user defined group types
 class CustomType:
-    def __init__(self, name, dt, members, inherits, instance=False):
+    def __init__(self, name, dt, members, interfaces, instance=False):
         # custom type name
         self.name = name
         # data type (struct, enum, module, interface)
@@ -113,30 +112,30 @@ class CustomType:
         self.pointers = 0
         # the members of the custom type
         self.members = members
-        # the internal inferfaces of custom type
-        self.inherits = inherits
         # create interface set
-        self.interfaces = [i.name for i in inherits if i.data_type == DataTypes.INTERFACE]
+        self.interfaces = interfaces
+        # create separate interfaces list for checking
+        self.interface_names = [x.name for x in interfaces]
         # if it can be iterated through by a for loop & subscripted (list based)
-        self.enumerable = True if 'IEnumerable' in inherits else False
+        self.enumerable = True if 'IEnumerable' in self.interface_names else False
         # if it can be called with parameters (function based)
-        self.callable = True if 'ICallable' in inherits else False
+        self.callable = True if 'ICallable' in self.interface_names else False
         # if it can be used to store a key-value pair and is ENUMERABLE (dict based)
-        self.hashable = True if 'IHashable' in inherits else False
+        self.hashable = True if 'IHashable' in self.interface_names else False
         # if it can be used like number (numeric operator overload)
-        self.numeric = True if 'INumeric' in inherits else False
+        self.numeric = True if 'INumeric' in self.interface_names else False
         # if it is an instance
         self.instance = instance
 
     def update_interface_overloads(self):
         # if it can be iterated through by a for loop & subscripted (list based)
-        self.enumerable = True if 'IEnumerable' in self.inherits else False
+        self.enumerable = True if 'IEnumerable' in self.interface_names else False
         # if it can be called with parameters (function based)
-        self.callable = True if 'ICallable' in self.inherits else False
+        self.callable = True if 'ICallable' in self.interface_names else False
         # if it can be used to store a key-value pair and is ENUMERABLE (dict based)
-        self.hashable = True if 'IHashable' in self.inherits else False
+        self.hashable = True if 'IHashable' in self.interface_names else False
         # if it can be used like number (numeric operator overload)
-        self.numeric = True if 'INumeric' in self.inherits else False
+        self.numeric = True if 'INumeric' in self.interface_names else False
 
 
 # type to hold incomplete types
@@ -161,95 +160,23 @@ class DataTypeLiteral:
 
 # used to hold template
 class Template:
-    # template variations
-    class TemplateTypes(Enum):
-        TYPE = 0
-        FUNC = 1
-        STRUCT = 2
-        ENUM = 3
-        MODULE = 4
-
-    def __init__(self, template_type, **kwargs):
+    def __init__(self, type_list):
         # set the template type
-        self.template_type = template_type
-        # initialize type template (type)
-        if template_type == self.TemplateTypes.TYPE:
-            self.type_list = kwargs['type_list']
-        # initialize function template (func, async, lambda)
-        elif template_type == self.TemplateTypes.FUNC:
-            self.parameters = kwargs['parameters']
-            self.return_type = kwargs['return_type']
-            self.is_async = kwargs['async']
-            self.is_lambda = kwargs['lambda']
-        # initialize struct & enum template (struct, enum)
-        elif template_type in {self.TemplateTypes.STRUCT, self.TemplateTypes.ENUM}:
-            self.members = kwargs['members']
-        # initialize module template (module)
-        elif template_type == self.TemplateTypes.MODULE:
-            self.constructor = kwargs['constructor']
-            self.members = kwargs['members']
-            self.interface = kwargs['interface']
-        # pointers value used to prevent errors (impossible for template to have pointers)
-        self.pointers = 0  # 0 is default unchangeable value
+        self.type_list = type_list
 
     def compare(self, other):
-        # if it is a type template, check if type is in type list
-        if self.template_type == self.TemplateTypes.TYPE:
-            # check for null, object type
-            if not self.type_list:
-                return True
-            # check by normal type list
-            if other not in self.type_list:
-                return False
-        # if it is a function template, check if it fulfills all function requirements
-        elif self.template_type == self.TemplateTypes.FUNC:
-            # check for data type match up
-            if not isinstance(other, Function):
-                return False
-            # all values not specified are None
-            if self.parameters and [x.data_type for x in other.parameters] != self.parameters:
-                return False
-            elif self.return_type and other.return_type != self.return_type:
-                return False
-            # lambdas must match
-            elif self.is_lambda != other.is_lambda:
-                return False
-            # async's must match
-            elif self.is_async != other.async:
-                return False
-        # all remaining types require a custom type
-        elif not isinstance(other, CustomType):
+        # check for null, object type
+        if not self.type_list:
+            return True
+        # check by normal type list
+        if other not in self.type_list:
             return False
-        # if it is a struct or enum template, types must match
-        elif self.template_type in {self.TemplateTypes.STRUCT, self.TemplateTypes.ENUM}:
-            # check type match ups
-            if other.data_type != DataTypes.STRUCT and self.template_type == self.TemplateTypes.STRUCT:
-                return False
-            elif other.data_type != DataTypes.ENUM and self.template_type == self.TemplateTypes.ENUM:
-                return False
-            for member in self.members:
-                if member not in other.members:
-                    return False
-        # if it is a module check qualifications
-        elif self.template_type == self.TemplateTypes.MODULE:
-            # check constructor
-            if self.constructor:
-                if modules.get_constructor(other) != self.constructor:
-                    return False
-            # check properties
-            if self.members:
-                if any(x not in other.members for x in self.members):
-                    return False
-            # check methods
-            if self.interface:
-                if any(x not in other.members for x in self.interface):
-                    return False
         # passed all tests, assume valid
         return True
 
 
 # store generic object type
-OBJECT_TEMPLATE = Template(Template.TemplateTypes.TYPE, type_list=None)
+OBJECT_TEMPLATE = Template(None)
 
 
 class VoidPointer:
@@ -292,6 +219,15 @@ def coerce(base_type, unknown):
         return False
     # if pointers don't match up, automatically not equal
     if base_type.pointers != unknown.pointers:
+        if isinstance(base_type, DataType) and isinstance(unknown, DataType):
+            # str -> char*
+            if base_type.data_type == DataTypes.STRING and unknown.data_type == DataTypes.CHAR:
+                if base_type.pointers == 0 and unknown.pointers == 1:
+                    return True
+            # char* -> str
+            elif base_type.data_type == DataTypes.CHAR and unknown.data_type == DataTypes.STRING:
+                if base_type.pointers == 1 and unknown.pointers == 0:
+                    return True
         return False
     # if neither is object and neither is data type return
     if not isinstance(base_type, DataType) and not isinstance(unknown, DataType):

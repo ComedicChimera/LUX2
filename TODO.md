@@ -4,13 +4,15 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Remove to_str methods once testing is complete *(syc/...)*
  
- - Comment expr.py *(syc/icg/generators/expr.py)*
- 
  - Add value cast checking *(syc/icg/casting.py)*
  
  - Redo function checking to check for code paths and allow for type coercion *(syc/icg/generators/functions.py)*
  
- - Add char* casting *(syc/icg/casting.py)*
+ - Add operator overloading to comparison operators *(syc/icg/generators/expr.py)*
+ 
+ - Fix order-centric operator overloading *(syc/icg/generators/expr.py)*
+ 
+ - Add static member checking to modules *(syc/icg/generators/atom.py)*
  
  **General**
  
@@ -20,7 +22,13 @@ This file exists to prevent potential debug hell and to ensure that all features
  
  - Add operator aggregators *(syc/...)*
  
- - Add static templates *(syc/icg/...)*
+ - Fix tuples to operate on types instead of values *(syc/icg/...)*
+ 
+ - Remove structs and lambdas.
+   
+ - Add expression functions and initializer lists. *(syc/...)*
+ 
+ - Fix the need for template casting *(syc/...)*
 
 
 ## Tests
