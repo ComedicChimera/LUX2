@@ -10,23 +10,13 @@ to be done.  This file exists to prevent potential debug hell and to ensure that
  
  - Fix order-centric operator overloading *(syc/icg/generators/expr.py)*
  
- - Add static member checking to modules *(syc/icg/generators/atom.py)*
- 
- - Add step slice to trailer parser *(syc/icg/generators/atom.py)*
- 
  **General**
  
  - Apply Raymond's optimization rules
  
- - Add detupling
- 
- - Add operator aggregators
+ - Add tuple unpacking
  
  - Fix tuples to operate on types instead of values *(syc/icg/...)*
- 
- - Remove structs and lambdas
-   
- - Add expression functions
  
  - Fix the need for template casting *(syc/icg/...)*
  

@@ -13,25 +13,24 @@ class DataTypes(Enum):
     CHAR = 6  # char
 
     # extended type set
-    STRUCT = 7
-    MODULE = 8
-    ENUM = 9
-    INTERFACE = 10
+    MODULE = 7
+    ENUM = 8
+    INTERFACE = 9
 
     # general data type for byte types
-    BYTE = 11
+    BYTE = 10
 
     # null type
-    NULL = 12
+    NULL = 11
 
     # value type
-    VALUE = 13
+    VALUE = 12
 
     # data type literal
-    DATA_TYPE = 14
+    DATA_TYPE = 13
 
     # package type
-    PACKAGE = 15
+    PACKAGE = 14
 
 
 # parent class for all data type objects
@@ -90,8 +89,6 @@ class Function:
         self.async = is_async
         # if the function is a generator
         self.generator = is_generator
-        # if the function is a lambda
-        self.is_lambda = is_lambda
         # add parameters
         self.parameters = parameters
 

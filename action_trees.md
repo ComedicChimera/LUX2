@@ -44,9 +44,9 @@ This table documents all the names of the action tree nodes, their functions and
 | InlineCompare | Object, Object, Object | Perform an inline comparison between 2 objects | ? : |
 | TypeCast | Object | Perform a type cast on an object | *typename*() |
 | Aggregate | Object, Function | Apply an aggregator | *expr*\|>*lambda/inline function*\| |
-| SliceBegin | Collection, Integer | Perform a slice from beginning to arbitrary index | \[:*integer*\] |
-| SliceEnd | Collection, Integer | Perform a slice from an arbitrary index to the end | \[*integer*:\] |
-| Slice | Collection, Integer, Integer | Slice a collection between 2 arbitrary points | \[*integer*:*integer*\] |
+| SliceBegin | Collection, Integer, Step=None | Perform a slice from beginning to arbitrary index | \[:*integer*\] |
+| SliceEnd | Collection, Integer, Step=None | Perform a slice from an arbitrary index to the end | \[*integer*:\] |
+| Slice | Collection, Integer, Integer, Step=None | Slice a collection between 2 arbitrary points | \[*integer*:*integer*\] |
 | GetMember | Object, Property | Get member of a module or structure | obj.prop |
 
 ## Statement Nodes

@@ -299,7 +299,7 @@ def generate_assignment(assignment):
     if new:
         expr = None
         # if it is not a structure of a group
-        if root.data_type not in [types.DataType(types.DataTypes.STRUCT, 0), types.DataType(types.DataTypes.MODULE, 0)]:
+        if root.data_type != types.DataTypes.MODULE:
             # if it is a data type
             if isinstance(root.data_type, types.DataTypeLiteral):
                 # get new pointer type

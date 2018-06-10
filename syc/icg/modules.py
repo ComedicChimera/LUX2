@@ -2,6 +2,10 @@ def get_property(custom_type, name):
     return custom_type
 
 
+def get_static_member(custom_type, name):
+    return custom_type
+
+
 def get_instance():
     return 0
 

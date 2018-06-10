@@ -107,7 +107,6 @@ def generate_atom(atom):
 
 # move import below to allow for recursive imports
 from syc.icg.generators.expr import generate_expr
-import syc.icg.generators.structs as structs
 import syc.icg.casting as casting
 
 
@@ -160,12 +159,7 @@ def add_call_trailer(root, trailer):
                             root, parameters)
     elif isinstance(root.data_type, types.DataType):
         if root.data_type.pointers == 0:
-            # call (struct) constructor
-            if root.data_type.data_type == types.DataTypes.STRUCT:
-                # check struct generator
-                parameters = structs.check_constructor(root.data_type, trailer.content[1])
-                return ExprNode('Constructor', root.data_type, root, parameters)
-            elif root.data_type.data_type == types.DataTypes.VALUE:
+            if root.data_type.data_type == types.DataTypes.VALUE:
                 return casting.value_cast(generate_expr(trailer.content[1]))
         errormodule.throw('semantic_error', 'Unable to call non-callable type', trailer)
     # if is module
@@ -257,8 +251,17 @@ def add_subscript_trailer(root, trailer):
         if not isinstance(expr.data_type, types.DataType) or expr.data_type.data_type != types.DataTypes.INT:
             errormodule.throw('semantic_error', 'Index must be an integral value', trailer)
         errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
-    # handle slice till end / general slice
+    # handle slice till end / general slice / check step
     elif len(trailer.content[1].content) > 1:
+        step = None
+        if isinstance(trailer.content[1].content[-1], ASTNode) and trailer.content[1].content[-1].name == 'step':
+            step = generate_expr(trailer.content[1].content[-1])
+            # check pointers
+            if step.data_type.pointers > 0:
+                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
+            # check data type
+            elif not isinstance(step.data_type, types.DataType) or step.data_type.data_types != types.DataTypes.INT:
+                errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
         # first expression of slice
         expr = generate_expr(trailer.content[1].content[0])
         # check for invalid pointers
@@ -289,12 +292,12 @@ def add_subscript_trailer(root, trailer):
                     slice_method = modules.get_property(root.data_type, '__slice__')
                     if slice_method:
                         functions.check_parameters(slice_method, [expr, expr2], trailer)
-                        return ExprNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2)
+                        return ExprNode('Call', slice_method.data_type.return_type, slice_method, expr, expr2, step)
                 # string slicing
                 elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                    return ExprNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2)
+                    return ExprNode('Slice', types.DataType(types.DataTypes.CHAR, 0), root, expr, expr2, step)
                 errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
-            return ExprNode('Slice', root.data_type, root, expr, expr2)
+            return ExprNode('Slice', root.data_type, root, expr, expr2, step)
         # check slice till end
         else:
             if not isinstance(root.data_type, types.ListType) and not isinstance(root.data_type, types.ArrayType):
@@ -303,13 +306,13 @@ def add_subscript_trailer(root, trailer):
                     slice_method = modules.get_property(root.data_type, '__slice__')
                     if slice_method:
                         functions.check_parameters(slice_method, [None, expr], trailer)
-                        return ExprNode('Call', slice_method.data_type.return_type, slice_method, None, expr)
+                        return ExprNode('Call', slice_method.data_type.return_type, slice_method, None, expr, step)
                 # use string overloading
                 elif isinstance(root.data_type, types.DataType) and root.data_type.data_type == types.DataTypes.STRING:
-                    return ExprNode('SliceEnd', root.data_type, root, expr)
+                    return ExprNode('SliceEnd', root.data_type, root, expr, step)
                 errormodule.throw('semantic_error', 'Unable to perform slice on non slice-able object', trailer)
             # general slice
-            return ExprNode('SliceEnd', root.data_type, root, expr)
+            return ExprNode('SliceEnd', root.data_type, root, expr, step)
     # handle traditional subscripting
     else:
         # the only subscriptable components are mutable (except for strings)
@@ -358,16 +361,15 @@ def add_get_member_trailer(root, trailer):
             errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
         # use module method if necessary
         elif root.data_type.data_type == types.DataTypes.MODULE:
-            prop = modules.get_property(root.data_type, trailer.content[1].value)
+            if root.data_type.instance:
+                prop = modules.get_property(root.data_type, trailer.content[1].value)
+            else:
+                prop = modules.get_static_member(root.data_type, trailer.content[1].value)
             if prop:
                 return ExprNode('GetMember', prop.data_type, root, Identifier(prop.name, prop.data_type, Modifiers.CONSTANT in prop.modifiers, Modifiers.CONSTEXPR in prop.modifiers))
             errormodule.throw('semantic_error', 'Object has no member \'%s\'' % trailer.content[1].value, trailer.content[1])
         # assume struct or enum
         else:
-            # check to ensure it is an instance of a struct if it is a struct
-            if root.data_type.data_type == types.DataTypes.STRUCT:
-                if not root.data_type.instance:
-                    errormodule.throw('semantic_error', '\'.\' is not valid for this object', trailer.content[0])
             identifier = trailer.content[1].value
             member_names = [x.name for x in root.data_type.members if x.name == identifier]
             if identifier in member_names:
@@ -441,7 +443,27 @@ def add_aggregator_trailer(root, trailer):
     # add operator aggregator
     else:
         op = aggregate_expr.content[1].content[0].type
-        # TODO type check operators
+        numeric_ops = [
+            '+',
+            '-',
+            '*',
+            '/',
+            '%',
+            '^',
+            '>>',
+            '>>>',
+            '<<',
+            '&&',
+            '||',
+            '^^'
+        ]
+        if op in numeric_ops:
+            if isinstance(dt, tuple):
+                if not (types.numeric(dt[0]), types.numeric(dt[1])):
+                    errormodule.throw('semantic_error', 'Invalid type for aggregate operator', trailer)
+            elif not types.numeric(dt):
+                errormodule.throw('semantic_error', 'Invalid type for aggregate operator', trailer)
+        return ExprNode('Aggregate', dt, root, op)
 
 
 # adds and checks the initializer list trailer
@@ -449,15 +471,17 @@ def add_initializer_trailer(root, trailer):
     # only custom typed modules can have initializer lists
     if isinstance(root.data_type, types.CustomType):
         if root.data_type.data_type == types.DataTypes.MODULE:
+            # initializer lists automatically create instances with the default constructor
             dt = copy(root.data_type)
             dt.instance = True
+            # check if there are any
             if isinstance(trailer.content[1], ASTNode):
                 init_list = functions.compile_parameters(trailer.content[1])
                 modules.check_initializer_list(root.data_type, init_list)
                 return ExprNode('CreateObjectInstance', dt, root, init_list)
+            # otherwise create object instance
             return ExprNode('CreateObjectInstance', dt, root)
     errormodule.throw('semantic_error', 'Invalid type for initializer list', trailer)
-
 
 
 #########
@@ -568,6 +592,12 @@ def generate_base(ast):
             if isinstance(base.content[-1].content[0], ASTNode):
                 # ensure function declares a body
                 if base.content[-1].content[0].content[0].type != ';':
+                    # handle func stmt
+                    if base.content[-1].content[0].content[1].name == 'func_stmt':
+                        # decide position in ASTNode
+                        pos = 1 if isinstance(base.content[-1].content[0].content[1].content[0], Token) else 0
+                        # extract inner layer
+                        base.content[-1].content[0].content[1] = base.content[-1].content[0].content[1].content[pos]
                     # generate a return type from center (either { main } or => stmt ;)
                     # gen = is generator
                     # if is is not an empty function
@@ -591,39 +621,6 @@ def generate_base(ast):
             tp = generate_type(base)
             # use types to generate a type result
             return Literal(types.DataTypeLiteral(tp), tp)
-        # handle lambda generation
-        elif base.name == 'lambda':
-            # parameter holders
-            params = []
-            for item in base.content:
-                if isinstance(item, ASTNode):
-                    # compile parameter from lambda_params
-                    if item.name == 'lambda_params':
-                        param_content = item.content
-                        if param_content[-1].name == 'n_lambda_param':
-                            while True:
-                                # synthesize parameter object
-                                params.append(type('Object', (), {
-                                    'name': param_content[1].value if param_content[0].type == ',' else param_content[0].value,
-                                    'data_type': generate_type(param_content[-2] if param_content[-1].name == 'n_lambda_param' else param_content[-1])
-                                }))
-                                # check end condition
-                                if param_content[-1].name != 'n_lambda_param':
-                                    break
-                                # update condition
-                                param_content = param_content[-1].content
-                        else:
-                            # handle lambdas with only 1 parameter
-                            params.append(type('Object', (), {'name': item.content[0].value, 'data_type': generate_type(item.content[-1])}))
-                    elif item.name == 'expr':
-                        util.symbol_table.add_scope()
-                        for param in params:
-                            util.symbol_table.add_variable(Symbol(param.name, param.data_type, []), item)
-                        # generate the expr and lambda Literal
-                        expr = generate_expr(item)
-                        util.symbol_table.exit_scope()
-                        dt = types.Function(params, expr.data_type, 0, False, False, True)
-                        return Literal(dt, expr)
 
 
 ###############

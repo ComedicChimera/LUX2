@@ -3,11 +3,13 @@ func Main() int {
 
     $m: map[char, int] = {'a': 2};
 
-    template typename<type{int, str}> {
+    template typename<int, str> {
         $y = 5;
     }
 
     $z = for(m|k| => int(k) * 2);
+
+    $b = x{2, 3};
 
     lock $a = 43;
 }

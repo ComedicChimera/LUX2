@@ -31,7 +31,6 @@
     "func_block",
     "enum_block",
     "interface_block",
-    "struct_block",
     "template_block"
   ],
   "block_stmt": [
@@ -106,8 +105,12 @@
   ],
   "functional_block": [
     "{ main }",
-    "=> stmt ;",
+    "=> func_stmt",
     ";"
+  ],
+  "func_stmt": [
+    "stmt ;",
+    "( expr )"
   ],
   "modifiers": [
     "EXTERN modifiers",
@@ -132,24 +135,14 @@
     "FUNC modifiers IDENTIFIER ( func_params_decl ) rt_type ; interface_main",
     "&"
   ],
-  "struct_block": [
-    "STRUCT modifiers IDENTIFIER { struct_main }"
-  ],
-  "struct_main": [
-    "DOLLAR IDENTIFIER extension n_var"
-  ],
-  "n_var": [
-    ", DOLLAR IDENTIFIER extension n_var",
-    "&"
-  ],
   "template_block": [
     "TEMPLATE extern IDENTIFIER < template > template_region"
   ],
   "template": [
-    "types n_type_template",
+    "types n_template",
     "&"
   ],
-  "n_type_template": [
+  "n_template": [
     ", types n_template",
     "&"
   ],
@@ -209,8 +202,7 @@
     "CASE expr n_list case_block"
   ],
   "case_block": [
-    ": stmt ;",
-    "{ main }"
+    ": main"
   ],
   "default": [
     "DEFAULT case_block"
@@ -551,19 +543,7 @@
     "BOOL_LITERAL",
     "byte",
     "atom_types",
-    "VALUE",
-    "lambda"
-  ],
-  "lambda": [
-    "LAMBDA ( lambda_params => expr )"
-  ],
-  "lambda_params": [
-    "IDENTIFIER : types n_lambda_param",
-    "&"
-  ],
-  "n_lambda_param": [
-    ", IDENTIFIER : types n_lambda_param",
-    "&"
+    "VALUE"
   ],
   "byte": [
     "HEX_LITERAL",
