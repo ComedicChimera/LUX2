@@ -139,11 +139,28 @@
     "TEMPLATE extern IDENTIFIER < template > template_region"
   ],
   "template": [
-    "types n_template",
+    "DATA_TYPE { type_list }",
+    "FUNC { function_template }",
+    "ASYNC { function_template }",
+    "MODULE { module_main }"
+  ],
+  "type_list": [
+    "types n_type_list",
     "&"
   ],
-  "n_template": [
-    ", types n_template",
+  "n_type_list": [
+    ", types n_list",
+    "&"
+  ],
+  "function_template": [
+    "template_parameters template_returns"
+  ],
+  "template_parameters": [
+    "( func_params_decl )",
+    "&"
+  ],
+  "template_returns": [
+    "[ type_list ]",
     "&"
   ],
   "template_region": [

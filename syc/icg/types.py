@@ -157,23 +157,64 @@ class DataTypeLiteral:
 
 # used to hold template
 class Template:
-    def __init__(self, type_list):
+    # template variations
+    class TemplateTypes(Enum):
+        TYPE = 0
+        FUNC = 1
+        MODULE = 2
+
+    def __init__(self, template_type, **kwargs):
         # set the template type
-        self.type_list = type_list
+        self.template_type = template_type
+        # initialize type template (type)
+        if template_type == self.TemplateTypes.TYPE:
+            self.type_list = kwargs['type_list']
+        # initialize function template (func, async, lambda)
+        elif template_type == self.TemplateTypes.FUNC:
+            self.parameters = kwargs['parameters']
+            self.return_type = kwargs['return_type']
+            self.is_async = kwargs['async']
+        # initialize module template (module)
+        elif template_type == self.TemplateTypes.MODULE:
+            self.members = kwargs['members']
 
     def compare(self, other):
-        # check for null, object type
-        if not self.type_list:
-            return True
-        # check by normal type list
-        if other not in self.type_list:
-            return False
+        # if it is a type template, check if type is in type list
+        if self.template_type == self.TemplateTypes.TYPE:
+            # check for null, object type
+            if not self.type_list:
+                return True
+            # check by normal type list
+            if other not in self.type_list:
+                return False
+        # if it is a function template, check if it fulfills all function requirements
+        elif self.template_type == self.TemplateTypes.FUNC:
+            # check for data type match up
+            if not isinstance(other, Function):
+                return False
+            # all values not specified are None
+            if self.parameters and [x for x in other.parameters] != self.parameters:
+                return False
+            elif self.return_type and other.return_type != self.return_type:
+                return False
+            # async's must match
+            elif self.is_async != other.async:
+                return False
+        # if it is a module check qualifications
+        elif self.template_type == self.TemplateTypes.MODULE:
+            # check for data type match up
+            if not isinstance(other, CustomType):
+                return False
+            # check to ensure all basic requirements are met
+            for item in self.members:
+                if item not in other.members:
+                    return False
         # passed all tests, assume valid
         return True
 
 
 # store generic object type
-OBJECT_TEMPLATE = Template(None)
+OBJECT_TEMPLATE = Template(Template.TemplateTypes.TYPE, type_list=None)
 
 
 class VoidPointer:

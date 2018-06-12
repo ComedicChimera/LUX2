@@ -3,7 +3,7 @@ func Main() int {
 
     $m: map[char, int] = {'a': 2};
 
-    template typename<int, str> {
+    template typename<type{int, str}> {
         $y = 5;
     }
 

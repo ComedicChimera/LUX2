@@ -25,3 +25,7 @@ def check_constructor_parameters(constructor, parameters):
 def check_initializer_list(custom_type, init_list):
     pass
 
+
+def generate_body(body_ast):
+    pass
+
