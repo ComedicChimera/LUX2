@@ -805,7 +805,7 @@ def generate_comprehension(for_comp):
     for_comp = for_comp.content[2]
     # data type of return value from comprehension
     # atom holds value of atom during generation
-    l_type, atom = None, None
+    fc_type, atom = None, None
     for item in for_comp.content:
         if isinstance(item, ASTNode):
             if item.name == 'atom':
@@ -814,13 +814,15 @@ def generate_comprehension(for_comp):
             elif item.name == 'iterator':
                 # get iterator from ASTNode (atom)
                 la = generate_iterator(atom, item)
-                # get type for la
-                l_type = la.data_type
                 # add to args
                 l_args.append(la)
             elif item.name == 'expr':
+                # generate expression
+                expr = generate_array_map(item)
+                # set fc_type
+                fc_type = expr.data_type
                 # add compiled expr to args
-                l_args.append(generate_expr(item))
+                l_args.append(expr)
             elif item.name == 'inline_for_if':
                 # compile internal expr (IF expr)
                 #                           ^^^^
@@ -833,7 +835,7 @@ def generate_comprehension(for_comp):
                 l_args.append(ExprNode('ForIf', cond_expr.data_type, cond_expr))
     # exit lambda scope
     util.symbol_table.exit_scope()
-    return ExprNode('ForComprehension', types.ListType(l_type, 0), *l_args)
+    return ExprNode('ForComprehension', types.ListType(fc_type, 0), *l_args)
 
 
 # iterator and atom to iterator
