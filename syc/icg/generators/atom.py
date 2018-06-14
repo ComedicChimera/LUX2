@@ -833,7 +833,7 @@ def generate_comprehension(for_comp):
                 l_args.append(ExprNode('ForIf', cond_expr.data_type, cond_expr))
     # exit lambda scope
     util.symbol_table.exit_scope()
-    return ExprNode('ForComprehension', l_type, *l_args)
+    return ExprNode('ForComprehension', types.ListType(l_type, 0), *l_args)
 
 
 # iterator and atom to iterator
@@ -872,10 +872,8 @@ def generate_iterator(atom_ast, iterator):
         # generate iterator
         return types.Iterator(dt, variables, atom)
 
-    if isinstance(atom.data_type, types.Tuple):
-        return generate_tuple_iterator(atom.data_type)
     # check lists and arrays
-    elif isinstance(atom.data_type, types.ListType) or isinstance(atom.data_type, types.ArrayType):
+    if isinstance(atom.data_type, types.ListType) or isinstance(atom.data_type, types.ArrayType):
         return generate_single_iterator(atom.data_type.element_type)
     # check map
     elif isinstance(atom.data_type, types.MapType):
