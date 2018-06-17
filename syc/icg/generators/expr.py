@@ -104,7 +104,7 @@ def generate_logical(logical):
                 elif isinstance(root.data_type, types.CustomType):
                     # get and check method
                     method = modules.get_property(tree.data_type, '__%s__' % op.lower())
-                    functions.check_parameters(method, tree, item)
+                    functions.check_parameters(method, [tree], item)
                     if method:
                         root = ExprNode('Call', method.data_type.return_type, method, tree)
                     else:
@@ -152,6 +152,17 @@ def generate_comparison(comparison):
                 errormodule.throw('semantic_error', 'The \'!\' operator is not applicable to object', comparison)
         # otherwise generate normal comparison operator
         else:
+            # comparison op method dictionary
+            comparison_methods = {
+                '<=': '__lteq__',
+                '>=': '__gteq__',
+                "<": '__lt__',
+                '>': '__gt__',
+                '==': '__eq__',
+                '!=': '__neq__',
+                '===': '__seq__',
+                '!==': '__sneq__'
+            }
             # unpack tree into expressions and operators
             unpacked_tree = comparison.content[:]
             for item in unpacked_tree:
@@ -165,8 +176,21 @@ def generate_comparison(comparison):
                 if item.name == 'not':
                     # extract next operator tree
                     n_tree = generate_comparison(item)
+                    # check for overloads
+                    if isinstance(root.data_type, types.CustomType):
+                        method = modules.get_property(root.data_type, comparison_methods[op])
+                        if not method:
+                            if op in {'<=', '>=', '<', '>'}:
+                                errormodule.throw('semantic_error', 'Unable to use numeric comparison with non-numeric type', comparison)
+                        else:
+                            functions.check_parameters(method.data_type, [n_tree], comparison)
+                            root = ExprNode('Call', method.data_type.return_type, method, [n_tree])
                     # check numeric comparison
                     if op in {'<=', '>=', '<', '>'}:
+                        # check invalid overloads
+                        if isinstance(n_tree.data_type, types.CustomType):
+                            errormodule.throw('semantic_error', 'Invalid type match up for numeric comparison'
+                                              , comparison)
                         if types.numeric(n_tree.data_type) and types.numeric(root.data_type):
                             root = ExprNode(op, types.DataType(types.DataTypes.BOOL, 0), root, n_tree)
                         else:
@@ -194,9 +218,14 @@ def generate_shift(shift):
             unpacked_tree += unpacked_tree.pop().content
         # get first expression
         root = generate_arithmetic(unpacked_tree.pop(0))
+        # check for overload flag
+        overload = False
         # check root data type
         if not isinstance(root.data_type, types.DataType):
-            errormodule.throw('semantic_error', 'Invalid type for left operand of binary shift', shift.content[0])
+            if isinstance(root.data_type, types.CustomType):
+                overload = True
+            else:
+                errormodule.throw('semantic_error', 'Invalid type for left operand of binary shift', shift.content[0])
         # operator used
         op = ''
         for item in unpacked_tree:
@@ -204,6 +233,15 @@ def generate_shift(shift):
             if isinstance(item, ASTNode):
                 # generate next tree element
                 tree = generate_arithmetic(item)
+                # check for overloads
+                if overload:
+                    method = modules.get_property(root.data_type, '__%s__' % op.lower())
+                    if not method:
+                        errormodule.throw('semantic_error', 'Invalid type for left operand of binary shift', shift.content[0])
+                    functions.check_parameters(method.data_type, [tree], item)
+                    overload = isinstance(method.data_type.return_type, types.CustomType)
+                    root = ExprNode('Call', method.data_type.return_type, method, [tree])
+
                 # type check element
                 if isinstance(tree.data_type, types.DataType):
                     # ensure it is an integer (binary shifts can only be continued by integers)
@@ -247,34 +285,39 @@ def generate_arithmetic(ari):
             # if there is an operator, generate arithmetic tree
             if op:
                 # generate next value
-                val2 = generate_unary_atom(item) if item.name == 'unary_atom' else generate_arithmetic(item)
+                val = generate_unary_atom(item) if item.name == 'unary_atom' else generate_arithmetic(item)
                 # check operands and extract data type
-                dt = check_operands(root.data_type, val2.data_type, op, ari)
+                dt = check_operands(root.data_type, val.data_type, op, ari)
                 if tree:
                     # operator overloading
-                    if isinstance(val2.data_type, types.CustomType):
+                    if isinstance(tree.data_type, types.CustomType):
                         # convert to method name
                         name = method_names[op]
-                        method = modules.get_property(val2.data_type, name)
+                        # get method and check parameters
+                        method = modules.get_property(tree.data_type, name)
                         # assume method exists
-                        tree = ExprNode('Call', dt, method, [tree])
+                        functions.check_parameters(method.data_type, [val], item)
+                        tree = ExprNode('Call', method.data_type.return_type, method, [tree])
                     # add arguments to previous tree (allow for multiple items)
-                    if tree.name == op:
-                        tree.arguments.append(val2)
+                    elif tree.name == op:
+                        tree.arguments.append(val)
                     # create expression node from tree
                     else:
-                        tree = ExprNode(op, dt, tree, val2)
+                        tree = ExprNode(op, dt, tree, val)
                 # create root tree
                 else:
                     # operator overloading
-                    if isinstance(val2.data_type, types.CustomType):
+                    if isinstance(root.data_type, types.CustomType):
                         # convert to method name
                         name = method_names[op]
-                        method = modules.get_property(val2.data_type, name)
-                        tree = ExprNode('Call', dt, method, [root])
+                        # get method and check parameters
+                        method = modules.get_property(root.data_type, name)
+                        # assume method exists
+                        functions.check_parameters(method.data_type, [val], item)
+                        tree = ExprNode('Call', method.data_type.return_type, method, [root])
                     # default generation
                     else:
-                        tree = ExprNode(op, dt, root, val2)
+                        tree = ExprNode(op, dt, root, val)
                 op, root, = None, tree
             # otherwise, generate root
             else:
@@ -289,6 +332,9 @@ def generate_arithmetic(ari):
 
 
 def check_operands(dt1, dt2, operator, ast):
+    # check for custom type mismatch
+    if not isinstance(dt1, types.CustomType) and isinstance(dt2, types.CustomType):
+        errormodule.throw('semantic_error', 'Invalid type match up for numeric operator', ast)
     # check for invalid pointer arithmetic
     if dt1.pointers > 0:
         if isinstance(dt2, types.DataType):

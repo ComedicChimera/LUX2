@@ -6,10 +6,6 @@ to be done.  This file exists to prevent potential debug hell and to ensure that
  
  - Redo function checking to check for code paths and allow for type coercion *(syc/icg/generators/functions.py)*
  
- - Add operator overloading to comparison operators *(syc/icg/generators/expr.py)*
- 
- - Fix order-centric operator overloading *(syc/icg/generators/expr.py)*
- 
  **General**
  
  - Apply Raymond's optimization rules
