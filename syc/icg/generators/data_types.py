@@ -31,7 +31,6 @@ def generate_type(ext):
             except IndexError:
                 errormodule.throw('semantic_error', 'Index out of range', error_ast)
                 return
-            print(count)
             if not count and count != 0:
                 errormodule.throw('semantic_error', 'Non-constexpr array bound', error_ast)
             elif type(count) == bool:

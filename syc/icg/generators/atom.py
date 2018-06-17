@@ -260,7 +260,7 @@ def add_subscript_trailer(root, trailer):
             if step.data_type.pointers > 0:
                 errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
             # check data type
-            elif not isinstance(step.data_type, types.DataType) or step.data_type.data_types != types.DataTypes.INT:
+            elif not isinstance(step.data_type, types.DataType) or step.data_type.data_type != types.DataTypes.INT:
                 errormodule.throw('semantic_error', 'Invalid slice parameter', trailer)
         # first expression of slice
         expr = generate_expr(trailer.content[1].content[0])
