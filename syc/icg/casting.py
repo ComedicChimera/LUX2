@@ -16,6 +16,10 @@ def static_cast(dt, obj):
                 return False
         return True
 
+    # perform array bounds checking
+    if isinstance(dt, types.ArrayType) and isinstance(obj.data_type, types.ListType):
+        if dt.count != len(obj.value):
+            return False
     # if dynamic cast is valid, static cast is valid
     if dynamic_cast(dt, obj.data_type):
         return True
