@@ -177,6 +177,8 @@ class Template:
         # initialize module template (module)
         elif template_type == self.TemplateTypes.MODULE:
             self.members = kwargs['members']
+        # pointers (so it conforms with type system; not actually able to be referenced)
+        self.pointers = 0
 
     def compare(self, other):
         # if it is a type template, check if type is in type list

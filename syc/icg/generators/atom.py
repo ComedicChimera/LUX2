@@ -173,7 +173,7 @@ def add_call_trailer(root, trailer):
     # type cast
     elif isinstance(root.data_type, types.DataTypeLiteral):
         # 'type' cannot be cast to
-        if root.data_type.data_type.data_type == types.DataTypes.DATA_TYPE:
+        if root.data_type.data_type == types.DataTypes.DATA_TYPE:
             errormodule.throw('semantic_error', 'Invalid type cast', trailer)
         # handle null type casts
         if isinstance(trailer.content[1], Token):
@@ -818,7 +818,7 @@ def generate_comprehension(for_comp):
                 l_args.append(la)
             elif item.name == 'expr':
                 # generate expression
-                expr = generate_array_map(item)
+                expr = generate_expr(item)
                 # set fc_type
                 fc_type = expr.data_type
                 # add compiled expr to args

@@ -12,4 +12,6 @@ func Main() int {
     $b = x{2, 3};
 
     lock $a = 43;
+
+    $arr = array[int, 4](["a", 2, 3, 4]);
 }
